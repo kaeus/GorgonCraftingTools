@@ -12,8 +12,46 @@
       color: #e0d9c8;
       font-family: 'Segoe UI', system-ui, sans-serif;
       min-height: 100vh;
-      padding: 2rem 1rem;
     }
+
+    /* ── Top bar ── */
+    .topbar {
+      background: #0f0f1e;
+      border-bottom: 1px solid #2a2a4a;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0;
+    }
+    .topbar-title {
+      font-size: 1rem; font-weight: 700; color: #c9a96e;
+      letter-spacing: 0.06em; flex: 1; text-decoration: none;
+    }
+    .topbar-title span { color: #7a7a9a; font-weight: 400; }
+    .auth-topbtn {
+      background: #c9a96e; color: #0f0f1e; border: none; border-radius: 5px;
+      padding: 0.4rem 0.9rem; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.04em; transition: background 0.2s;
+    }
+    .auth-topbtn:hover { background: #e8c87a; }
+    .auth-topbtn.secondary {
+      background: transparent; color: #8a8aaa; border: 1px solid #3a3a5a;
+    }
+    .auth-topbtn.secondary:hover { color: #e0d9c8; border-color: #6a6a8a; background: transparent; }
+    .user-chip {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.82rem; color: #c9a96e;
+    }
+    .user-chip .avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #2a2a4a; display: flex; align-items: center;
+      justify-content: center; font-size: 0.78rem; font-weight: 700;
+      color: #c9a96e; flex-shrink: 0; overflow: hidden;
+    }
+    .user-chip .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .page-wrap { padding: 2rem 1rem; }
 
     h1 {
       text-align: center;
@@ -28,6 +66,139 @@
       font-size: 0.85rem;
       margin-bottom: 2rem;
     }
+
+    /* ── Publish section ── */
+    .publish-section {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid #2a2a4a;
+    }
+    .publish-section label {
+      text-transform: none; font-size: 0.82rem; letter-spacing: 0;
+      color: #7a7a9a; margin-bottom: 0.75rem; display: block;
+    }
+    .publish-row { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+    .publish-btn {
+      background: #5a9a7a; color: #0f0f1e; border: none; border-radius: 5px;
+      padding: 0.5rem 1.1rem; font-size: 0.88rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .publish-btn:hover:not(:disabled) { background: #6abf8e; }
+    .publish-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .publish-btn.unpublish { background: #3a2a2a; color: #cc7070; border: 1px solid #5a3a3a; }
+    .publish-btn.unpublish:hover:not(:disabled) { background: #5a3a3a; }
+    .share-link {
+      font-size: 0.8rem; color: #5a9a7a; word-break: break-all;
+      font-family: monospace;
+    }
+    .share-link a { color: #5a9a7a; }
+    .publish-status { font-size: 0.82rem; color: #8a8aaa; }
+
+    /* ── Incoming orders card ── */
+    .orders-table {
+      width: 100%; border-collapse: collapse; font-size: 0.88rem;
+    }
+    .orders-table th {
+      text-align: left; color: #8a8aaa; font-size: 0.75rem;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 0.4rem 0.6rem; border-bottom: 1px solid #2a2a4a; font-weight: 600;
+    }
+    .orders-table td {
+      padding: 0.5rem 0.6rem; border-bottom: 1px solid #1e1e38; vertical-align: middle;
+    }
+    .orders-table tr:last-child td { border-bottom: none; }
+    .badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      padding: 0.15rem 0.5rem; border-radius: 3px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .badge.pending     { background: #3a3010; color: #c9a96e; }
+    .badge.in_progress { background: #0f2040; color: #6a9aca; }
+    .badge.done        { background: #0f2a1a; color: #5a9a7a; }
+    .badge.cancelled   { background: #2a2a3a; color: #5a5a7a; }
+    .status-btn {
+      background: transparent; border: 1px solid currentColor;
+      border-radius: 3px; padding: 0.2rem 0.5rem;
+      font-size: 0.75rem; cursor: pointer; transition: background 0.2s, color 0.2s;
+      font-weight: 600;
+    }
+    .status-btn.progress { color: #6a9aca; }
+    .status-btn.progress:hover { background: #6a9aca; color: #0f0f1e; }
+    .status-btn.done-btn { color: #5a9a7a; }
+    .status-btn.done-btn:hover { background: #5a9a7a; color: #0f0f1e; }
+    .status-btn.delete-btn { color: #cc7070; }
+    .status-btn.delete-btn:hover { background: #cc7070; color: #0f0f1e; }
+    .note-icon-btn { background:transparent; border:none; cursor:pointer; font-size:1rem; padding:0.1rem 0.3rem; opacity:0.75; transition:opacity 0.15s; }
+    .note-icon-btn:hover { opacity:1; }
+
+    /* ── My Listings card ── */
+    .my-listing-row { display:flex; align-items:center; justify-content:space-between; padding:0.6rem 0; border-bottom:1px solid #1e1e3a; gap:0.5rem; flex-wrap:wrap; }
+    .my-listing-row:last-child { border-bottom:none; }
+    .my-listing-meta { font-size:0.78rem; color:#5a5a7a; margin-left:0.5rem; }
+    .my-listing-actions { display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center; }
+    .my-listing-link { font-size:0.78rem; padding:0.2rem 0.5rem; text-decoration:none; border:1px solid #5a9aca; border-radius:4px; color:#5a9aca; }
+    .my-listing-link:hover { background:#5a9aca; color:#0f0f1e; }
+
+    /* ── Auth modal ── */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65); z-index: 500;
+      align-items: center; justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: #16213e; border: 1px solid #2a2a4a;
+      border-radius: 10px; padding: 2rem; width: 100%;
+      max-width: 380px; margin: 1rem;
+    }
+    .modal h3 { color: #c9a96e; font-size: 1.1rem; margin-bottom: 1.25rem; }
+    .modal-tabs {
+      display: flex; margin-bottom: 1.25rem;
+      border: 1px solid #3a3a5a; border-radius: 5px; overflow: hidden;
+    }
+    .modal-tab {
+      flex: 1; padding: 0.5rem; background: transparent;
+      border: none; color: #8a8aaa; font-size: 0.88rem;
+      cursor: pointer; transition: background 0.2s, color 0.2s;
+    }
+    .modal-tab.active { background: #c9a96e; color: #0f0f1e; font-weight: 700; }
+    .modal-tab:not(.active):hover { background: #1e2a4e; color: #e0d9c8; }
+    .google-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center;
+      gap: 0.6rem; padding: 0.7rem; background: #fff;
+      border: none; border-radius: 5px; font-size: 0.92rem;
+      font-weight: 600; color: #333; cursor: pointer;
+      transition: background 0.2s; margin-bottom: 0.5rem;
+    }
+    .google-btn:hover { background: #f0f0f0; }
+    .google-icon { width: 18px; height: 18px; flex-shrink: 0; }
+    .modal input[type="email"], .modal input[type="password"], .modal input[type="text"] {
+      width: 100%; background: #0f0f1e; border: 1px solid #3a3a5a;
+      border-radius: 5px; color: #e0d9c8; padding: 0.55rem 0.75rem;
+      font-size: 0.92rem; outline: none; transition: border-color 0.2s;
+      margin-bottom: 0.85rem;
+    }
+    .modal input:focus { border-color: #c9a96e; }
+    .modal-submit {
+      width: 100%; background: #c9a96e; color: #0f0f1e;
+      border: none; border-radius: 5px; padding: 0.6rem;
+      font-size: 0.92rem; font-weight: 700; cursor: pointer;
+      transition: background 0.2s; margin-bottom: 0.75rem;
+    }
+    .modal-submit:hover { background: #e8c87a; }
+    .modal-toggle { font-size: 0.82rem; color: #7a8aaa; text-align: center; }
+    .modal-toggle a { color: #c9a96e; cursor: pointer; text-decoration: none; }
+    .modal-toggle a:hover { text-decoration: underline; }
+    .modal-error {
+      font-size: 0.82rem; color: #cc7070; background: #1a0f0f;
+      border: 1px solid #3a2020; border-radius: 4px;
+      padding: 0.4rem 0.6rem; margin-bottom: 0.75rem;
+    }
+    .modal-close {
+      float: right; background: transparent; border: none;
+      color: #5a5a7a; font-size: 1.2rem; cursor: pointer; padding: 0; line-height: 1;
+    }
+    .modal-close:hover { color: #e0d9c8; }
 
     .card {
       background: #16213e;
@@ -269,6 +440,15 @@
 </head>
 <body>
 
+<!-- ── Top bar ── -->
+<div class="topbar">
+  <a href="/" class="topbar-title">Gorgon Crafting <span>Workboard</span></a>
+  <div id="auth-area">
+    <button class="auth-topbtn" onclick="openAuthModal()">Sign In</button>
+  </div>
+</div>
+
+<div class="page-wrap">
 <h1>Crafting Calculator</h1>
 <p class="subtitle">Project Gorgon · Commission Calculator</p>
 
@@ -279,7 +459,7 @@
   <h2 onclick="toggleSetup()">Setup <span class="loaded-badge">Loaded</span><span class="setup-toggle">▾</span></h2>
 
   <div id="setup-body">
-  <div class="form-grid" style="margin-bottom:1rem;">
+  <div class="form-grid thirds" style="margin-bottom:1rem;">
     <div>
       <label for="profession-select">Profession</label>
       <select id="profession-select">
@@ -303,18 +483,33 @@
       <label for="crafter-name">Crafter Name</label>
       <input type="text" id="crafter-name" placeholder="e.g. Sinda">
     </div>
+    <div>
+      <label for="server-name">Server</label>
+      <select id="server-name">
+        <option value="">— Select server —</option>
+        <option>Arisetsu</option>
+        <option>Dreva</option>
+        <option>Laeth</option>
+        <option>Miraverre</option>
+        <option>Strekios</option>
+      </select>
+    </div>
   </div>
 
   <div style="margin-bottom:1rem;">
     <label for="sheet-url">Price Sheet URL (Google Sheets)</label>
     <input type="text" id="sheet-url"
-      placeholder="Paste any Google Sheets URL (edit or export)">
+      placeholder="Paste any Google Sheets URL (needs a 'Material' and 'Price' column)">
   </div>
 
-  <div class="form-grid">
+  <div class="form-grid thirds">
     <div>
       <label for="commission-pct">Commission (%)</label>
       <input type="number" id="commission-pct" value="50" min="0" step="1">
+    </div>
+    <div>
+      <label for="crafter-level">Crafter Level</label>
+      <input type="number" id="crafter-level" min="1" max="125" step="1" placeholder="e.g. 80">
     </div>
     <div class="load-col">
       <button class="load-btn" id="load-btn" onclick="loadData()" disabled>Load</button>
@@ -322,7 +517,29 @@
   </div>
 
   <div id="setup-error" class="step-error" style="display:none;"></div>
+
+  <!-- Publish section — shown after successful Load + signed in -->
+  <div class="publish-section" id="publish-section" style="display:none;">
+    <label>Publish this setup to the workboard so customers can place orders with you.</label>
+    <div class="publish-row" id="publish-row">
+      <button class="publish-btn" id="publish-btn" onclick="upsertListing()">Publish Listing</button>
+      <button class="publish-btn" id="cancel-edit-btn" style="display:none;background:#2a2a4a;color:#8888cc;border:1px solid #4a4a6a" onclick="cancelEdit()">Cancel Edit</button>
+      <span class="publish-status" id="publish-status"></span>
+    </div>
+    <div id="share-link-wrap" style="display:none; margin-top:0.6rem;">
+      <span class="share-link">Share: <a id="share-link-a" href="#" target="_blank"></a></span>
+      <button class="publish-btn unpublish" style="margin-left:0.75rem;" onclick="unpublishListing()">Unpublish</button>
+    </div>
+  </div>
   </div><!-- #setup-body -->
+</div>
+
+<!-- ── My Listings ────────────────────────────────────────── -->
+<div class="card" id="my-listings-card" style="display:none;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+    <h2 style="margin:0">My Listings</h2>
+  </div>
+  <div id="my-listings-body"></div>
 </div>
 
 <!-- ── Order Details (shown after successful load) ────────── -->
@@ -392,7 +609,456 @@
   <button class="copy-btn" id="copy-btn" onclick="copyMessage()">Copy to Clipboard</button>
 </div>
 
+<!-- ── Incoming Orders (crafter, shown when logged in + has listing) ── -->
+<div class="card" id="incoming-orders-card" style="display:none;">
+  <h2>Incoming Orders</h2>
+  <div id="incoming-orders-body">
+    <div style="color:#4a4a6a; font-style:italic; text-align:center; padding:1rem 0; font-size:0.88rem;">
+      No orders yet.
+    </div>
+  </div>
+</div>
+
+</div><!-- .page-wrap -->
+
+<!-- ── Note modal ── -->
+<div class="modal-backdrop" id="note-modal" onclick="if(event.target===this)closeNoteModal()">
+  <div class="modal" style="max-width:480px">
+    <button class="modal-close" onclick="closeNoteModal()">✕</button>
+    <h3>Order Note</h3>
+    <p id="note-modal-text" style="white-space:pre-wrap;color:#c8c8e8;font-size:0.9rem;line-height:1.6;margin:0"></p>
+  </div>
+</div>
+
+<!-- ── Auth modal ── -->
+<div class="modal-backdrop" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuthModal()">✕</button>
+    <h3>Sign In</h3>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-google" onclick="switchTab('google')">Google</button>
+      <button class="modal-tab" id="tab-email" onclick="switchTab('email')">Email</button>
+    </div>
+    <div id="pane-google">
+      <button class="google-btn" onclick="signInGoogle()">
+        <svg class="google-icon" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </button>
+      <div id="google-error" class="modal-error" style="display:none;"></div>
+    </div>
+    <div id="pane-email" style="display:none;">
+      <div id="email-error" class="modal-error" style="display:none;"></div>
+      <div id="email-name-wrap" style="display:none;">
+        <label for="auth-name">Display Name</label>
+        <input type="text" id="auth-name" placeholder="Your in-game name">
+      </div>
+      <label for="auth-email">Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email">
+      <label for="auth-password">Password</label>
+      <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password">
+      <button class="modal-submit" id="email-submit" onclick="signInEmail()">Sign In</button>
+      <div class="modal-toggle">
+        <span id="toggle-text">Don't have an account?</span>
+        <a onclick="toggleEmailMode()"> Register</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
 <script>
+// ─── Firebase ─────────────────────────────────────────────────────────────────
+let db, auth, currentUser = null;
+let myListingId = null;
+let incomingOrdersUnsub = null;
+
+function initFirebase() {
+  if (!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.startsWith('REPLACE')) return false;
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db   = firebase.firestore();
+  auth = firebase.auth();
+  auth.onAuthStateChanged(onUserChange);
+  return true;
+}
+
+function onUserChange(user) {
+  currentUser = user;
+  const area = document.getElementById('auth-area');
+  if (user) {
+    const inGameName = localStorage.getItem('inGameName');
+    const displayName = inGameName || user.displayName || user.email || '?';
+    const initial = displayName[0].toUpperCase();
+    const photoHtml = user.photoURL ? `<img src="${user.photoURL}" alt="">` : initial;
+    area.innerHTML = `
+      <div class="user-chip">
+        <div class="avatar">${photoHtml}</div>
+        <span>${escHtml(displayName)}</span>
+        <button class="auth-topbtn secondary" onclick="doSignOut()">Sign Out</button>
+      </div>`;
+    // Pre-fill in-game name if we have it stored
+    if (inGameName && !document.getElementById('crafter-name').value) {
+      document.getElementById('crafter-name').value = inGameName;
+    }
+    closeAuthModal();
+    checkPublishReady();
+    loadMyListings();
+  } else {
+    area.innerHTML = `<button class="auth-topbtn" onclick="openAuthModal()">Sign In</button>`;
+    document.getElementById('publish-section').style.display = 'none';
+    document.getElementById('incoming-orders-card').style.display = 'none';
+    myListingId = null;
+    if (incomingOrdersUnsub) { incomingOrdersUnsub(); incomingOrdersUnsub = null; }
+  }
+}
+
+// Show publish section only when signed in AND data is loaded
+function checkPublishReady() {
+  if (currentUser) {
+    document.getElementById('publish-section').style.display = 'block';
+  }
+}
+
+async function loadMyListings() {
+  if (!currentUser || !db) return;
+  try {
+    const snap = await db.collection('listings')
+      .where('uid', '==', currentUser.uid)
+      .get();
+    const docs = snap.docs.slice().sort((a, b) => {
+      const ta = a.data().createdAt?.toMillis?.() ?? 0;
+      const tb = b.data().createdAt?.toMillis?.() ?? 0;
+      return tb - ta;
+    });
+    if (docs.length > 0) {
+      subscribeIncomingOrders(currentUser.uid);
+    }
+    renderMyListings(docs);
+  } catch (e) {
+    console.error('loadMyListings:', e);
+  }
+}
+
+function renderMyListings(docs) {
+  const card = document.getElementById('my-listings-card');
+  const body = document.getElementById('my-listings-body');
+  if (docs.length === 0) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'block';
+  const orderBase = `${location.origin}${location.pathname.replace('craftingOrders.html', 'order.html')}`;
+  body.innerHTML = docs.map(doc => {
+    const d = doc.data();
+    const statusColor = d.active ? '#5a9a7a' : '#5a5a7a';
+    const statusText  = d.active ? 'Active' : 'Inactive';
+    const orderUrl    = `${orderBase}?listing=${doc.id}`;
+    const toggleBtn   = d.active
+      ? `<button class="status-btn" style="color:#cc7070" onclick="unpublishListing('${doc.id}')">Unpublish</button>`
+      : `<button class="status-btn" style="color:#5a9a7a" onclick="republishListing('${doc.id}')">Republish</button>`;
+    return `
+      <div class="my-listing-row">
+        <div class="my-listing-info">
+          <strong>${escHtml(d.profession || '—')}${d.crafterLevel ? ` - Lvl ${d.crafterLevel}` : ''}</strong>
+          <span style="color:${statusColor};font-size:0.78rem;margin-left:0.5rem">${statusText}</span>
+          ${d.server      ? `<span class="my-listing-meta">🌐 ${escHtml(d.server)}</span>` : ''}
+        </div>
+        <div class="my-listing-actions">
+          <a href="${orderUrl}" target="_blank" class="my-listing-link">Link ↗</a>
+          <button class="status-btn" style="color:#5a9a7a" onclick="editListing('${doc.id}')">Edit</button>
+          ${toggleBtn}
+          <button class="status-btn delete-btn" onclick="deleteListing('${doc.id}')">Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function editListing(id) {
+  try {
+    const doc = await db.collection('listings').doc(id).get();
+    if (!doc.exists) return;
+    const d = doc.data();
+    myListingId = id;
+    if (d.profession)   document.getElementById('profession-select').value = d.profession;
+    if (d.crafterName) {
+      document.getElementById('crafter-name').value = d.crafterName;
+      localStorage.setItem('inGameName', d.crafterName);
+    }
+    if (d.server)        document.getElementById('server-name').value    = d.server;
+    if (d.crafterLevel)  document.getElementById('crafter-level').value  = d.crafterLevel;
+    if (d.commissionPct != null) document.getElementById('commission-pct').value = d.commissionPct;
+    if (d.sheetUrl)      document.getElementById('sheet-url').value      = d.sheetUrl;
+    document.getElementById('publish-btn').textContent = 'Update Listing';
+    document.getElementById('cancel-edit-btn').style.display = '';
+    if (d.active) showShareLink(id);
+    document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+    checkPublishReady();
+  } catch (e) {
+    alert('Could not load listing: ' + e.message);
+  }
+}
+
+function cancelEdit() {
+  myListingId = null;
+  document.getElementById('profession-select').value = '';
+  document.getElementById('crafter-level').value     = '';
+  document.getElementById('sheet-url').value         = '';
+  document.getElementById('publish-btn').textContent = 'Publish Listing';
+  document.getElementById('cancel-edit-btn').style.display = 'none';
+  document.getElementById('share-link-wrap').style.display = 'none';
+  checkPublishReady();
+}
+
+async function deleteListing(id) {
+  if (!confirm('Permanently delete this listing? This cannot be undone.')) return;
+  try {
+    await db.collection('listings').doc(id).delete();
+    if (myListingId === id) cancelEdit();
+    loadMyListings();
+  } catch (err) {
+    alert('Could not delete: ' + err.message);
+  }
+}
+
+async function republishListing(id) {
+  try {
+    await db.collection('listings').doc(id).update({
+      active: true,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    loadMyListings();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+function showShareLink(listingId) {
+  const url = `${location.origin}${location.pathname.replace('craftingOrders.html','order.html')}?listing=${listingId}`;
+  const a = document.getElementById('share-link-a');
+  a.href = url;
+  a.textContent = url;
+  document.getElementById('share-link-wrap').style.display = 'block';
+  document.getElementById('publish-btn').textContent = 'Update Listing';
+}
+
+async function upsertListing() {
+  if (!currentUser) { openAuthModal(); return; }
+  const btn = document.getElementById('publish-btn');
+  const statusEl = document.getElementById('publish-status');
+  const profession   = document.getElementById('profession-select').value;
+  if (!profession) {
+    document.getElementById('publish-status').textContent = 'Please select a profession first.';
+    return;
+  }
+
+  btn.disabled = true;
+  statusEl.textContent = 'Saving…';
+  const crafterName  = document.getElementById('crafter-name').value.trim();
+  const server       = document.getElementById('server-name').value.trim();
+  const sheetUrl     = document.getElementById('sheet-url').value.trim();
+  const commissionPct = parseFloat(document.getElementById('commission-pct').value) || 50;
+  const crafterLevel  = parseInt(document.getElementById('crafter-level').value) || 0;
+
+  if (crafterName) localStorage.setItem('inGameName', crafterName);
+
+  const data = {
+    uid: currentUser.uid,
+    crafterName: crafterName || localStorage.getItem('inGameName') || 'Crafter',
+    profession,
+    server,
+    sheetUrl,
+    commissionPct,
+    crafterLevel,
+    active: true,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  };
+
+  try {
+    if (myListingId) {
+      await db.collection('listings').doc(myListingId).update(data);
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = await db.collection('listings').add(data);
+      myListingId = ref.id;
+      subscribeIncomingOrders(currentUser.uid);
+    }
+    showShareLink(myListingId);
+    document.getElementById('publish-btn').textContent = 'Update Listing';
+    document.getElementById('cancel-edit-btn').style.display = '';
+    statusEl.textContent = 'Saved!';
+    setTimeout(() => { statusEl.textContent = ''; }, 3000);
+    loadMyListings();
+  } catch (err) {
+    statusEl.textContent = 'Error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function unpublishListing(id) {
+  id = id || myListingId;
+  if (!id) return;
+  if (!confirm('Remove this listing from the workboard?')) return;
+  try {
+    await db.collection('listings').doc(id).update({
+      active: false,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    if (myListingId === id) {
+      document.getElementById('share-link-wrap').style.display = 'none';
+    }
+    loadMyListings();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+function subscribeIncomingOrders(uid) {
+  if (incomingOrdersUnsub) incomingOrdersUnsub();
+  document.getElementById('incoming-orders-card').style.display = 'block';
+  incomingOrdersUnsub = db.collection('orders')
+    .where('crafterUid', '==', uid)
+    .orderBy('createdAt', 'desc')
+    .onSnapshot(snap => renderIncomingOrders(snap.docs), err => {
+      document.getElementById('incoming-orders-body').innerHTML =
+        `<div style="color:#cc7070;font-size:0.84rem;padding:0.5rem">Could not load orders: ${err.message}</div>`;
+    });
+}
+
+function renderIncomingOrders(docs) {
+  const body = document.getElementById('incoming-orders-body');
+  if (docs.length === 0) {
+    body.innerHTML = '<div style="color:#4a4a6a;font-style:italic;text-align:center;padding:1rem 0;font-size:0.88rem">No orders yet.</div>';
+    return;
+  }
+  const rows = docs.map(doc => {
+    const d = doc.data();
+    const date = d.createdAt ? new Date(d.createdAt.toMillis()).toLocaleDateString() : '—';
+    let actions = '';
+    if (d.status === 'pending')
+      actions = `<button class="status-btn progress" onclick="setOrderStatus('${doc.id}','in_progress')">In Progress</button> `;
+    else if (d.status === 'in_progress')
+      actions = `<button class="status-btn done-btn" onclick="setOrderStatus('${doc.id}','done')">Done</button> `;
+    actions += `<button class="status-btn delete-btn" onclick="deleteCrafterOrder('${doc.id}')">Delete</button>`;
+    return `<tr>
+      <td>${escHtml(d.customerName || '—')}</td>
+      <td>${escHtml(d.recipeName)}</td>
+      <td style="text-align:right">${d.craftNum}</td>
+      <td style="text-align:right;color:#c9a96e">${d.totalCost != null ? '$' + Number(d.totalCost).toLocaleString('en-US') : '—'}</td>
+      <td style="text-align:center">${d.note ? `<button class="note-icon-btn" title="${escHtml(d.note)}" onclick="openNoteModal(this)">📋</button>` : '<span style="color:#4a4a6a">—</span>'}</td>
+      <td style="text-align:center">${date}</td>
+      <td style="text-align:center"><span class="badge ${d.status}">${d.status.replace('_',' ')}</span></td>
+      <td style="text-align:right;white-space:nowrap"><a href="order-view.html?order=${doc.id}" class="status-btn" style="color:#5a9aca;text-decoration:none;border:1px solid #5a9aca;border-radius:4px;padding:0.2rem 0.5rem">View</a> ${actions}</td>
+    </tr>`;
+  }).join('');
+  body.innerHTML = `<table class="orders-table">
+    <thead><tr>
+      <th>Customer</th><th>Item</th><th style="text-align:right">Qty</th>
+      <th style="text-align:right">Total</th><th>Notes</th><th style="text-align:center">Date</th>
+      <th style="text-align:center">Status</th><th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+async function setOrderStatus(orderId, status) {
+  try {
+    await db.collection('orders').doc(orderId).update({
+      status,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  } catch (err) {
+    alert('Could not update order: ' + err.message);
+  }
+}
+
+async function deleteCrafterOrder(orderId) {
+  if (!confirm('Permanently delete this order? This cannot be undone.')) return;
+  try {
+    await db.collection('orders').doc(orderId).delete();
+  } catch (err) {
+    alert('Could not delete order: ' + err.message);
+  }
+}
+
+// ─── Auth modal ───────────────────────────────────────────────────────────────
+let emailMode = 'signin';
+
+function openAuthModal()  { document.getElementById('auth-modal').classList.add('open'); }
+function closeAuthModal() { document.getElementById('auth-modal').classList.remove('open'); }
+
+function openNoteModal(btn) {
+  document.getElementById('note-modal-text').textContent = btn.title;
+  document.getElementById('note-modal').classList.add('open');
+}
+function closeNoteModal() { document.getElementById('note-modal').classList.remove('open'); }
+
+document.getElementById('auth-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeAuthModal();
+});
+
+function switchTab(tab) {
+  document.getElementById('pane-google').style.display = tab === 'google' ? '' : 'none';
+  document.getElementById('pane-email').style.display  = tab === 'email'  ? '' : 'none';
+  document.getElementById('tab-google').classList.toggle('active', tab === 'google');
+  document.getElementById('tab-email').classList.toggle('active',  tab === 'email');
+}
+
+function toggleEmailMode() {
+  emailMode = emailMode === 'signin' ? 'register' : 'signin';
+  const isReg = emailMode === 'register';
+  document.getElementById('email-submit').textContent = isReg ? 'Register' : 'Sign In';
+  document.getElementById('toggle-text').textContent  = isReg ? 'Already have an account?' : "Don't have an account?";
+  document.getElementById('email-name-wrap').style.display = isReg ? '' : 'none';
+  document.getElementById('auth-password').autocomplete = isReg ? 'new-password' : 'current-password';
+  document.getElementById('email-error').style.display = 'none';
+}
+
+async function signInGoogle() {
+  const errEl = document.getElementById('google-error');
+  errEl.style.display = 'none';
+  try {
+    await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  } catch (err) { errEl.textContent = err.message; errEl.style.display = 'block'; }
+}
+
+async function signInEmail() {
+  const errEl    = document.getElementById('email-error');
+  const email    = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  errEl.style.display = 'none';
+  if (!email || !password) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.style.display = 'block'; return;
+  }
+  try {
+    if (emailMode === 'register') {
+      const name = document.getElementById('auth-name').value.trim();
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+      if (name) await cred.user.updateProfile({ displayName: name });
+    } else {
+      await auth.signInWithEmailAndPassword(email, password);
+    }
+  } catch (err) { errEl.textContent = err.message; errEl.style.display = 'block'; }
+}
+
+async function doSignOut() { await auth.signOut(); }
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 const RECIPES_URL = 'https://cdn.projectgorgon.com/v461/data/recipes.json';
 const ITEMS_URL   = 'https://cdn.projectgorgon.com/v461/data/items.json';
@@ -527,10 +1193,12 @@ async function loadData() {
       itemNames[key] = item.Name || key;
     }
 
-    // Filter recipes by selected profession
+    // Filter recipes by selected profession and crafter level
+    const crafterLevel = parseInt(document.getElementById('crafter-level').value) || 0;
     filteredRecipes = [];
     for (const [key, recipe] of Object.entries(recipesData)) {
-      if (recipe.RewardSkill === profession) {
+      const levelOk = !crafterLevel || (recipe.SkillLevelReq || 0) <= crafterLevel;
+      if (recipe.Skill === profession && levelOk) {
         const ingList = recipe.Ingredients || [];
         filteredRecipes.push({
           key,
@@ -606,6 +1274,7 @@ async function loadData() {
 
     setupCombo();
     collapseSetup();
+    checkPublishReady();
 
     const rLabel = `${filteredRecipes.length} recipe${filteredRecipes.length !== 1 ? 's' : ''}`;
     const pLabel = `${priceCount} material${priceCount !== 1 ? 's' : ''} priced`;
@@ -874,6 +1543,7 @@ document.getElementById('sheet-url').addEventListener('blur', () => {
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 prefetch();
 readUrlParams();
+initFirebase();
 </script>
 </body>
 </html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gorgon Crafting · Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #1a1a2e;
+      color: #e0d9c8;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 3rem;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      background: #0f0f1e;
+      border-bottom: 1px solid #2a2a4a;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .topbar-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #c9a96e;
+      letter-spacing: 0.06em;
+      flex: 1;
+    }
+    .topbar-title span { color: #7a7a9a; font-weight: 400; }
+    .auth-btn {
+      background: #c9a96e; color: #0f0f1e; border: none; border-radius: 5px;
+      padding: 0.45rem 1rem; font-size: 0.85rem; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.04em; transition: background 0.2s;
+      text-decoration: none; display: inline-block;
+    }
+    .auth-btn:hover { background: #e8c87a; }
+    .auth-btn.secondary {
+      background: transparent; color: #8a8aaa;
+      border: 1px solid #3a3a5a;
+    }
+    .auth-btn.secondary:hover { color: #e0d9c8; border-color: #6a6a8a; background: transparent; }
+    .user-chip {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.85rem; color: #c9a96e;
+    }
+    .user-chip .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #2a2a4a; display: flex; align-items: center;
+      justify-content: center; font-size: 0.8rem; font-weight: 700;
+      color: #c9a96e; flex-shrink: 0; overflow: hidden;
+    }
+    .user-chip .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Page ── */
+    .page { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem; }
+    h1 { font-size: 1.8rem; color: #c9a96e; margin-bottom: 0.25rem; letter-spacing: 0.05em; }
+    .subtitle { color: #7a7a9a; font-size: 0.85rem; margin-bottom: 2rem; }
+
+    .status-bar {
+      text-align: center; font-size: 0.82rem; padding: 0.5rem;
+      border-radius: 4px; margin-bottom: 1.5rem;
+    }
+    .status-bar.loading { color: #7a8aaa; }
+    .status-bar.error   { color: #cc7070; background: #1a0f0f; border: 1px solid #3a2020; }
+    .status-bar.ok      { color: #5a9a7a; }
+    .status-bar.warn    { color: #c9a96e; }
+
+    /* ── Filter / toolbar ── */
+    .toolbar {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.25rem; flex-wrap: wrap;
+    }
+    .toolbar label {
+      font-size: 0.78rem; color: #8a8aaa;
+      text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+    }
+    .toolbar select {
+      background: #0f0f1e; border: 1px solid #3a3a5a;
+      border-radius: 5px; color: #e0d9c8; padding: 0.35rem 0.65rem;
+      font-size: 0.88rem; outline: none; cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .toolbar select:focus { border-color: #c9a96e; }
+    .toolbar .spacer { flex: 1; }
+    .refresh-btn {
+      background: transparent; color: #c9a96e;
+      border: 1px solid #c9a96e; border-radius: 5px;
+      padding: 0.4rem 0.9rem; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.04em; transition: background 0.2s, color 0.2s;
+    }
+    .refresh-btn:hover { background: #c9a96e; color: #0f0f1e; }
+
+    /* ── Listings table ── */
+    .listings-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .listings-table th {
+      text-align: left; color: #8a8aaa;
+      font-size: 0.75rem; text-transform: uppercase;
+      letter-spacing: 0.05em; padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid #2a2a4a; font-weight: 600;
+      white-space: nowrap;
+    }
+    .listings-table td {
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid #1e1e38;
+      vertical-align: middle;
+    }
+    .listings-table tr:last-child td { border-bottom: none; }
+    .listings-table tr:hover td { background: #16213e; }
+
+    .badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      padding: 0.15rem 0.5rem; border-radius: 3px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .badge.active   { background: #0f2a1a; color: #5a9a7a; }
+    .badge.inactive { background: #2a2a3a; color: #5a5a7a; }
+
+    .delete-btn {
+      background: transparent; color: #cc7070;
+      border: 1px solid #cc7070; border-radius: 3px;
+      padding: 0.2rem 0.55rem; font-size: 0.75rem;
+      cursor: pointer; transition: background 0.2s, color 0.2s;
+    }
+    .delete-btn:hover { background: #cc7070; color: #0f0f1e; }
+
+    .view-link {
+      color: #c9a96e; text-decoration: none; font-size: 0.8rem;
+    }
+    .view-link:hover { text-decoration: underline; }
+
+    .empty-state {
+      text-align: center; color: #4a4a6a;
+      font-style: italic; padding: 2.5rem 0; font-size: 0.9rem;
+    }
+
+    /* ── Access denied / loading gate ── */
+    #gate {
+      max-width: 400px; margin: 6rem auto; text-align: center;
+      color: #7a7a9a; font-size: 0.95rem;
+    }
+    #gate.denied { color: #cc7070; }
+    #gate h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+
+<!-- ── Top bar ── -->
+<div class="topbar">
+  <div class="topbar-title">Gorgon Crafting <span>Admin</span></div>
+  <div id="auth-area">
+    <span style="font-size:0.85rem; color:#5a5a7a;">Checking auth…</span>
+  </div>
+</div>
+
+<!-- ── Gate (shown while checking / on deny) ── -->
+<div id="gate">Checking admin access…</div>
+
+<!-- ── Admin panel (hidden until access confirmed) ── -->
+<div id="admin-panel" style="display:none;">
+  <div class="page">
+    <h1>Admin Panel</h1>
+    <p class="subtitle">View and manage all crafter listings</p>
+
+    <div id="status" class="status-bar loading">Loading listings…</div>
+
+    <div class="toolbar">
+      <label for="status-filter">Show</label>
+      <select id="status-filter" onchange="applyFilter()">
+        <option value="">All</option>
+        <option value="active">Active only</option>
+        <option value="inactive">Inactive only</option>
+      </select>
+      <div class="spacer"></div>
+      <button class="refresh-btn" onclick="loadAllListings()">↺ Refresh</button>
+    </div>
+
+    <div id="table-wrap">
+      <div class="empty-state">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+let db, auth;
+let currentUser = null;
+let allDocs = [];
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+function initFirebase() {
+  if (!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.startsWith('REPLACE')) {
+    showGate('Firebase is not configured. Edit firebase-config.js.', true);
+    return false;
+  }
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db   = firebase.firestore();
+  auth = firebase.auth();
+  return true;
+}
+
+// ─── Gate helpers ─────────────────────────────────────────────────────────────
+function showGate(msg, denied = false) {
+  const gate = document.getElementById('gate');
+  gate.style.display = '';
+  gate.className = denied ? 'denied' : '';
+  gate.innerHTML = denied
+    ? `<h2>Access Denied</h2><p>${escHtml(msg)}</p><p style="margin-top:1rem;"><a href="/" style="color:#c9a96e;">← Back to Workboard</a></p>`
+    : `<p>${escHtml(msg)}</p>`;
+  document.getElementById('admin-panel').style.display = 'none';
+}
+
+function showPanel() {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('admin-panel').style.display = '';
+}
+
+// ─── Status ───────────────────────────────────────────────────────────────────
+function setStatus(msg, type = 'loading') {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status-bar ' + type;
+}
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+async function onUserChange(user) {
+  currentUser = user;
+  const area = document.getElementById('auth-area');
+
+  if (!user) {
+    area.innerHTML = `<button class="auth-btn" onclick="signInGoogle()">Sign In with Google</button>`;
+    showGate('You must be signed in as an admin to access this page.', true);
+    return;
+  }
+
+  // Render user chip while we check
+  const inGameName = localStorage.getItem('inGameName');
+  const displayName = inGameName || user.displayName || user.email || '?';
+  const initial = displayName[0].toUpperCase();
+  const photoHtml = user.photoURL ? `<img src="${user.photoURL}" alt="">` : initial;
+  area.innerHTML = `
+    <div class="user-chip">
+      <div class="avatar">${photoHtml}</div>
+      <span>${escHtml(displayName)}</span>
+      <button class="auth-btn secondary" onclick="signOut()">Sign Out</button>
+    </div>`;
+
+  // Check admin doc
+  try {
+    const adminDoc = await db.collection('admins').doc(user.uid).get();
+    if (!adminDoc.exists || !adminDoc.data().isAdmin) {
+      showGate('You do not have admin access.', true);
+      return;
+    }
+  } catch (err) {
+    showGate(`Could not verify admin status: ${err.message}`, true);
+    return;
+  }
+
+  showPanel();
+  loadAllListings();
+}
+
+async function signInGoogle() {
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithPopup(provider);
+  } catch (err) {
+    showGate('Sign-in failed: ' + err.message, true);
+  }
+}
+
+async function signOut() {
+  await auth.signOut();
+}
+
+// ─── Listings ─────────────────────────────────────────────────────────────────
+async function loadAllListings() {
+  if (!db) return;
+  setStatus('Loading listings…', 'loading');
+  try {
+    const snap = await db.collection('listings')
+      .orderBy('createdAt', 'desc')
+      .get();
+    allDocs = snap.docs;
+    applyFilter();
+    setStatus(`${snap.docs.length} total listing${snap.docs.length !== 1 ? 's' : ''}`, 'ok');
+  } catch (err) {
+    setStatus(`Failed to load: ${err.message}`, 'error');
+    document.getElementById('table-wrap').innerHTML =
+      '<div class="empty-state">Could not load listings.</div>';
+  }
+}
+
+function applyFilter() {
+  const filter = document.getElementById('status-filter').value;
+  let docs = allDocs;
+  if (filter === 'active')   docs = allDocs.filter(d => d.data().active);
+  if (filter === 'inactive') docs = allDocs.filter(d => !d.data().active);
+  renderTable(docs);
+}
+
+function renderTable(docs) {
+  const wrap = document.getElementById('table-wrap');
+  if (docs.length === 0) {
+    wrap.innerHTML = '<div class="empty-state">No listings match the current filter.</div>';
+    return;
+  }
+  const rows = docs.map(doc => {
+    const d = doc.data();
+    const active = d.active ? true : false;
+    const badge = active
+      ? '<span class="badge active">Active</span>'
+      : '<span class="badge inactive">Inactive</span>';
+    const created = d.createdAt ? new Date(d.createdAt.toMillis()).toLocaleDateString() : '—';
+    const server = escHtml(d.server || '—');
+    return `<tr id="row-${doc.id}">
+      <td>${escHtml(d.crafterName || '—')}</td>
+      <td>${escHtml(d.profession || '—')}</td>
+      <td>${server}</td>
+      <td>${d.commissionPct ?? '—'}%</td>
+      <td>${badge}</td>
+      <td>${created}</td>
+      <td>
+        <a href="order.html?listing=${doc.id}" class="view-link" target="_blank">View</a>
+      </td>
+      <td>
+        <button class="delete-btn" onclick="deleteListing('${doc.id}', '${escHtml(d.crafterName || 'this listing')}')">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <table class="listings-table">
+      <thead><tr>
+        <th>Crafter</th>
+        <th>Profession</th>
+        <th>Server</th>
+        <th>Commission</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th></th>
+        <th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+async function deleteListing(id, name) {
+  if (!confirm(`Delete listing for "${name}"?\n\nThis cannot be undone.`)) return;
+  try {
+    await db.collection('listings').doc(id).delete();
+    // Remove from cached docs and re-render
+    allDocs = allDocs.filter(d => d.id !== id);
+    applyFilter();
+    setStatus(`Deleted listing ${id}. ${allDocs.length} listing${allDocs.length !== 1 ? 's' : ''} remain.`, 'warn');
+  } catch (err) {
+    alert('Could not delete listing: ' + err.message);
+  }
+}
+
+// ─── Util ─────────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+if (initFirebase()) {
+  auth.onAuthStateChanged(onUserChange);
+} else {
+  document.getElementById('auth-area').innerHTML = '';
+}
+</script>
+</body>
+</html>

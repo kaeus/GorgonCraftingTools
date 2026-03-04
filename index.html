@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gorgon Crafting Workboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #1a1a2e;
+      color: #e0d9c8;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 3rem;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      background: #0f0f1e;
+      border-bottom: 1px solid #2a2a4a;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .topbar-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #c9a96e;
+      letter-spacing: 0.06em;
+      flex: 1;
+    }
+    .topbar-title span { color: #7a7a9a; font-weight: 400; }
+    .auth-btn {
+      background: #c9a96e; color: #0f0f1e; border: none; border-radius: 5px;
+      padding: 0.45rem 1rem; font-size: 0.85rem; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.04em; transition: background 0.2s;
+    }
+    .auth-btn:hover { background: #e8c87a; }
+    .auth-btn.secondary {
+      background: transparent; color: #8a8aaa;
+      border: 1px solid #3a3a5a;
+    }
+    .auth-btn.secondary:hover { color: #e0d9c8; border-color: #6a6a8a; background: transparent; }
+    .user-chip {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.85rem; color: #c9a96e;
+    }
+    .user-chip .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #2a2a4a; display: flex; align-items: center;
+      justify-content: center; font-size: 0.8rem; font-weight: 700;
+      color: #c9a96e; flex-shrink: 0; overflow: hidden;
+    }
+    .user-chip .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Page layout ── */
+    .page { max-width: 860px; margin: 0 auto; padding: 2rem 1rem; }
+
+    h1 { font-size: 1.8rem; color: #c9a96e; margin-bottom: 0.25rem; letter-spacing: 0.05em; }
+    .subtitle { color: #7a7a9a; font-size: 0.85rem; margin-bottom: 2rem; }
+
+    .section-header {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .section-header h2 {
+      font-size: 1rem; color: #c9a96e;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .section-header .spacer { flex: 1; }
+    .action-btn {
+      background: #c9a96e; color: #0f0f1e; border: none; border-radius: 5px;
+      padding: 0.45rem 1rem; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.04em; transition: background 0.2s;
+      text-decoration: none; display: inline-block;
+    }
+    .action-btn:hover { background: #e8c87a; }
+    .action-btn.ghost {
+      background: transparent; color: #c9a96e;
+      border: 1px solid #c9a96e;
+    }
+    .action-btn.ghost:hover { background: #c9a96e; color: #0f0f1e; }
+
+    .status-bar {
+      text-align: center; font-size: 0.82rem; padding: 0.5rem;
+      border-radius: 4px; margin-bottom: 1.5rem;
+    }
+    .status-bar.loading { color: #7a8aaa; }
+    .status-bar.error   { color: #cc7070; background: #1a0f0f; border: 1px solid #3a2020; }
+    .status-bar.ok      { color: #5a9a7a; }
+    .status-bar.warn    { color: #c9a96e; }
+
+    /* ── Listing cards grid ── */
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .listing-card {
+      background: #16213e; border: 1px solid #2a2a4a;
+      border-radius: 8px; padding: 1.25rem;
+      display: flex; flex-direction: column; gap: 0.6rem;
+      transition: border-color 0.2s;
+    }
+    .listing-card:hover { border-color: #5a5a7a; }
+    .listing-card .profession {
+      font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #5a9a7a;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .listing-card .crafter-name {
+      font-size: 1rem; font-weight: 700; color: #e0d9c8;
+    }
+    .listing-card .commission {
+      font-size: 0.82rem; color: #8a8aaa;
+    }
+    .listing-card .server {
+      font-size: 0.78rem; color: #5a5a7a;
+    }
+    .listing-card .card-footer {
+      margin-top: auto; padding-top: 0.75rem;
+      border-top: 1px solid #2a2a4a;
+      display: flex; justify-content: flex-end;
+    }
+    .order-link {
+      font-size: 0.82rem; font-weight: 700; color: #c9a96e;
+      text-decoration: none; letter-spacing: 0.04em;
+      padding: 0.35rem 0.85rem; border: 1px solid #c9a96e;
+      border-radius: 4px; transition: background 0.2s, color 0.2s;
+    }
+    .order-link:hover { background: #c9a96e; color: #0f0f1e; }
+
+    .empty-state {
+      grid-column: 1 / -1; text-align: center;
+      color: #4a4a6a; font-style: italic; padding: 2.5rem 0;
+      font-size: 0.9rem;
+    }
+
+    /* ── My Orders table ── */
+    .orders-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .orders-table th {
+      text-align: left; color: #8a8aaa;
+      font-size: 0.75rem; text-transform: uppercase;
+      letter-spacing: 0.05em; padding: 0.4rem 0.6rem;
+      border-bottom: 1px solid #2a2a4a; font-weight: 600;
+    }
+    .orders-table th:not(:first-child) { text-align: right; }
+    .orders-table td {
+      padding: 0.5rem 0.6rem;
+      border-bottom: 1px solid #1e1e38;
+      vertical-align: middle;
+    }
+    .orders-table td:not(:first-child) { text-align: right; }
+    .orders-table tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      padding: 0.15rem 0.5rem; border-radius: 3px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .badge.pending     { background: #3a3010; color: #c9a96e; }
+    .badge.in_progress { background: #0f2040; color: #6a9aca; }
+    .badge.done        { background: #0f2a1a; color: #5a9a7a; }
+    .badge.cancelled   { background: #2a2a3a; color: #5a5a7a; }
+
+    .cancel-btn, .delete-order-btn {
+      background: transparent; color: #cc7070;
+      border: 1px solid #cc7070; border-radius: 3px;
+      padding: 0.2rem 0.55rem; font-size: 0.75rem;
+      cursor: pointer; transition: background 0.2s, color 0.2s;
+    }
+    .cancel-btn:hover, .delete-order-btn:hover { background: #cc7070; color: #0f0f1e; }
+
+    /* ── Auth modal ── */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65); z-index: 500;
+      align-items: center; justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: #16213e; border: 1px solid #2a2a4a;
+      border-radius: 10px; padding: 2rem; width: 100%;
+      max-width: 380px; margin: 1rem;
+    }
+    .modal h3 { color: #c9a96e; font-size: 1.1rem; margin-bottom: 1.25rem; }
+    .modal-tabs {
+      display: flex; gap: 0; margin-bottom: 1.25rem;
+      border: 1px solid #3a3a5a; border-radius: 5px; overflow: hidden;
+    }
+    .modal-tab {
+      flex: 1; padding: 0.5rem; background: transparent;
+      border: none; color: #8a8aaa; font-size: 0.88rem;
+      cursor: pointer; transition: background 0.2s, color 0.2s;
+    }
+    .modal-tab.active { background: #c9a96e; color: #0f0f1e; font-weight: 700; }
+    .modal-tab:not(.active):hover { background: #1e2a4e; color: #e0d9c8; }
+
+    .google-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center;
+      gap: 0.6rem; padding: 0.7rem; background: #fff;
+      border: none; border-radius: 5px; font-size: 0.92rem;
+      font-weight: 600; color: #333; cursor: pointer;
+      transition: background 0.2s; margin-bottom: 0.5rem;
+    }
+    .google-btn:hover { background: #f0f0f0; }
+    .google-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .modal label {
+      display: block; font-size: 0.78rem; color: #8a8aaa;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.35rem;
+    }
+    .modal input[type="email"], .modal input[type="password"], .modal input[type="text"] {
+      width: 100%; background: #0f0f1e; border: 1px solid #3a3a5a;
+      border-radius: 5px; color: #e0d9c8; padding: 0.55rem 0.75rem;
+      font-size: 0.92rem; outline: none; transition: border-color 0.2s;
+      margin-bottom: 0.85rem;
+    }
+    .modal input:focus { border-color: #c9a96e; }
+    .modal-submit {
+      width: 100%; background: #c9a96e; color: #0f0f1e;
+      border: none; border-radius: 5px; padding: 0.6rem;
+      font-size: 0.92rem; font-weight: 700; cursor: pointer;
+      transition: background 0.2s; margin-bottom: 0.75rem;
+    }
+    .modal-submit:hover { background: #e8c87a; }
+    .modal-toggle { font-size: 0.82rem; color: #7a8aaa; text-align: center; }
+    .modal-toggle a { color: #c9a96e; cursor: pointer; text-decoration: none; }
+    .modal-toggle a:hover { text-decoration: underline; }
+    .modal-error {
+      font-size: 0.82rem; color: #cc7070; background: #1a0f0f;
+      border: 1px solid #3a2020; border-radius: 4px;
+      padding: 0.4rem 0.6rem; margin-bottom: 0.75rem;
+    }
+    .modal-close {
+      float: right; background: transparent; border: none;
+      color: #5a5a7a; font-size: 1.2rem; cursor: pointer;
+      padding: 0; line-height: 1;
+    }
+    .modal-close:hover { color: #e0d9c8; }
+
+    .divider { border-top: 1px solid #2a2a4a; margin: 1.5rem 0; }
+
+    .section-hidden { display: none; }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .filter-bar label {
+      font-size: 0.78rem; color: #8a8aaa;
+      text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+    }
+    .filter-bar select {
+      background: #0f0f1e; border: 1px solid #3a3a5a;
+      border-radius: 5px; color: #e0d9c8; padding: 0.35rem 0.65rem;
+      font-size: 0.88rem; outline: none; cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .filter-bar select:focus { border-color: #c9a96e; }
+
+    @media (max-width: 520px) {
+      .listings-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Top bar ── -->
+<div class="topbar">
+  <div class="topbar-title">Gorgon Crafting <span>Workboard</span></div>
+  <div id="auth-area">
+    <button class="auth-btn" onclick="openAuthModal()">Sign In</button>
+  </div>
+</div>
+
+<!-- ── Main page ── -->
+<div class="page">
+  <h1>Crafting Workboard</h1>
+  <p class="subtitle">Project Gorgon · Browse crafter listings and place orders</p>
+
+  <div id="status" class="status-bar loading">Loading listings…</div>
+
+  <!-- Active listings -->
+  <div class="section-header">
+    <h2>Active Crafters</h2>
+    <div class="spacer"></div>
+    <a href="craftingOrders.html" class="action-btn ghost" id="post-listing-btn">Manage Your Listing</a>
+  </div>
+  <div class="filter-bar">
+    <label for="server-filter">Server</label>
+    <select id="server-filter" onchange="applyFilter()">
+      <option value="">All Servers</option>
+      <option>Arisetsu</option>
+      <option>Dreva</option>
+      <option>Laeth</option>
+      <option>Miraverre</option>
+      <option>Strekios</option>
+    </select>
+  </div>
+  <div class="listings-grid" id="listings-grid">
+    <div class="empty-state">Loading…</div>
+  </div>
+
+  <!-- My Orders (logged-in customers) -->
+  <div id="my-orders-section" class="section-hidden">
+    <div class="divider"></div>
+    <div class="section-header">
+      <h2>My Orders</h2>
+    </div>
+    <div id="my-orders-status" class="status-bar loading" style="display:none;"></div>
+    <div id="my-orders-container">
+      <div class="empty-state" style="padding:1.5rem 0;">Loading your orders…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Auth modal ── -->
+<div class="modal-backdrop" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuthModal()">✕</button>
+    <h3>Sign In</h3>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-google" onclick="switchTab('google')">Google</button>
+      <button class="modal-tab" id="tab-email" onclick="switchTab('email')">Email</button>
+    </div>
+
+    <!-- Google tab -->
+    <div id="pane-google">
+      <button class="google-btn" onclick="signInGoogle()">
+        <svg class="google-icon" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </button>
+      <div id="google-error" class="modal-error" style="display:none;"></div>
+    </div>
+
+    <!-- Email tab -->
+    <div id="pane-email" style="display:none;">
+      <div id="email-error" class="modal-error" style="display:none;"></div>
+      <div id="email-name-wrap" style="display:none;">
+        <label for="auth-name">Display Name</label>
+        <input type="text" id="auth-name" placeholder="Your in-game name">
+      </div>
+      <label for="auth-email">Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email">
+      <label for="auth-password">Password</label>
+      <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password">
+      <button class="modal-submit" id="email-submit" onclick="signInEmail()">Sign In</button>
+      <div class="modal-toggle">
+        <span id="toggle-text">Don't have an account?</span>
+        <a onclick="toggleEmailMode()"> Register</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+// ─── Init ─────────────────────────────────────────────────────────────────────
+let db, auth;
+let currentUser = null;
+let myOrdersUnsub = null;
+let allListingDocs = [];
+
+function initFirebase() {
+  if (!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.startsWith('REPLACE')) {
+    setStatus('Firebase is not configured. Edit firebase-config.js with your project details.', 'error');
+    return false;
+  }
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db   = firebase.firestore();
+  auth = firebase.auth();
+  return true;
+}
+
+// ─── Status ───────────────────────────────────────────────────────────────────
+function setStatus(msg, type = 'loading') {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status-bar ' + type;
+}
+
+// ─── Auth state ───────────────────────────────────────────────────────────────
+async function onUserChange(user) {
+  currentUser = user;
+  const area = document.getElementById('auth-area');
+  if (user) {
+    const inGameName = localStorage.getItem('inGameName');
+    const displayName = inGameName || user.displayName || user.email || '?';
+    const initial = displayName[0].toUpperCase();
+    const photoHtml = user.photoURL
+      ? `<img src="${user.photoURL}" alt="">`
+      : initial;
+
+    // Check admin status
+    let adminLink = '';
+    try {
+      const adminDoc = await db.collection('admins').doc(user.uid).get();
+      if (adminDoc.exists && adminDoc.data().isAdmin) {
+        adminLink = `<a href="admin.html" class="auth-btn secondary" style="text-decoration:none;">Admin</a>`;
+      }
+    } catch (_) {}
+
+    area.innerHTML = `
+      <div class="user-chip">
+        <div class="avatar">${photoHtml}</div>
+        <span>${escHtml(displayName)}</span>
+        ${adminLink}
+        <button class="auth-btn secondary" onclick="signOut()">Sign Out</button>
+      </div>`;
+    document.getElementById('my-orders-section').classList.remove('section-hidden');
+    subscribeMyOrders(user.uid);
+    closeAuthModal();
+  } else {
+    area.innerHTML = `<button class="auth-btn" onclick="openAuthModal()">Sign In</button>`;
+    document.getElementById('my-orders-section').classList.add('section-hidden');
+    if (myOrdersUnsub) { myOrdersUnsub(); myOrdersUnsub = null; }
+  }
+}
+
+// ─── Listings ─────────────────────────────────────────────────────────────────
+const PROFESSION_EMOJI = {
+  Alchemy:'⚗️', Armorsmithing:'🛡️', Blacksmithing:'⚒️', Brewing:'🍺',
+  CandleMaking:'🕯️', Cheesemaking:'🧀', Cooking:'🍳', FlowerArrangement:'🌸',
+  Gadgeteering:'⚙️', Leatherworking:'🪡', Mycology:'🍄', Tailoring:'🧵',
+  Toolcrafting:'🔧',
+};
+
+function renderListings(docs) {
+  const grid = document.getElementById('listings-grid');
+  if (docs.length === 0) {
+    grid.innerHTML = '<div class="empty-state">No active listings yet. Be the first to post!</div>';
+    return;
+  }
+  grid.innerHTML = docs.map(doc => {
+    const d = doc.data();
+    const emoji = PROFESSION_EMOJI[d.profession] || '🔨';
+    const serverLine = d.server ? `<div class="server">🌐 ${escHtml(d.server)}</div>` : '';
+    const levelLine = d.crafterLevel ? ` - Lvl ${d.crafterLevel}` : '';
+    return `
+      <div class="listing-card">
+        <div class="profession">${emoji} ${d.profession}${levelLine}</div>
+        <div class="crafter-name">${escHtml(d.crafterName || 'Unknown Crafter')}</div>
+        <div class="commission">${d.commissionPct ?? 50}% commission</div>
+        ${serverLine}
+        <div class="card-footer">
+          <a href="order.html?listing=${doc.id}" class="order-link">Place Order →</a>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function applyFilter() {
+  const server = document.getElementById('server-filter').value;
+  if (server) localStorage.setItem('wb-server-filter', server);
+  else localStorage.removeItem('wb-server-filter');
+  const filtered = server
+    ? allListingDocs.filter(d => d.data().server === server)
+    : allListingDocs;
+  renderListings(filtered);
+}
+
+async function loadListings() {
+  if (!db) return;
+  try {
+    const snap = await db.collection('listings')
+      .where('active', '==', true)
+      .orderBy('crafterName')
+      .get();
+    allListingDocs = snap.docs;
+    renderListings(snap.docs);
+    setStatus(`${snap.docs.length} active listing${snap.docs.length !== 1 ? 's' : ''}`, 'ok');
+  } catch (err) {
+    setStatus(`Failed to load listings: ${err.message}`, 'error');
+    document.getElementById('listings-grid').innerHTML =
+      '<div class="empty-state">Could not load listings.</div>';
+  }
+}
+
+// ─── My Orders ────────────────────────────────────────────────────────────────
+function subscribeMyOrders(uid) {
+  if (myOrdersUnsub) myOrdersUnsub();
+  myOrdersUnsub = db.collection('orders')
+    .where('customerUid', '==', uid)
+    .orderBy('createdAt', 'desc')
+    .onSnapshot(snap => renderMyOrders(snap.docs), err => {
+      document.getElementById('my-orders-container').innerHTML =
+        `<div class="empty-state">Could not load orders: ${err.message}</div>`;
+    });
+}
+
+function renderMyOrders(docs) {
+  const container = document.getElementById('my-orders-container');
+  if (docs.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="padding:1.5rem 0;">No orders yet.</div>';
+    return;
+  }
+  const rows = docs.map(doc => {
+    const d = doc.data();
+    const canCancel = d.status === 'pending';
+    const cancelBtn = canCancel
+      ? `<button class="cancel-btn" onclick="cancelOrder('${doc.id}')">Cancel</button> `
+      : `<button class="delete-order-btn" onclick="deleteOrder('${doc.id}')">Delete</button>`;
+    const date = d.createdAt ? new Date(d.createdAt.toMillis()).toLocaleDateString() : '—';
+    return `<tr>
+      <td>${escHtml(d.crafterName || '—')}</td>
+      <td style="text-align:left">${escHtml(d.recipeName)}</td>
+      <td>${d.craftNum}</td>
+      <td style="color:#c9a96e">${d.totalCost != null ? '$' + d.totalCost.toLocaleString('en-US') : '—'}</td>
+      <td>${date}</td>
+      <td><span class="badge ${d.status}">${d.status.replace('_', ' ')}</span></td>
+      <td><a href="order-view.html?order=${doc.id}" style="color:#5a9aca;font-size:0.82rem;text-decoration:none;border:1px solid #5a9aca;border-radius:4px;padding:0.2rem 0.5rem;margin-right:0.4rem">View</a>${cancelBtn}</td>
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <table class="orders-table">
+      <thead><tr>
+        <th>Crafter</th><th style="text-align:left">Item</th>
+        <th>Qty</th><th>Total</th><th>Date</th><th>Status</th><th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+async function cancelOrder(orderId) {
+  if (!confirm('Cancel this order?')) return;
+  try {
+    await db.collection('orders').doc(orderId).update({
+      status: 'cancelled',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  } catch (err) {
+    alert('Could not cancel order: ' + err.message);
+  }
+}
+
+async function deleteOrder(orderId) {
+  if (!confirm('Permanently delete this order? This cannot be undone.')) return;
+  try {
+    await db.collection('orders').doc(orderId).delete();
+  } catch (err) {
+    alert('Could not delete order: ' + err.message);
+  }
+}
+
+// ─── Auth modal ───────────────────────────────────────────────────────────────
+let emailMode = 'signin'; // 'signin' | 'register'
+
+function openAuthModal()  { document.getElementById('auth-modal').classList.add('open'); }
+function closeAuthModal() { document.getElementById('auth-modal').classList.remove('open'); }
+
+document.getElementById('auth-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeAuthModal();
+});
+
+function switchTab(tab) {
+  document.getElementById('pane-google').style.display = tab === 'google' ? '' : 'none';
+  document.getElementById('pane-email').style.display  = tab === 'email'  ? '' : 'none';
+  document.getElementById('tab-google').classList.toggle('active', tab === 'google');
+  document.getElementById('tab-email').classList.toggle('active',  tab === 'email');
+}
+
+function toggleEmailMode() {
+  emailMode = emailMode === 'signin' ? 'register' : 'signin';
+  const isReg = emailMode === 'register';
+  document.getElementById('email-submit').textContent = isReg ? 'Register' : 'Sign In';
+  document.getElementById('toggle-text').textContent  = isReg ? 'Already have an account?' : "Don't have an account?";
+  document.getElementById('email-name-wrap').style.display = isReg ? '' : 'none';
+  document.getElementById('auth-password').autocomplete = isReg ? 'new-password' : 'current-password';
+  document.getElementById('email-error').style.display = 'none';
+}
+
+async function signInGoogle() {
+  const errEl = document.getElementById('google-error');
+  errEl.style.display = 'none';
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithPopup(provider);
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  }
+}
+
+async function signInEmail() {
+  const errEl   = document.getElementById('email-error');
+  const email   = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  errEl.style.display = 'none';
+  if (!email || !password) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.style.display = 'block'; return;
+  }
+  try {
+    if (emailMode === 'register') {
+      const name = document.getElementById('auth-name').value.trim();
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+      if (name) await cred.user.updateProfile({ displayName: name });
+    } else {
+      await auth.signInWithEmailAndPassword(email, password);
+    }
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  }
+}
+
+async function signOut() {
+  await auth.signOut();
+}
+
+// ─── Util ─────────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+if (initFirebase()) {
+  // Restore saved server filter before listings load
+  const savedFilter = localStorage.getItem('wb-server-filter');
+  if (savedFilter) document.getElementById('server-filter').value = savedFilter;
+
+  auth.onAuthStateChanged(onUserChange);
+  loadListings();
+} else {
+  document.getElementById('listings-grid').innerHTML =
+    '<div class="empty-state">Firebase not configured — see firebase-config.js</div>';
+}
+</script>
+</body>
+</html>
