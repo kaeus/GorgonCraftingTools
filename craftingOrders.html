@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gorgon Crafting Calculator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #1a1a2e;
+      color: #e0d9c8;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      color: #c9a96e;
+      margin-bottom: 0.25rem;
+      letter-spacing: 0.05em;
+    }
+    .subtitle {
+      text-align: center;
+      color: #7a7a9a;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: #16213e;
+      border: 1px solid #2a2a4a;
+      border-radius: 8px;
+      padding: 1.5rem;
+      max-width: 760px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      color: #c9a96e;
+      margin-bottom: 1.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid #2a2a4a;
+      padding-bottom: 0.6rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .form-grid.wide { grid-template-columns: 1fr; }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      color: #8a8aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.35rem;
+    }
+
+    select, input[type="text"], input[type="number"] {
+      width: 100%;
+      background: #0f0f1e;
+      border: 1px solid #3a3a5a;
+      border-radius: 5px;
+      color: #e0d9c8;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    select:focus, input:focus {
+      border-color: #c9a96e;
+    }
+    select option { background: #0f0f1e; }
+
+    /* Searchable combo */
+    .combo-wrap { position: relative; }
+    .combo-list {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0; right: 0;
+      background: #0f0f1e;
+      border: 1px solid #c9a96e;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+      max-height: 260px;
+      overflow-y: auto;
+      z-index: 200;
+      list-style: none;
+      padding: 0.25rem 0;
+    }
+    .combo-list.open { display: block; }
+    .combo-list li {
+      padding: 0.45rem 0.75rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #e0d9c8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .combo-list li:hover, .combo-list li.active { background: #1e1e38; color: #c9a96e; }
+    .combo-list li.no-results { color: #5a5a7a; font-style: italic; cursor: default; }
+    .combo-list li.no-results:hover { background: transparent; color: #5a5a7a; }
+
+    /* Ingredients table */
+    .ingredients-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-top: 0.5rem;
+    }
+    .ingredients-table th {
+      text-align: left;
+      color: #8a8aaa;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.4rem 0.6rem;
+      border-bottom: 1px solid #2a2a4a;
+    }
+    .ingredients-table th:not(:first-child) { text-align: right; }
+    .ingredients-table td {
+      padding: 0.45rem 0.6rem;
+      border-bottom: 1px solid #1e1e38;
+      vertical-align: middle;
+    }
+    .ingredients-table td:not(:first-child) { text-align: right; }
+    .ingredients-table tr:last-child td { border-bottom: none; }
+    .ingredients-table .no-price { color: #5a5a7a; font-style: italic; }
+    .ingredients-table .price-cell { color: #c9a96e; }
+
+    /* Totals */
+    .totals-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.35rem 1rem;
+      align-items: baseline;
+    }
+    .totals-grid .label { color: #8a8aaa; font-size: 0.88rem; }
+    .totals-grid .value { text-align: right; color: #c9a96e; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+    .totals-grid .divider { grid-column: 1 / -1; border-top: 1px solid #2a2a4a; margin: 0.4rem 0; }
+    .totals-grid .total-label { color: #e0d9c8; font-size: 1rem; font-weight: 600; }
+    .totals-grid .total-value { text-align: right; color: #e8c87a; font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    /* Output message */
+    .output-box {
+      background: #0f0f1e;
+      border: 1px solid #3a3a5a;
+      border-radius: 5px;
+      padding: 0.9rem 1rem;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: #c9d8c8;
+      min-height: 3rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .copy-btn {
+      margin-top: 0.75rem;
+      background: #c9a96e;
+      color: #0f0f1e;
+      border: none;
+      border-radius: 5px;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      letter-spacing: 0.04em;
+    }
+    .copy-btn:hover { background: #e8c87a; }
+    .copy-btn:active { transform: scale(0.97); }
+    .copy-btn.copied { background: #5a9a7a; color: #e0f0e8; }
+
+    /* Status */
+    .status {
+      text-align: center;
+      font-size: 0.82rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    .status.loading { color: #7a8aaa; }
+    .status.error { color: #cc7070; background: #1a0f0f; border: 1px solid #3a2020; }
+    .status.ok { color: #5a9a7a; }
+    .status.warn { color: #c9a96e; }
+
+    .placeholder { color: #4a4a6a; font-style: italic; text-align: center; padding: 1rem 0; font-size: 0.88rem; }
+
+    @media (max-width: 520px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Crafting Calculator</h1>
+<p class="subtitle">Project Gorgon · Generic Crafting Cost Calculator</p>
+
+<div id="status" class="status loading">Loading data…</div>
+
+<div class="card">
+  <h2>Order Details</h2>
+  <div class="form-grid wide" style="margin-bottom:1rem;">
+    <div>
+      <label for="item-search">Item</label>
+      <div class="combo-wrap">
+        <input type="text" id="item-search" placeholder="— Loading… —" autocomplete="off" disabled>
+        <ul class="combo-list" id="combo-list"></ul>
+      </div>
+    </div>
+  </div>
+  <div class="form-grid">
+    <div>
+      <label for="craft-num">Craft Quantity</label>
+      <input type="number" id="craft-num" value="1" min="1" step="1">
+    </div>
+    <div>
+      <label for="primary-gem">Primary Gem / Skill</label>
+      <input type="text" id="primary-gem" placeholder="e.g. Fire Magic">
+    </div>
+    <div style="grid-column: 2">
+      <label for="aux-gem">Auxiliary Gem / Skill</label>
+      <input type="text" id="aux-gem" placeholder="e.g. Sword">
+    </div>
+  </div>
+</div>
+
+<div class="card" id="ingredients-card" style="display:none;">
+  <h2>Material Costs</h2>
+  <table class="ingredients-table" id="ingredients-table">
+    <thead>
+      <tr>
+        <th>Material</th>
+        <th>Per Craft</th>
+        <th>Total Qty</th>
+        <th>Unit Price</th>
+        <th>Line Total</th>
+      </tr>
+    </thead>
+    <tbody id="ingredients-body"></tbody>
+  </table>
+</div>
+
+<div class="card" id="totals-card" style="display:none;">
+  <h2>Totals</h2>
+  <div class="totals-grid">
+    <span class="label">Material Subtotal</span>
+    <span class="value" id="t-subtotal">—</span>
+    <span class="label">Commission (50%)</span>
+    <span class="value" id="t-vat">—</span>
+    <div class="divider"></div>
+    <span class="total-label">Total Councils</span>
+    <span class="total-value" id="t-total">—</span>
+  </div>
+</div>
+
+<div class="card" id="message-card" style="display:none;">
+  <h2>Order Message</h2>
+  <div class="output-box" id="output-msg"></div>
+  <button class="copy-btn" id="copy-btn" onclick="copyMessage()">Copy to Clipboard</button>
+</div>
+
+<script>
+// ─── Config ───────────────────────────────────────────────────────────────────
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/16xImLTdTDmf3WkRIjmWB14D304aj9CA0BLnKwqL3nl8/export?format=csv&gid=384060610';
+const RECIPES_URL   = 'https://cdn.projectgorgon.com/v461/data/recipes.json';
+const ITEMS_URL     = 'https://cdn.projectgorgon.com/v461/data/items.json';
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let materialPrices = {}; // name (lowercase) → price (number)
+let tailoringRecipes = []; // [{ key, name, ingredients: [{itemCode, stackSize}] }]
+let itemNames = {};        // "item_1234" → "Item Name"
+let selectedRecipeIdx = null;
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
+function setStatus(msg, type = 'loading') {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status ' + type;
+}
+
+function fmt(n) {
+  return Number.isFinite(n) ? n.toLocaleString('en-US') : '—';
+}
+
+// Parse CSV handling quoted fields (fields may contain commas)
+function parseCSV(text) {
+  const rows = [];
+  const lines = text.split(/\r?\n/);
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) {
+        cols.push(cur); cur = '';
+      } else {
+        cur += ch;
+      }
+    }
+    cols.push(cur);
+    rows.push(cols);
+  }
+  return rows;
+}
+
+function cleanPrice(str) {
+  if (!str) return NaN;
+  // Remove currency symbols, spaces, commas
+  const n = parseFloat(str.replace(/[^\d.\-]/g, ''));
+  return isNaN(n) ? NaN : n;
+}
+
+// ─── Data Fetching ────────────────────────────────────────────────────────────
+async function loadSheetPrices() {
+  const resp = await fetch(SHEET_CSV_URL, { redirect: 'follow' });
+  if (!resp.ok) throw new Error(`Sheet fetch failed: ${resp.status}`);
+  const text = await resp.text();
+  const rows = parseCSV(text);
+  // Materials start at row 16 (0-indexed: 15), col C (2) and D (3)
+  const prices = {};
+  for (let i = 15; i < rows.length; i++) {
+    const row = rows[i];
+    const name  = (row[2] || '').trim();
+    const price = cleanPrice(row[3] || '');
+    if (name && Number.isFinite(price)) {
+      prices[name.toLowerCase()] = price;
+      prices[name] = price; // also keep original case for display
+    }
+  }
+  return prices;
+}
+
+async function loadRecipes() {
+  const resp = await fetch(RECIPES_URL);
+  if (!resp.ok) throw new Error(`Recipes fetch failed: ${resp.status}`);
+  const data = await resp.json();
+  const results = [];
+  for (const [key, recipe] of Object.entries(data)) {
+    if (recipe.RewardSkill === 'Tailoring') {
+      results.push({
+        key,
+        name: recipe.Name || recipe.InternalName || key,
+        ingredients: (recipe.Ingredients || []).filter(ing => ing.ItemCode != null).map(ing => ({
+          itemCode: ing.ItemCode,
+          stackSize: ing.StackSize || 1,
+        })),
+      });
+    }
+  }
+  results.sort((a, b) => a.name.localeCompare(b.name));
+  return results;
+}
+
+async function loadItems() {
+  const resp = await fetch(ITEMS_URL);
+  if (!resp.ok) throw new Error(`Items fetch failed: ${resp.status}`);
+  const data = await resp.json();
+  const lookup = {};
+  for (const [key, item] of Object.entries(data)) {
+    lookup[key] = item.Name || key;
+  }
+  return lookup;
+}
+
+// ─── Combo box ────────────────────────────────────────────────────────────────
+function setupCombo() {
+  const input = document.getElementById('item-search');
+  const list  = document.getElementById('combo-list');
+  let activeIdx = -1;
+
+  function getFiltered() {
+    const q = input.value.toLowerCase();
+    return q
+      ? tailoringRecipes.map((r, i) => ({ r, i })).filter(({ r }) => r.name.toLowerCase().includes(q))
+      : tailoringRecipes.map((r, i) => ({ r, i }));
+  }
+
+  function renderList(filtered) {
+    list.innerHTML = '';
+    activeIdx = -1;
+    if (filtered.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'no-results';
+      li.textContent = 'No matches';
+      list.appendChild(li);
+      return;
+    }
+    filtered.forEach(({ r, i }, pos) => {
+      const li = document.createElement('li');
+      li.textContent = r.name;
+      li.dataset.idx = i;
+      li.addEventListener('mousedown', e => {
+        e.preventDefault(); // don't blur input before click registers
+        selectItem(i, r.name);
+      });
+      list.appendChild(li);
+    });
+  }
+
+  function openList() {
+    renderList(getFiltered());
+    list.classList.add('open');
+  }
+
+  function closeList() {
+    list.classList.remove('open');
+    activeIdx = -1;
+  }
+
+  function selectItem(idx, name) {
+    selectedRecipeIdx = idx;
+    input.value = name;
+    closeList();
+    updateCalc();
+  }
+
+  function setActive(pos) {
+    const items = list.querySelectorAll('li:not(.no-results)');
+    items.forEach(li => li.classList.remove('active'));
+    activeIdx = Math.max(0, Math.min(pos, items.length - 1));
+    if (items[activeIdx]) {
+      items[activeIdx].classList.add('active');
+      items[activeIdx].scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  input.addEventListener('focus', openList);
+
+  input.addEventListener('input', () => {
+    // Typing clears selection until user picks from list
+    selectedRecipeIdx = null;
+    openList();
+    updateCalc();
+  });
+
+  input.addEventListener('keydown', e => {
+    const items = list.querySelectorAll('li:not(.no-results)');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (!list.classList.contains('open')) openList();
+      setActive(activeIdx + 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActive(activeIdx - 1);
+    } else if (e.key === 'Enter') {
+      if (activeIdx >= 0 && items[activeIdx]) {
+        const idx = parseInt(items[activeIdx].dataset.idx);
+        selectItem(idx, tailoringRecipes[idx].name);
+      }
+    } else if (e.key === 'Escape') {
+      closeList();
+      input.blur();
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.combo-wrap')) closeList();
+  });
+
+  input.disabled = false;
+  input.placeholder = '— Type to search… —';
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
+  setStatus('Loading prices, recipes and items…', 'loading');
+  try {
+    [materialPrices, tailoringRecipes, itemNames] = await Promise.all([
+      loadSheetPrices(),
+      loadRecipes(),
+      loadItems(),
+    ]);
+  } catch (err) {
+    setStatus(`Error loading data: ${err.message}`, 'error');
+    return;
+  }
+
+  if (tailoringRecipes.length === 0) {
+    document.getElementById('item-search').placeholder = '— No Tailoring recipes found —';
+    setStatus('No Tailoring recipes found in recipes.json. The CDN data may not include them yet.', 'warn');
+  } else {
+    setupCombo();
+    const priceCount = Math.ceil(Object.keys(materialPrices).length / 2);
+    setStatus(`Ready · ${tailoringRecipes.length} recipes · ${priceCount} materials priced`, 'ok');
+  }
+
+  document.getElementById('craft-num').addEventListener('input', updateCalc);
+  document.getElementById('primary-gem').addEventListener('input', updateCalc);
+  document.getElementById('aux-gem').addEventListener('input', updateCalc);
+}
+
+// ─── Calculator ───────────────────────────────────────────────────────────────
+function updateCalc() {
+  if (selectedRecipeIdx === null) {
+    ['ingredients-card', 'totals-card', 'message-card'].forEach(id =>
+      document.getElementById(id).style.display = 'none');
+    return;
+  }
+
+  const recipe     = tailoringRecipes[selectedRecipeIdx];
+  const craftNum   = Math.max(1, parseInt(document.getElementById('craft-num').value) || 1);
+  const primaryGem = document.getElementById('primary-gem').value.trim();
+  const auxGem     = document.getElementById('aux-gem').value.trim();
+
+  // Build ingredient rows
+  const tbody = document.getElementById('ingredients-body');
+  tbody.innerHTML = '';
+  let subtotal = 0;
+  let missingPrices = [];
+
+  recipe.ingredients.forEach(ing => {
+    const itemKey  = `item_${ing.itemCode}`;
+    const itemName = itemNames[itemKey] || `Unknown (${itemKey})`;
+    const price    = materialPrices[itemName.toLowerCase()];
+    const totalQty = ing.stackSize * craftNum;
+    const lineTotal = Number.isFinite(price) ? price * totalQty : NaN;
+
+    if (Number.isFinite(lineTotal)) subtotal += lineTotal;
+    else missingPrices.push(itemName);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${itemName}</td>
+      <td>${ing.stackSize}</td>
+      <td>${totalQty}</td>
+      <td class="${Number.isFinite(price) ? 'price-cell' : 'no-price'}">${Number.isFinite(price) ? fmt(price) : 'no price'}</td>
+      <td class="${Number.isFinite(lineTotal) ? 'price-cell' : 'no-price'}">${Number.isFinite(lineTotal) ? fmt(lineTotal) : '—'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const vat   = subtotal * 0.5;
+  const total = subtotal + vat;
+
+  document.getElementById('t-subtotal').textContent = fmt(subtotal);
+  document.getElementById('t-vat').textContent      = fmt(vat);
+  document.getElementById('t-total').textContent    = fmt(total);
+
+  // Order message
+  const msg = `Hi Sinda. I would like [${craftNum}] copies of [${recipe.name}] with the [${primaryGem || '…'}] and [${auxGem || '…'}] skills for the total price of [${fmt(total)}] councils.`;
+  document.getElementById('output-msg').textContent = msg;
+
+  ['ingredients-card', 'totals-card', 'message-card'].forEach(id =>
+    document.getElementById(id).style.display = 'block');
+
+  // Update status if some prices are missing
+  if (missingPrices.length > 0) {
+    setStatus(`Note: no sheet price found for: ${missingPrices.join(', ')}`, 'warn');
+  } else {
+    const priceCount = Math.ceil(Object.keys(materialPrices).length / 2);
+    setStatus(`Ready · ${tailoringRecipes.length} recipes · ${priceCount} materials priced`, 'ok');
+  }
+}
+
+// ─── Copy ─────────────────────────────────────────────────────────────────────
+function copyMessage() {
+  const text = document.getElementById('output-msg').textContent;
+  const btn  = document.getElementById('copy-btn');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy to Clipboard';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy to Clipboard';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
