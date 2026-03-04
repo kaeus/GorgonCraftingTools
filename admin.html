@@ -216,7 +216,7 @@ function showGate(msg, denied = false) {
   gate.style.display = '';
   gate.className = denied ? 'denied' : '';
   gate.innerHTML = denied
-    ? `<h2>Access Denied</h2><p>${escHtml(msg)}</p><p style="margin-top:1rem;"><a href="/" style="color:#c9a96e;">← Back to Workboard</a></p>`
+    ? `<h2>Access Denied</h2><p>${escHtml(msg)}</p><p style="margin-top:1rem;"><a href="index.html" style="color:#c9a96e;">← Back to Workboard</a></p>`
     : `<p>${escHtml(msg)}</p>`;
   document.getElementById('admin-panel').style.display = 'none';
 }
