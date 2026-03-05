@@ -433,6 +433,8 @@
     #setup-body { overflow: hidden; }
     #setup-card.collapsed #setup-body { display: none; }
 
+    .item-icon { width: 24px; height: 24px; vertical-align: middle; margin-right: 6px; image-rendering: pixelated; }
+
     @media (max-width: 560px) {
       .form-grid, .form-grid.thirds { grid-template-columns: 1fr; }
     }
@@ -675,6 +677,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
+<script src="cdn.js"></script>
 
 <script>
 // ─── Firebase ─────────────────────────────────────────────────────────────────
@@ -1059,24 +1062,24 @@ function escHtml(str) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-const RECIPES_URL = 'https://cdn.projectgorgon.com/v461/data/recipes.json';
-const ITEMS_URL   = 'https://cdn.projectgorgon.com/v461/data/items.json';
-
 // ─── State ────────────────────────────────────────────────────────────────────
 let filteredRecipes   = [];  // recipes for the loaded profession
 let itemNames         = {};  // "item_1234" → "Name"
+let itemIcons         = {};  // "item_1234" → IconId
 let materialPrices    = {};  // lowercase name → price
 let selectedRecipeIdx = null;
+let _cdnBase          = null; // resolved CDN data base URL
 
 // Prefetch promises — start immediately, reused when Load is clicked
 let _recipesPromise = null;
 let _itemsPromise   = null;
 
-function prefetch() {
-  _recipesPromise = fetch(RECIPES_URL)
+async function prefetch() {
+  const base = await cdnReady;
+  _cdnBase = base;
+  _recipesPromise = fetch(base + 'recipes.json')
     .then(r => { if (!r.ok) throw new Error(`Recipes ${r.status}`); return r.json(); });
-  _itemsPromise = fetch(ITEMS_URL)
+  _itemsPromise = fetch(base + 'items.json')
     .then(r => { if (!r.ok) throw new Error(`Items ${r.status}`); return r.json(); });
   // Suppress unhandled-rejection noise before Load is clicked
   _recipesPromise.catch(() => {});
@@ -1187,10 +1190,12 @@ async function loadData() {
         : Promise.resolve(null),
     ]);
 
-    // Build item name lookup
+    // Build item name + icon lookup
     itemNames = {};
+    itemIcons = {};
     for (const [key, item] of Object.entries(itemsData)) {
       itemNames[key] = item.Name || key;
+      if (item.IconId != null) itemIcons[key] = item.IconId;
     }
 
     // Filter recipes by selected profession and crafter level
@@ -1404,12 +1409,18 @@ function updateCalc() {
   const tbody = document.getElementById('ingredients-body');
   tbody.innerHTML = '';
 
+  const iconBase = _cdnBase ? _cdnBase.replace('/data/', '/icons/') : null;
+
   recipe.ingredients.forEach(ing => {
     const itemKey  = `item_${ing.itemCode}`;
     const itemName = itemNames[itemKey] || `Unknown (${itemKey})`;
     const key      = itemName.toLowerCase();
     const price    = materialPrices[key];
     const totalQty = ing.stackSize * craftNum;
+    const iconId   = itemIcons[itemKey];
+    const iconHtml = (iconId != null && iconBase)
+      ? `<img class="item-icon" src="${iconBase}icon_${iconId}.png" alt="" loading="lazy" onerror="this.style.display='none'">`
+      : '';
 
     const tr = document.createElement('tr');
     tr.dataset.item = key;
@@ -1420,7 +1431,7 @@ function updateCalc() {
       : `<td><input type="number" class="price-override" min="0" step="1" placeholder="—"></td>`;
 
     tr.innerHTML = `
-      <td>${itemName}</td>
+      <td>${iconHtml}${escHtml(itemName)}</td>
       <td>${ing.stackSize}</td>
       <td>${totalQty}</td>
       ${priceCell}
