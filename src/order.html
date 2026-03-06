@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Place Order - CraftingCorner</title>
+  <script type="module" src="./js/main.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">
+    <a href="market.html" class="market-link">
+      <img src="./images/black_wing_rectangle.png" alt="Black Wing Market">
+    </a>
+  </div>
+  <a href="craftingOrders.html" class="action-btn ghost">Manage Your Listings</a>
+  <div class="topbar-title">
+    <img src="./images/crooked_coliseum_card.png" alt="Crooked Coliseum">
+  </div>
+  <div class="topbar-title">
+    <img src="./images/artisan_alley.png" alt="Artisan Alley">
+  </div>
+  <div id="user-auth-slot">
+    <button class="action-btn" data-action="open-auth">Sign In</button>
+  </div>
+</div>
+
+<div class="page">
+  <h1>Place Order</h1>
+  <p class="subtitle">Commission a crafter from Project Gorgon</p>
+
+  <div id="status" class="status-bar loading">Loading listing…</div>
+
+  <div id="listing-info" style="display:none;">
+    <!-- Crafter Info Section -->
+    <div class="section-header">
+      <h2>Crafter</h2>
+    </div>
+    <div id="listing-card" style="margin-bottom:2rem;"></div>
+
+    <!-- Order Details Section -->
+    <div class="section-header">
+      <h2>Order Details</h2>
+    </div>
+    <div id="order-form" style="margin-bottom:2rem;">
+      <label for="order-item">Item</label>
+      <div id="item-input-wrapper" style="position:relative; margin-bottom:1rem;">
+        <input type="text" id="order-item" placeholder="— Type to search… —" autocomplete="off" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#0a0a0a; color:#e8e8e8; font-family:inherit;">
+      </div>
+
+      <label for="order-quantity">Craft Quantity</label>
+      <input type="number" id="order-quantity" value="1" min="1" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#0a0a0a; color:#e8e8e8; margin-bottom:1rem; font-family:inherit;">
+
+      <div id="order-pricing" style="margin-bottom:1rem; padding:1rem; background:#0a0a0a; border-radius:5px; display:none;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+          <span>Base Price:</span>
+          <span id="base-price">—</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+          <span>Craft Cost:</span>
+          <span id="craft-cost">—</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; border-top:1px solid #505050; padding-top:0.5rem; font-weight:bold;">
+          <span>Total:</span>
+          <span id="total-price">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Place Order Section -->
+    <div class="section-header">
+      <h2>Place Order</h2>
+    </div>
+    <div id="place-order-form">
+      <label for="character-name">Your Character Name</label>
+      <input type="text" id="character-name" placeholder="e.g. Kilwind" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#0a0a0a; color:#e8e8e8; margin-bottom:1rem; font-family:inherit;">
+
+      <label for="order-notes">Note to Crafter (Optional)</label>
+      <textarea id="order-notes" placeholder="Any special requests or context…" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#0a0a0a; color:#e8e8e8; min-height:100px; font-family:inherit; margin-bottom:1rem;"></textarea>
+
+      <div id="order-submit-status" style="text-align:center; margin-bottom:1rem; color:#a8a8a8;">Select an item above to place an order.</div>
+      <button class="action-btn" data-action="submit-order" style="width:100%;" id="submit-order-btn" disabled>Place Order</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" data-action="close-auth">✕</button>
+    <h3>Sign In to Place Order</h3>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-google" data-tab="google">Google</button>
+      <button class="modal-tab" id="tab-email" data-tab="email">Email</button>
+    </div>
+
+    <div id="pane-google">
+      <button class="google-btn" data-action="sign-in-google">
+        <svg class="google-icon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continue with Google
+      </button>
+      <div id="google-error" class="modal-error" style="display:none;"></div>
+    </div>
+
+    <div id="pane-email" style="display:none;">
+      <div id="email-error" class="modal-error" style="display:none;"></div>
+      <div id="email-name-wrap" style="display:none;">
+        <label for="auth-name">Display Name</label>
+        <input type="text" id="auth-name" placeholder="Your in-game name">
+      </div>
+      <label for="auth-email">Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email">
+      <label for="auth-password">Password</label>
+      <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password">
+      <button class="modal-submit" id="email-submit" data-action="sign-in-email">Sign In</button>
+      <div class="modal-toggle">
+        <span id="toggle-text">Don't have an account?</span>
+        <a data-action="toggle-email-mode"> Register</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js"></script>
+
+</body>
+</html>

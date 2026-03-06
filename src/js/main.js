@@ -177,7 +177,7 @@ function setupEventListeners() {
       try {
         await db.collection('listings').add({
           ...listingData,
-          createdBy: user.uid,
+          uid: user.uid,
           createdAt: new Date(),
           active: true
         })
