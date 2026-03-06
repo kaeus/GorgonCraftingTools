@@ -3,7 +3,7 @@ import { glob } from 'glob'
 import path from 'path'
 
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/CraftingCorner/' : '/',
+  base: process.env.NODE_ENV === 'production' ? '/GorgonCraftingTools/' : '/',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
