@@ -23,6 +23,8 @@
 //                        && request.resource.data.uid == request.auth.uid;
 //          allow update: if request.auth != null
 //                        && resource.data.uid == request.auth.uid;
+//          // sample listing fields: crafterName, profession, server, pstAvailability,
+//          // sheetUrl, description, commissionPct, crafterLevel, active, createdAt
 //          // Owner OR admin can delete
 //          allow delete: if request.auth != null
 //                        && (resource.data.uid == request.auth.uid
