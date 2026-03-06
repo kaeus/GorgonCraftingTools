@@ -73,6 +73,14 @@ function setupEventListeners() {
     if (e.target.matches('[data-action="submit-order"]')) {
       OrderPageModule.submitOrder()
     }
+    if (e.target.matches('[data-action="cancel-order"]')) {
+      const orderId = e.target.dataset.orderId
+      window.cancelOrder(orderId)
+    }
+    if (e.target.matches('[data-action="delete-order"]')) {
+      const orderId = e.target.dataset.orderId
+      window.deleteOrder(orderId)
+    }
   })
 
   // Tab switching
@@ -95,6 +103,9 @@ function setupEventListeners() {
     if (e.target.id === 'server-filter') {
       ListingsModule.applyFilter()
     }
+    if (e.target.id === 'status-filter') {
+      ListingsModule.applyAdminFilter()
+    }
   })
 
   // Listing card click handlers
@@ -114,9 +125,70 @@ function setupEventListeners() {
   })
 
   // Posting listing button
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', async (e) => {
     if (e.target.matches('[data-action="post-listing"]')) {
       window.location.href = 'craftingOrders.html'
+    }
+    if (e.target.matches('[data-action="edit-listing"]')) {
+      const listingId = e.target.dataset.listingId
+      console.log('Edit listing:', listingId)
+      // TODO: Implement edit functionality
+    }
+    if (e.target.matches('[data-action="delete-listing"]')) {
+      const listingId = e.target.dataset.listingId
+      if (confirm('Delete this listing?')) {
+        await ListingsModule.deleteListing(listingId)
+        const user = await FirebaseModule.getCurrentUser()
+        if (user) {
+          await ListingsModule.loadUserListings(user.uid)
+        }
+      }
+    }
+  })
+
+  // New listing form submission
+  document.addEventListener('submit', async (e) => {
+    if (e.target.id === 'new-listing-form') {
+      e.preventDefault()
+      const user = await FirebaseModule.getCurrentUser()
+      if (!user) {
+        AuthModule.openAuthModal()
+        return
+      }
+
+      const listingData = {
+        crafterName: document.getElementById('listing-name').value,
+        profession: document.getElementById('listing-profession').value,
+        server: document.getElementById('listing-server').value,
+        crafterLevel: document.getElementById('listing-level').value || null,
+        commissionRate: document.getElementById('listing-commission').value,
+        pstAvailability: document.getElementById('listing-pst').value || null,
+        description: document.getElementById('listing-description').value || null
+      }
+
+      // Check required fields
+      if (!listingData.crafterName || !listingData.profession || !listingData.server || !listingData.commissionRate) {
+        alert('Please fill in all required fields')
+        return
+      }
+
+      // Add createdBy before saving
+      const db = FirebaseModule.getFirestore()
+      try {
+        await db.collection('listings').add({
+          ...listingData,
+          createdBy: user.uid,
+          createdAt: new Date(),
+          active: true
+        })
+        // Clear form
+        e.target.reset()
+        // Reload listings
+        await ListingsModule.loadUserListings(user.uid)
+      } catch (error) {
+        console.error('Error creating listing:', error)
+        alert('Error creating listing. Please try again.')
+      }
     }
   })
 }
@@ -152,6 +224,10 @@ function initializeApp() {
     if (user && document.querySelector('#my-orders-container')) {
       OrdersModule.subscribeMyOrders(user.uid, OrdersModule.renderMyOrders)
     }
+    // Load crafting interface if user is on craftingOrders page
+    if (user && document.querySelector('#crafting-area') !== null) {
+      ListingsModule.loadUserListings(user.uid)
+    }
   })
 }
 
@@ -168,6 +244,8 @@ window.toggleEmailMode = AuthModule.toggleEmailMode
 window.applyFilter = ListingsModule.applyFilter
 window.loadListings = ListingsModule.loadListings
 window.searchListings = ListingsModule.searchListings
+window.loadAllListings = ListingsModule.loadAllListings
+window.applyAdminFilter = ListingsModule.applyAdminFilter
 
 // Orders functions
 window.cancelOrder = OrdersModule.cancelOrder

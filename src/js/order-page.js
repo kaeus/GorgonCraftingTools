@@ -141,16 +141,22 @@ function showItemSuggestions(searchTerm) {
         border-bottom: 1px solid #505050;
         cursor: pointer;
         transition: background 0.2s;
-      " onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='transparent'">
+      ">
         <div style="font-weight:bold;">${escapeHtml(item.name)}</div>
         <div style="font-size:0.85rem; color:#a8a8a8;">${item.basePrice} gold base price</div>
       </div>
     `).join('')
     
-    // Add click listeners to suggestions
+    // Add event listeners to suggestions
     suggestionsDiv.querySelectorAll('.item-suggestion').forEach(el => {
       el.addEventListener('click', () => {
         selectItemById(el.dataset.itemId)
+      })
+      el.addEventListener('mouseover', () => {
+        el.style.background = '#1a1a1a'
+      })
+      el.addEventListener('mouseout', () => {
+        el.style.background = 'transparent'
       })
     })
   }

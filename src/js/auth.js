@@ -159,11 +159,11 @@ export function renderUserAuth(user) {
       <div class="user-chip">
         <div class="avatar">${photoHtml}</div>
         <span>${displayName}</span>
-        <button class="auth-btn secondary" onclick="signOut()">Sign Out</button>
+        <button class="auth-btn secondary" data-action="sign-out">Sign Out</button>
         <div id="admin-link-slot">${adminLink}</div>
       </div>
     `
   } else {
-    slot.innerHTML = '<button class="action-btn" onclick="openAuthModal()">Sign In</button>'
+    slot.innerHTML = '<button class="action-btn" data-action="open-auth">Sign In</button>'
   }
 }

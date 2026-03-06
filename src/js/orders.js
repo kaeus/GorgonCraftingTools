@@ -52,7 +52,7 @@ export function renderMyOrders(docs) {
     const d = doc.data()
     const canCancel = d.status === 'pending'
     const cancelBtn = canCancel
-      ? `<button class="cancel-btn" onclick="cancelOrder('${doc.id}')">Cancel</button>`
+      ? `<button class="cancel-btn" data-action="cancel-order" data-order-id="${doc.id}">Cancel</button>`
       : ''
     const date = formatDate(d.createdAt)
 
@@ -63,7 +63,7 @@ export function renderMyOrders(docs) {
         <td><span class="badge ${d.status}">${d.status}</span></td>
         <td>${date}</td>
         <td>${cancelBtn}</td>
-        <td><button class="delete-order-btn" onclick="deleteOrder('${doc.id}')">Delete</button></td>
+        <td><button class="delete-order-btn" data-action="delete-order" data-order-id="${doc.id}">Delete</button></td>
       </tr>
     `
   }).join('')
