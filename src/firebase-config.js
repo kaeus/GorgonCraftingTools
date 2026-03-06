@@ -69,7 +69,7 @@
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const FIREBASE_CONFIG = {
+window.FIREBASE_CONFIG = {
   apiKey: "AIzaSyBLBftKwNteyYbKDGsDpTjlmCPnfhAlfA8",
   authDomain: "gorgon-crafting-tools.firebaseapp.com",
   projectId: "gorgon-crafting-tools",
