@@ -3,18 +3,19 @@ import { glob } from 'glob'
 import path from 'path'
 
 export default defineConfig({
+  root: 'src',
   base: process.env.NODE_ENV === 'production' ? '/GorgonCraftingTools/' : '/',
   build: {
-    outDir: 'dist',
+    outDir: '../dist',
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        index: path.resolve(__dirname, 'src/pages/index.html'),
-        market: path.resolve(__dirname, 'src/pages/market.html'),
-        order: path.resolve(__dirname, 'src/pages/order.html'),
-        'order-view': path.resolve(__dirname, 'src/pages/order-view.html'),
-        'craftingOrders': path.resolve(__dirname, 'src/pages/craftingOrders.html'),
-        admin: path.resolve(__dirname, 'src/pages/admin.html')
+        index: path.resolve(__dirname, 'src/index.html'),
+        market: path.resolve(__dirname, 'src/market.html'),
+        order: path.resolve(__dirname, 'src/order.html'),
+        'order-view': path.resolve(__dirname, 'src/order-view.html'),
+        'craftingOrders': path.resolve(__dirname, 'src/craftingOrders.html'),
+        admin: path.resolve(__dirname, 'src/admin.html')
       },
       output: {
         entryFileNames: 'js/[name].js',
@@ -30,6 +31,6 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    open: '/src/pages/market.html'
+    open: '/market.html'
   }
 })

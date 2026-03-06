@@ -16,18 +16,13 @@ export function subscribeMyOrders(uid, callback) {
     return null
   }
 
-  // Load all orders and filter/sort in JavaScript to avoid requiring Firestore indexes
   return db.collection('orders')
+    .where('customerUid', '==', uid)
+    .orderBy('createdAt', 'desc')
     .onSnapshot(snap => {
-      const userOrders = snap.docs
-        .filter(doc => doc.data().customerId === uid)
-        .sort((a, b) => {
-          const timeA = a.data().createdAt?.toMillis?.() || 0
-          const timeB = b.data().createdAt?.toMillis?.() || 0
-          return timeB - timeA
-        })
-      
-      callback(userOrders)
+      callback(snap.docs)
+    }, err => {
+      console.error('Error subscribing to orders:', err)
     })
 }
 
@@ -135,7 +130,7 @@ export async function createOrder(listing) {
 
   try {
     const orderRef = await db.collection('orders').add({
-      customerId: auth.currentUser.uid,
+      customerUid: auth.currentUser.uid,
       customerEmail: auth.currentUser.email,
       listingId: listing.id,
       crafterName: listing.crafterName,
