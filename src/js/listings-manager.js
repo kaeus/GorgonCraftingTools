@@ -7,57 +7,104 @@ import { getFirestore, getAuth } from './firebase.js'
 import { escapeHtml, PROFESSION_EMOJI, setStatus } from './utils.js'
 
 let userListings = []
-let sheetLoadedStatus = {} // Track which forms have loaded sheets
-let cachedSkills = null // Cache for unique skills from recipes.json
 
 /**
- * Format skill name for display
- * Converts "FlowerArrangement" to "Flower Arrangement"
- * and replaces underscores with spaces
+ * Fetch all unique ingredients for a profession
  */
-function formatSkillName(skillName) {
-  return skillName
-    .replace(/_/g, ' ') // Replace underscores with spaces
-    .replace(/([A-Z])/g, ' $1') // Insert space before capital letters
-    .trim() // Remove leading/trailing spaces
-    .replace(/\s+/g, ' ') // Collapse multiple spaces into one
-}
-
-/**
- * Fetch unique skills from recipes.json
- * Only includes skills that have ResultItems
- */
-async function getUniqueSkills() {
-  // Return cached skills if already fetched
-  if (cachedSkills !== null) {
-    return cachedSkills
-  }
-
+async function getIngredientsForProfession(profession) {
   try {
     const response = await fetch('https://cdn.projectgorgon.com/v461/data/recipes.json')
-    if (!response.ok) {
-      console.error('Failed to fetch recipes.json:', response.statusText)
-      return []
-    }
-
-    const recipes = await response.json()
-    const skillsSet = new Set()
-
-    // Extract unique skills from recipes that have ResultItems
-    if (recipes && typeof recipes === 'object') {
-      for (const recipe of Object.values(recipes)) {
-        if (recipe.Skill && typeof recipe.Skill === 'string' && 
-            Array.isArray(recipe.ResultItems) && recipe.ResultItems.length > 0) {
-          skillsSet.add(recipe.Skill)
-        }
+    if (!response.ok) throw new Error('Failed to fetch recipes')
+    
+    const allRecipes = await response.json()
+    
+    // Also fetch items data to resolve ItemCode to names and get IconId
+    const itemsResponse = await fetch('https://cdn.projectgorgon.com/v461/data/items.json')
+    const itemsData = itemsResponse.ok ? await itemsResponse.json() : {}
+    
+    const ingredientMap = {} // Map to deduplicate ingredients
+    
+    Object.entries(allRecipes).forEach(([recipeId, recipe]) => {
+      if ((recipe.Skill || '').toLowerCase() === profession.toLowerCase()) {
+        const ingredients = recipe.Ingredients || []
+        ingredients.forEach(ing => {
+          let desc = ing.Desc
+          let itemKey = null
+          let iconId = null
+          let iconUrl = null
+          
+          // Case 1: Ingredient with Desc field (variable ingredients like "Any Bone")
+          if (desc) {
+            const key = desc.toLowerCase()
+            if (!ingredientMap[key]) {
+              // Try to find icon by looking up first ItemKey in items' Keywords
+              if (ing.ItemKeys && ing.ItemKeys.length > 0) {
+                const firstItemKey = ing.ItemKeys[0]
+                
+                // Search through all items to find one with this keyword
+                for (let [itemDatabaseKey, itemData] of Object.entries(itemsData)) {
+                  if (itemData && itemData.Keywords && Array.isArray(itemData.Keywords)) {
+                    if (itemData.Keywords.includes(firstItemKey) && itemData.IconId) {
+                      iconId = itemData.IconId
+                      iconUrl = `https://cdn.projectgorgon.com/v461/icons/icon_${iconId}.png`
+                      break
+                    }
+                  }
+                }
+              }
+              
+              ingredientMap[key] = {
+                desc: desc,
+                itemKeys: ing.ItemKeys || [],
+                stackSize: ing.StackSize || 1,
+                iconId: iconId,
+                iconUrl: iconUrl
+              }
+            }
+          }
+          // Case 2: Ingredient with ItemCode (fixed ingredients)
+          else if (ing.ItemCode !== undefined) {
+            const itemKey = `item_${ing.ItemCode}`
+            const item = itemsData[itemKey]
+            if (item && item.Name) {
+              const key = item.Name.toLowerCase()
+              if (!ingredientMap[key]) {
+                iconId = item.IconId
+                if (iconId) {
+                  iconUrl = `https://cdn.projectgorgon.com/v461/icons/icon_${iconId}.png`
+                }
+                ingredientMap[key] = {
+                  desc: item.Name,
+                  itemCode: ing.ItemCode,
+                  stackSize: ing.StackSize || 1,
+                  iconId: iconId,
+                  iconUrl: iconUrl
+                }
+              }
+            } else {
+              // Fallback if item not found
+              const key = `item_${ing.ItemCode}`.toLowerCase()
+              if (!ingredientMap[key]) {
+                ingredientMap[key] = {
+                  desc: `Item #${ing.ItemCode}`,
+                  itemCode: ing.ItemCode,
+                  stackSize: ing.StackSize || 1,
+                  iconId: null,
+                  iconUrl: null
+                }
+              }
+            }
+          } else {
+            console.warn('Ingredient missing both Desc and ItemCode in recipe', recipeId, ':', ing)
+          }
+        })
       }
-    }
-
-    // Convert set to sorted array and cache it
-    cachedSkills = Array.from(skillsSet).sort()
-    return cachedSkills
+    })
+    
+    // Convert to sorted array
+    return Object.values(ingredientMap).sort((a, b) => a.desc.localeCompare(b.desc))
   } catch (error) {
-    console.error('Error fetching recipes:', error)
+    console.error('Error fetching ingredients:', error)
     return []
   }
 }
@@ -65,7 +112,7 @@ async function getUniqueSkills() {
 /**
  * Initialize the listings manager page
  */
-export function initListingsManager() {
+export async function initListingsManager() {
   const craftingArea = document.getElementById('crafting-area')
   const status = document.getElementById('status')
   
@@ -84,7 +131,8 @@ export function initListingsManager() {
   craftingArea.style.display = 'block'
   if (status) status.style.display = 'block'
   
-  loadUserListings(auth.currentUser.uid)
+  // Wait for listings to load
+  await loadUserListings(auth.currentUser.uid)
 }
 
 /**
@@ -136,10 +184,24 @@ function renderListingsManager(docs) {
   const craftingArea = document.getElementById('crafting-area')
   if (!craftingArea) return
 
-  // Separate listings by type
-  const itemListings = docs.filter(doc => doc.data().type === 'item')
-  const craftedListings = docs.filter(doc => doc.data().type === 'crafted' || !doc.data().type)
-  const serviceListings = docs.filter(doc => doc.data().type === 'service')
+  const rowsHtml = docs.map(doc => {
+    const d = doc.data()
+    const emoji = PROFESSION_EMOJI[d.profession] || '🔨'
+    const statusBadge = d.active ? '<span class="badge active">Active</span>' : '<span class="badge inactive">Inactive</span>'
+    
+    return `
+      <tr>
+        <td><strong>${emoji} ${escapeHtml(d.profession)}</strong></td>
+        <td>${escapeHtml(d.crafterName)}</td>
+        <td>${escapeHtml(d.server || '—')}</td>
+        <td>${statusBadge}</td>
+        <td>
+          <button class="action-btn ghost" onclick="window.editListing('${doc.id}')">Edit</button>
+          <button class="delete-btn" onclick="window.deleteListing('${doc.id}')">Delete</button>
+        </td>
+      </tr>
+    `
+  }).join('')
 
   if (docs.length === 0) {
     craftingArea.innerHTML = `
@@ -152,132 +214,25 @@ function renderListingsManager(docs) {
     return
   }
 
-  let html = `
+  craftingArea.innerHTML = `
     <div style="margin-bottom:1rem;">
       <button class="action-btn" onclick="window.createNewListing()">+ Create New Listing</button>
     </div>
+    <table class="listings-table">
+      <thead>
+        <tr>
+          <th>Profession</th>
+          <th>Crafter Name</th>
+          <th>Server</th>
+          <th>Status</th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+    </table>
   `
-
-  // Black Wing Market Section
-  if (itemListings.length > 0) {
-    html += `
-      <div style="margin-bottom:2rem;">
-        <h3 style="margin-bottom:1rem; color:#c9a961;">🏴 Black Wing Market</h3>
-        <table class="listings-table">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Amount</th>
-              <th>Unit Price</th>
-              <th>Fence</th>
-              <th>Server</th>
-              <th>Status</th>
-              <th style="text-align:right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemListings.map(doc => {
-              const d = doc.data()
-              const statusBadge = d.active ? '<span class="badge active">Active</span>' : '<span class="badge inactive">Inactive</span>'
-              return `
-                <tr>
-                  <td>${escapeHtml(d.itemName || 'Unknown')}</td>
-                  <td>${d.amount || 0}</td>
-                  <td>${d.pricePerUnit || 0} 💰</td>
-                  <td>${escapeHtml(d.characterName || '—')}</td>
-                  <td>${escapeHtml(d.server || '—')}</td>
-                  <td>${statusBadge}</td>
-                  <td style="text-align:right;">
-                    <button class="action-btn ghost" onclick="window.editListing('${doc.id}')">Edit</button>
-                    <button class="delete-btn" onclick="window.deleteListing('${doc.id}')">Delete</button>
-                  </td>
-                </tr>
-              `
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-    `
-  }
-
-  // Artisan Alley Section
-  if (craftedListings.length > 0) {
-    html += `
-      <div style="margin-bottom:2rem;">
-        <h3 style="margin-bottom:1rem;">🎨 Artisan Alley</h3>
-        <table class="listings-table">
-          <thead>
-            <tr>
-              <th>Profession</th>
-              <th>Crafter Name</th>
-              <th>Server</th>
-              <th>Status</th>
-              <th style="text-align:right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${craftedListings.map(doc => {
-              const d = doc.data()
-              const emoji = PROFESSION_EMOJI[d.profession] || '🔨'
-              const statusBadge = d.active ? '<span class="badge active">Active</span>' : '<span class="badge inactive">Inactive</span>'
-              return `
-                <tr>
-                  <td><strong>${emoji} ${escapeHtml(d.profession)}</strong></td>
-                  <td>${escapeHtml(d.crafterName)}</td>
-                  <td>${escapeHtml(d.server || '—')}</td>
-                  <td>${statusBadge}</td>
-                  <td style="text-align:right;">
-                    <button class="action-btn ghost" onclick="window.editListing('${doc.id}')">Edit</button>
-                    <button class="delete-btn" onclick="window.deleteListing('${doc.id}')">Delete</button>
-                  </td>
-                </tr>
-              `
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-    `
-  }
-
-  // Legs List Section (Services)
-  if (serviceListings.length > 0) {
-    html += `
-      <div style="margin-bottom:2rem;">
-        <h3 style="margin-bottom:1rem; color:#ff6b6b;">💼 Legs List</h3>
-        <table class="listings-table">
-          <thead>
-            <tr>
-              <th>Service</th>
-              <th>Provider</th>
-              <th>Server</th>
-              <th>Status</th>
-              <th style="text-align:right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${serviceListings.map(doc => {
-              const d = doc.data()
-              const statusBadge = d.active ? '<span class="badge active">Active</span>' : '<span class="badge inactive">Inactive</span>'
-              return `
-                <tr>
-                  <td>${escapeHtml(d.serviceName || 'Unknown Service')}</td>
-                  <td>${escapeHtml(d.characterName || '—')}</td>
-                  <td>${escapeHtml(d.server || '—')}</td>
-                  <td>${statusBadge}</td>
-                  <td style="text-align:right;">
-                    <button class="action-btn ghost" onclick="window.editListing('${doc.id}')">Edit</button>
-                    <button class="delete-btn" onclick="window.deleteListing('${doc.id}')">Delete</button>
-                  </td>
-                </tr>
-              `
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-    `
-  }
-
-  craftingArea.innerHTML = html
 }
 
 /**
@@ -318,14 +273,14 @@ export function createNewListing() {
 /**
  * Handle listing type selection
  */
-export async function selectListingType(type) {
+export function selectListingType(type) {
   const listingTypeModal = document.getElementById('listing-type-modal')
   if (listingTypeModal) {
     listingTypeModal.classList.remove('open')
   }
 
   if (type === 'crafted') {
-    await showListingForm(null)
+    showListingForm(null)
   } else if (type === 'item') {
     showItemListingForm()
   } else if (type === 'service') {
@@ -341,22 +296,11 @@ async function showItemListingForm() {
   if (!craftingArea) return
 
   const formHtml = `
-    <style>
-      /* Hide number input spinners */
-      #item-price::-webkit-outer-spin-button,
-      #item-price::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-      #item-price[type=number] {
-        -moz-appearance: textfield;
-      }
-    </style>
     <div style="margin-bottom:2rem; padding:1.5rem; background:#0a0a0a; border:1px solid #505050; border-radius:5px;">
       <h3 style="margin-bottom:1.5rem; font-size:1.1rem;">Fence an Item</h3>
       <p style="color:#a8a8a8; font-size:0.9rem; margin-bottom:1rem;">List items you want to sell on the Black Wing Market.</p>
       <div id="item-form-container">
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+        <div style="display:grid; gap:1rem;">
           <!-- Character Name -->
           <div>
             <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Character Name *</label>
@@ -383,7 +327,7 @@ async function showItemListingForm() {
           </div>
           
           <!-- Item Search -->
-          <div style="grid-column:1 / -1;">
+          <div>
             <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Item *</label>
             <div style="position:relative;">
               <input type="text" id="item-search" placeholder="Search items..." style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;" autocomplete="off">
@@ -406,23 +350,17 @@ async function showItemListingForm() {
             <input type="number" id="item-price" placeholder="Price per unit" min="1" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
           </div>
           
-          <!-- Total Expected Councils -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Total Expected Councils</label>
-            <input type="text" id="item-total" readonly style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#2a2a2a; color:#7cb342; cursor:default;">
-          </div>
-          
           <!-- Notes -->
-          <div style="grid-column:1 / -1;">
+          <div>
             <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Notes (Optional)</label>
             <textarea id="item-notes" placeholder="Add any notes about this listing..." style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8; min-height:80px; font-family:inherit; resize:vertical;"></textarea>
           </div>
           
           <!-- Error Message -->
-          <div id="item-form-error" style="grid-column:1 / -1; color:#ff6b6b; background:#2a1a1a; border:1px solid #4a3030; border-radius:4px; padding:0.6rem; display:none;"></div>
+          <div id="item-form-error" style="color:#ff6b6b; background:#2a1a1a; border:1px solid #4a3030; border-radius:4px; padding:0.6rem; display:none;"></div>
           
           <!-- Buttons -->
-          <div style="grid-column:1 / -1; display:flex; gap:1rem;">
+          <div style="display:flex; gap:1rem;">
             <button class="action-btn" id="item-submit-btn" onclick="window.saveItemListing()" disabled style="opacity:0.5; cursor:not-allowed;">Create Listing</button>
             <button class="action-btn ghost" onclick="window.cancelItemListingForm()">Cancel</button>
           </div>
@@ -456,36 +394,22 @@ function showServiceListingModal() {
 /**
  * Edit a listing
  */
-export async function editListing(listingId) {
+export function editListing(listingId) {
   const listing = userListings.find(doc => doc.id === listingId)
   if (listing) {
-    await showListingForm(listing)
+    showListingForm(listing)
   }
 }
 
 /**
  * Show listing form (create or edit)
  */
-async function showListingForm(docSnapshot = null) {
+function showListingForm(docSnapshot = null) {
   const craftingArea = document.getElementById('crafting-area')
   if (!craftingArea) return
 
   const isEditing = docSnapshot !== null
   const d = docSnapshot?.data?.() || {}
-
-  // Reset sheet loaded status for new form
-  sheetLoadedStatus = { sheet: false }
-  
-  // If editing and already has a sheet URL, mark as loaded
-  if (isEditing && d.sheetUrl) {
-    sheetLoadedStatus.sheet = true
-  }
-
-  // Fetch unique skills from recipes
-  const skills = await getUniqueSkills()
-  const skillOptions = skills.map(skill => 
-    `<option value="${escapeHtml(skill)}" ${d.profession === skill ? 'selected' : ''}>${formatSkillName(skill)}</option>`
-  ).join('')
 
   const formHtml = `
     <div style="margin-bottom:2rem; padding:1.5rem; background:#0a0a0a; border:1px solid #505050; border-radius:5px;">
@@ -500,7 +424,15 @@ async function showListingForm(docSnapshot = null) {
           <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Profession *</label>
           <select id="form-profession" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
             <option value="">Select a profession</option>
-            ${skillOptions}
+            <option value="Weaponcrafting" ${d.profession === 'Weaponcrafting' ? 'selected' : ''}>Weaponcrafting</option>
+            <option value="Armorsmithing" ${d.profession === 'Armorsmithing' ? 'selected' : ''}>Armorsmithing</option>
+            <option value="Tailoring" ${d.profession === 'Tailoring' ? 'selected' : ''}>Tailoring</option>
+            <option value="Carpentry" ${d.profession === 'Carpentry' ? 'selected' : ''}>Carpentry</option>
+            <option value="Jewelcrafting" ${d.profession === 'Jewelcrafting' ? 'selected' : ''}>Jewelcrafting</option>
+            <option value="Alchemy" ${d.profession === 'Alchemy' ? 'selected' : ''}>Alchemy</option>
+            <option value="Cooking" ${d.profession === 'Cooking' ? 'selected' : ''}>Cooking</option>
+            <option value="Engraving" ${d.profession === 'Engraving' ? 'selected' : ''}>Engraving</option>
+            <option value="Scribing" ${d.profession === 'Scribing' ? 'selected' : ''}>Scribing</option>
           </select>
         </div>
       </div>
@@ -540,12 +472,20 @@ async function showListingForm(docSnapshot = null) {
       </div>
 
       <div style="margin-bottom:1rem;">
-        <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Google Sheets URL *</label>
-        <div style="display:flex; gap:0.5rem;">
-          <input type="url" id="form-sheet-url" value="${escapeHtml(d.sheetUrl || '')}" placeholder="Link to your pricing/availability sheet" style="flex:1; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;" required>
-          <button type="button" class="action-btn ghost" onclick="window.loadGoogleSheet()" style="padding:0.75rem 1rem; white-space:nowrap;">Load Sheet</button>
+        <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Ingredient Prices *</label>
+        <div id="ingredient-pricing-fixed" style="border:1px solid #505050; border-radius:5px; padding:1rem; background:#1a1a1a; max-height:400px; overflow-y:auto;">
+          <div style="color:#a8a8a8; text-align:center; padding:2rem;">Select a profession above to load ingredients</div>
         </div>
-        <div id="sheet-load-status" style="font-size:0.75rem; color:#a8a8a8; margin-top:0.35rem; display:none;"></div>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">
+          Variable Ingredient Prices *
+          <span class="info-icon" title="Some recipe ingredient requirements can be met via varying ingredients (e.g. elf skull vs human skull). Consider your cheapest option in the category (even zero if it is an existing item to be modified)." style="display:inline-flex; align-items:center; justify-content:center; width:1.2rem; height:1.2rem; background:#505050; border-radius:50%; font-size:0.7rem; cursor:help; text-transform:none;">?</span>
+        </label>
+        <div id="ingredient-pricing-variable" style="border:1px solid #505050; border-radius:5px; padding:1rem; background:#1a1a1a; max-height:400px; overflow-y:auto;">
+          <div style="color:#a8a8a8; text-align:center; padding:2rem;">Select a profession above to load ingredients</div>
+        </div>
       </div>
 
       <div style="margin-bottom:1.5rem;">
@@ -588,17 +528,22 @@ export async function saveNewListing(listingId) {
   const crafterName = document.getElementById('form-crafter-name').value.trim()
   const profession = document.getElementById('form-profession').value.trim()
   const commissionRate = document.getElementById('form-commission').value.trim()
-  const sheetUrl = document.getElementById('form-sheet-url').value.trim()
+  const ingredientPrices = getIngredientPrices()
 
-  if (!crafterName || !profession || !commissionRate || !sheetUrl) {
+  if (!crafterName || !profession || !commissionRate) {
     document.getElementById('form-error').textContent = 'Please fill in all required fields (marked with *)'
+    document.getElementById('form-error').style.display = 'block'
+    return
+  }
+
+  if (Object.keys(ingredientPrices).length === 0) {
+    document.getElementById('form-error').textContent = 'Please set prices for at least one ingredient'
     document.getElementById('form-error').style.display = 'block'
     return
   }
 
   try {
     const listingData = {
-      type: 'crafted',
       crafterName,
       profession,
       server: document.getElementById('form-server').value.trim() || null,
@@ -606,7 +551,7 @@ export async function saveNewListing(listingId) {
       pstAvailability: document.getElementById('form-pst').value.trim() || null,
       commissionRate,
       description: document.getElementById('form-description').value.trim() || null,
-      sheetUrl,
+      ingredientPrices,
       active: document.getElementById('form-active').checked,
       uid: auth.currentUser.uid,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -634,87 +579,27 @@ export async function saveNewListing(listingId) {
 }
 
 /**
- * Load and validate Google Sheet URL
- */
-export async function loadGoogleSheet() {
-  const sheetUrlInput = document.getElementById('form-sheet-url')
-  const statusDiv = document.getElementById('sheet-load-status')
-  
-  if (!sheetUrlInput) return
-  
-  const sheetUrl = sheetUrlInput.value.trim()
-  
-  if (!sheetUrl) {
-    statusDiv.textContent = '⚠ Please enter a Google Sheets URL'
-    statusDiv.style.color = '#ffb74d'
-    statusDiv.style.display = 'block'
-    return
-  }
-
-  try {
-    statusDiv.textContent = '⏳ Loading sheet…'
-    statusDiv.style.color = '#a8a8a8'
-    statusDiv.style.display = 'block'
-
-    // Validate it's a Google Sheets URL
-    if (!sheetUrl.includes('docs.google.com/spreadsheets')) {
-      throw new Error('Invalid Google Sheets URL. Must be from docs.google.com/spreadsheets')
-    }
-
-    // Extract sheet ID from URL
-    const sheetIdMatch = sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/)
-    if (!sheetIdMatch) {
-      throw new Error('Could not extract sheet ID from URL')
-    }
-
-    const sheetId = sheetIdMatch[1]
-
-    // Construct public CSV export URL for the first sheet
-    const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`
-    
-    // Try to fetch the sheet as CSV
-    const response = await fetch(csvUrl)
-    if (!response.ok) {
-      throw new Error('Could not load sheet. Make sure it is publicly shared (link sharing enabled)')
-    }
-
-    const csvData = await response.text()
-    
-    if (!csvData || csvData.trim().length === 0) {
-      throw new Error('Sheet appears to be empty')
-    }
-
-    // Success message
-    statusDiv.textContent = '✓ Sheet loaded successfully!'
-    statusDiv.style.color = '#7cb342'
-    statusDiv.style.display = 'block'
-
-    // Mark sheet as loaded and validate form
-    const formId = document.getElementById('form-crafter-name')?.formId || 'new'
-    sheetLoadedStatus['sheet'] = true
-    validateForm(formId)
-
-  } catch (error) {
-    console.error('Error loading sheet:', error)
-    statusDiv.textContent = '✗ ' + error.message
-    statusDiv.style.color = '#ff6b6b'
-    statusDiv.style.display = 'block'
-    
-    // Mark as not loaded
-    sheetLoadedStatus['sheet'] = false
-    validateForm('new')
-  }
-}
-
-/**
  * Set up real-time validation for form inputs
  */
 function setupFormValidation(formId) {
+  const professionSelect = document.getElementById('form-profession')
+  
+  if (professionSelect) {
+    professionSelect.addEventListener('change', async (e) => {
+      await loadAndRenderIngredients(e.target.value)
+      validateForm(formId)
+    })
+    
+    // Load ingredients if editing existing listing with profession
+    const currentProfession = professionSelect.value
+    if (currentProfession) {
+      loadAndRenderIngredients(currentProfession)
+    }
+  }
+  
   const inputs = [
     'form-crafter-name',
-    'form-profession',
-    'form-commission',
-    'form-sheet-url'
+    'form-commission'
   ]
 
   inputs.forEach(inputId => {
@@ -727,22 +612,135 @@ function setupFormValidation(formId) {
 }
 
 /**
+ * Load and render ingredients for selected profession
+ */
+async function loadAndRenderIngredients(profession) {
+  const fixedContainer = document.getElementById('ingredient-pricing-fixed')
+  const variableContainer = document.getElementById('ingredient-pricing-variable')
+  
+  if (!fixedContainer || !variableContainer) return
+  
+  if (!profession) {
+    fixedContainer.innerHTML = '<div style="color:#a8a8a8; text-align:center; padding:2rem;">Select a profession above to load ingredients</div>'
+    variableContainer.innerHTML = '<div style="color:#a8a8a8; text-align:center; padding:2rem;">Select a profession above to load ingredients</div>'
+    return
+  }
+  
+  fixedContainer.innerHTML = '<div style="color:#a8a8a8; text-align:center; padding:2rem;">Loading ingredients…</div>'
+  variableContainer.innerHTML = '<div style="color:#a8a8a8; text-align:center; padding:2rem;">Loading ingredients…</div>'
+  
+  const ingredients = await getIngredientsForProfession(profession)
+  
+  if (ingredients.length === 0) {
+    fixedContainer.innerHTML = '<div style="color:#a8a8a8; text-align:center; padding:2rem;">No ingredients found for this profession</div>'
+    variableContainer.innerHTML = '<div style="color:#a8a8a8; text-align:center; padding:2rem;">No ingredients found for this profession</div>'
+    return
+  }
+  
+  // Separate ingredients into fixed and variable
+  const fixedIngredients = ingredients.filter(ing => ing.itemCode !== undefined)
+  const variableIngredients = ingredients.filter(ing => ing.itemKeys && ing.itemKeys.length > 0)
+  
+  // Render fixed ingredients
+  if (fixedIngredients.length > 0) {
+    const fixedHtml = fixedIngredients.map((ing, idx) => {
+      const inputId = `fixed-ing-${idx}`
+      return `
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid #404040;">
+          ${ing.iconUrl ? `<img src="${ing.iconUrl}" alt="${escapeHtml(ing.desc)}" style="width:32px; height:32px; object-fit:contain; flex-shrink:0;">` : '<div style="width:32px; height:32px; background:#404040; border-radius:4px; flex-shrink:0;"></div>'}
+          <label for="${inputId}" style="font-size:0.85rem; color:#e8e8e8; min-width:200px; flex-shrink:0;">
+            <strong>${escapeHtml(ing.desc)}</strong>
+          </label>
+          <input 
+            type="number"
+            id="${inputId}"
+            name="ingredient_fixed_${idx}"
+            class="ingredient-price-input"
+            data-ingredient="${escapeHtml(ing.desc)}"
+            placeholder="Price"
+            min="0"
+            step="1"
+            style="flex:1; padding:0.5rem; border:1px solid #505050; border-radius:4px; background:#0a0a0a; color:#e8e8e8; font-size:0.9rem;"
+          >
+        </div>
+      `
+    }).join('')
+    fixedContainer.innerHTML = fixedHtml
+  } else {
+    fixedContainer.innerHTML = '<div style="color:#a8a8a8; text-align:center; padding:2rem;">No fixed ingredients for this profession</div>'
+  }
+  
+  // Render variable ingredients
+  if (variableIngredients.length > 0) {
+    const variableHtml = variableIngredients.map((ing, idx) => {
+      const inputId = `variable-ing-${idx}`
+      console.log(`Variable ingredient: ${ing.desc}, iconUrl: ${ing.iconUrl}, itemKeys: ${ing.itemKeys.join(', ')}`)
+      return `
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid #404040;">
+          ${ing.iconUrl ? `<img src="${ing.iconUrl}" alt="${escapeHtml(ing.desc)}" style="width:32px; height:32px; object-fit:contain; flex-shrink:0;">` : '<div style="width:32px; height:32px; background:#404040; border-radius:4px; flex-shrink:0;"></div>'}
+          <label for="${inputId}" style="font-size:0.85rem; color:#e8e8e8; min-width:200px; flex-shrink:0;">
+            <strong>${escapeHtml(ing.desc)}</strong>
+          </label>
+          <input 
+            type="number"
+            id="${inputId}"
+            name="ingredient_variable_${idx}"
+            class="ingredient-price-input"
+            data-ingredient="${escapeHtml(ing.desc)}"
+            placeholder="Price"
+            min="0"
+            step="1"
+            style="flex:1; padding:0.5rem; border:1px solid #505050; border-radius:4px; background:#0a0a0a; color:#e8e8e8; font-size:0.9rem;"
+          >
+        </div>
+      `
+    }).join('')
+    variableContainer.innerHTML = variableHtml
+  } else {
+    variableContainer.innerHTML = '<div style="color:#a8a8a8; text-align:center; padding:2rem;">No variable ingredients for this profession</div>'
+  }
+  
+  // Add event listeners to ingredient inputs
+  document.querySelectorAll('.ingredient-price-input').forEach(input => {
+    input.addEventListener('input', () => validateForm(''))
+    input.addEventListener('change', () => validateForm(''))
+  })
+}
+
+/**
+ * Get all ingredient prices from form
+ */
+function getIngredientPrices() {
+  const ingredients = {}
+  document.querySelectorAll('.ingredient-price-input').forEach(input => {
+    const ingredientName = input.getAttribute('data-ingredient')
+    const price = parseFloat(input.value) || 0
+    if (ingredientName && price > 0) {
+      ingredients[ingredientName] = price
+    }
+  })
+  return ingredients
+}
+
+/**
  * Validate form and update button state
  */
 function validateForm(formId) {
   const crafterName = document.getElementById('form-crafter-name')?.value.trim() || ''
   const profession = document.getElementById('form-profession')?.value.trim() || ''
   const commissionRate = document.getElementById('form-commission')?.value.trim() || ''
-  const sheetUrl = document.getElementById('form-sheet-url')?.value.trim() || ''
   const submitBtn = document.getElementById('submit-listing-btn')
 
   if (!submitBtn) return
 
-  // Check if all required fields are filled and sheet is loaded
-  const allFieldsFilled = crafterName && profession && commissionRate && sheetUrl
-  const sheetLoaded = sheetLoadedStatus['sheet'] === true
+  // Check if all required fields are filled
+  const allFieldsFilled = crafterName && profession && commissionRate
+  
+  // Check if at least one ingredient has a price
+  const ingredientPrices = getIngredientPrices()
+  const hasIngredientsWithPrices = Object.keys(ingredientPrices).length > 0
 
-  const isValid = allFieldsFilled && sheetLoaded
+  const isValid = allFieldsFilled && hasIngredientsWithPrices
 
   // Update button state
   submitBtn.disabled = !isValid
@@ -1015,34 +1013,6 @@ function setupItemFormValidation() {
       input.addEventListener('change', validateItemForm)
     }
   })
-  
-  // Add listeners for total calculation
-  const amountInput = document.getElementById('item-amount')
-  const priceInput = document.getElementById('item-price')
-  
-  if (amountInput) {
-    amountInput.addEventListener('input', calculateItemTotal)
-    amountInput.addEventListener('change', calculateItemTotal)
-  }
-  
-  if (priceInput) {
-    priceInput.addEventListener('input', calculateItemTotal)
-    priceInput.addEventListener('change', calculateItemTotal)
-  }
-}
-
-/**
- * Calculate total expected councils
- */
-function calculateItemTotal() {
-  const amount = parseInt(document.getElementById('item-amount')?.value) || 0
-  const price = parseInt(document.getElementById('item-price')?.value) || 0
-  const total = amount * price
-  const totalField = document.getElementById('item-total')
-  
-  if (totalField) {
-    totalField.value = total > 0 ? total.toLocaleString() : ''
-  }
 }
 
 /**

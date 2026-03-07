@@ -4,9 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CraftingCorner - Index</title>
+  <style>
+    body { visibility: hidden; }
+  </style>
   <script type="module" src="../../src/js/main.js"></script>
 </head>
 <body>
+
+<!-- ── Global Loading Overlay ── -->
+<div id="global-loading-overlay">
+  <img src="../../images/loading.png" alt="Loading...">
+</div>
 
 <!-- ── Sidebar ── -->
 <div class="topbar">
@@ -15,7 +23,11 @@
       <img src="../../images/black_wing_rectangle.png" alt="Black Wing Market">
     </a>
   </div>
-  <a href="yourListings.html" class="action-btn ghost" id="post-listing-btn">Manage Your Listings</a>
+  <div class="topbar-title">
+    <a href="yourListings.html" class="topbar-image-link" id="post-listing-btn">
+      <img src="../../images/manage_listings.png" alt="Manage Your Listings">
+    </a>
+  </div>
   <div class="topbar-title">
     <img src="../../images/crooked_coliseum_card.png" alt="Crooked Coliseum">
   </div>
@@ -112,7 +124,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../firebase-config.js"></script>
+<script src="/firebase-config.js"></script>
 
 </body>
 </html>

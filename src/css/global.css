@@ -6,6 +6,36 @@
   padding: 0; 
 }
 
+/* ── Global Loading Overlay ── */
+#global-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: #000;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
+}
+
+#global-loading-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#global-loading-overlay img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  animation: pulse-scale 2s ease-in-out infinite;
+}
+
+@keyframes pulse-scale {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
 body {
   background-color: #0a0a0a;
   background-image: linear-gradient(rgba(10, 10, 10, 0.50), rgba(10, 10, 10, 0.50)), url('../assets/textures/bg_texture.jpg');
@@ -43,6 +73,8 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   align-items: center;
   width: 100%;
+  flex-shrink: 0;
+  min-width: 0;
   font-size: 1rem;
   font-weight: 700;
   color: #f5f5f5;
@@ -54,6 +86,7 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
   height: 80px;
   width: auto;
+  max-width: 100%;
   transition: filter 0.15s, box-shadow 0.15s;
 }
 
@@ -996,4 +1029,74 @@ h1 {
   .listings-grid { 
     grid-template-columns: 1fr; 
   }
+}
+
+/* ── Dark theme scrollbar styling ── */
+/* Standard scrollbar for Chromium-based browsers and Firefox */
+* {
+  scrollbar-color: #404040 #1a1a1a;
+  scrollbar-width: thin;
+}
+
+/* Webkit scrollbar styling (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-left: 1px solid #303030;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 5px;
+  border: 2px solid #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #505050;
+  cursor: pointer;
+}
+
+/* Remove white/default scrollbar styles on all elements */
+html {
+  scrollbar-color: #404040 #1a1a1a;
+  scrollbar-width: thin;
+}
+
+body {
+  scrollbar-color: #404040 #1a1a1a;
+  scrollbar-width: thin;
+}
+
+/* Apply to scrollable containers */
+.page,
+.topbar,
+.modal,
+.listings-grid,
+.orders-table,
+textarea,
+select,
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  scrollbar-color: #404040 #1a1a1a;
+  scrollbar-width: thin;
+}
+
+/* ── Remove number input spinners/increment arrows ── */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"]:focus {
+  -moz-appearance: textfield;
 }

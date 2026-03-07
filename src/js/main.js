@@ -152,7 +152,7 @@ function setupEventListeners() {
  * Initialize page-specific functionality
  * Called when the DOM is ready
  */
-function initializeApp() {
+async function initializeApp() {
   console.log('CraftingCorner app initialized')
   
   // Render sidebar on all pages
@@ -175,15 +175,9 @@ function initializeApp() {
     FirebaseModule.initializeFirebase(FIREBASE_CONFIG)
   }
   
-  // Load initial listings based on page
+  // Load initial listings if we're on the market page
   if (document.querySelector('.listings-grid')) {
-    // Check if we're on the market page or artisan alley page
-    const pageTitle = document.querySelector('h1')?.textContent || ''
-    if (pageTitle.includes('Black Wing Market')) {
-      ListingsModule.loadMarketListings()
-    } else {
-      ListingsModule.loadListings()
-    }
+    await ListingsModule.loadListings()
   }
   
   // Initialize order page if we're on order.html
@@ -193,25 +187,68 @@ function initializeApp() {
   
   // Initialize listings manager if we're on yourListings.html
   if (document.querySelector('#crafting-area')) {
-    FirebaseModule.onAuthStateChanged((user) => {
+    // Wait for auth state to settle
+    await new Promise((resolve) => {
+      const unsubscribe = FirebaseModule.onAuthStateChanged(async (user) => {
+        AuthModule.renderUserAuth(user)
+        if (user) {
+          await ListingsManagerModule.initListingsManager()
+        } else {
+          document.getElementById('status').textContent = 'You must be signed in to manage listings'
+          document.getElementById('status').className = 'status-bar error'
+        }
+        unsubscribe()
+        resolve()
+      })
+    })
+  } else {
+    // Set up auth state listener for other pages
+    FirebaseModule.onAuthStateChanged(async (user) => {
       AuthModule.renderUserAuth(user)
-      if (user) {
-        ListingsManagerModule.initListingsManager()
-      } else {
-        document.getElementById('status').textContent = 'You must be signed in to manage listings'
-        document.getElementById('status').className = 'status-bar error'
+      if (user && document.querySelector('#my-orders-container')) {
+        OrdersModule.subscribeMyOrders(user.uid, OrdersModule.renderMyOrders)
       }
     })
-    return // Skip the generic auth state change listener below
+  }
+
+  // Hide the global loading overlay after all content is loaded
+  await hideGlobalLoadingOverlay()
+}
+
+/**
+ * Hide the global loading overlay with fade-out effect
+ */
+async function hideGlobalLoadingOverlay() {
+  const overlay = document.getElementById('global-loading-overlay')
+  if (!overlay) return
+  
+  // Wait for fonts to load if available
+  if (document.fonts && document.fonts.ready) {
+    try {
+      await document.fonts.ready
+    } catch (e) {
+      console.warn('Font loading check failed:', e)
+    }
   }
   
-  // Set up auth state listener
-  FirebaseModule.onAuthStateChanged(async (user) => {
-    AuthModule.renderUserAuth(user)
-    if (user && document.querySelector('#my-orders-container')) {
-      OrdersModule.subscribeMyOrders(user.uid, OrdersModule.renderMyOrders)
+  // Wait for next animation frame to ensure DOM is fully rendered
+  await new Promise(resolve => requestAnimationFrame(resolve))
+  
+  // Give additional time for styles to apply
+  await new Promise(resolve => setTimeout(resolve, 200))
+  
+  // Make body visible
+  document.body.style.visibility = 'visible'
+  
+  // Add the hidden class to fade out the overlay
+  overlay.classList.add('hidden')
+  
+  // Remove from DOM after animation completes
+  setTimeout(() => {
+    if (overlay.parentNode) {
+      overlay.remove()
     }
-  })
+  }, 500)
 }
 
 // Expose module functions to global scope for onclick handlers in HTML
@@ -226,7 +263,6 @@ window.toggleEmailMode = AuthModule.toggleEmailMode
 // Listings functions
 window.applyFilter = ListingsModule.applyFilter
 window.loadListings = ListingsModule.loadListings
-window.loadMarketListings = ListingsModule.loadMarketListings
 window.searchListings = ListingsModule.searchListings
 
 // Orders functions

@@ -33,7 +33,11 @@ export function renderSidebar() {
         <img src="./images/crooked_coliseum_card.png" alt="Crooked Coliseum">
       </a>
     </div>
-    <a href="yourListings.html" class="action-btn ghost" id="post-listing-btn">Manage Your Listings</a>
+    <div class="topbar-title">
+      <a href="yourListings.html" class="topbar-image-link" id="post-listing-btn">
+        <img src="./images/manage_listings.png" alt="Manage Your Listings">
+      </a>
+    </div>
     <div id="user-auth-slot">
       <button class="action-btn" data-action="open-auth">Sign In</button>
     </div>
@@ -92,7 +96,11 @@ export function renderOrderSidebar() {
         <img src="./images/black_wing_rectangle.png" alt="Black Wing Market">
       </a>
     </div>
-    <a href="yourListings.html" class="action-btn ghost">Manage Your Listings</a>
+    <div class="topbar-title">
+      <a href="yourListings.html" class="topbar-image-link">
+        <img src="./images/manage_listings.png" alt="Manage Your Listings">
+      </a>
+    </div>
     <div class="topbar-title">
       <a href="artisan_alley.html" class="topbar-image-link">
         <img src="./images/artisan_alley.png" alt="Artisan Alley">

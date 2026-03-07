@@ -24,12 +24,9 @@ export async function loadListings() {
     // Load all listings and filter/sort in JavaScript to avoid needing Firestore indexes
     const snap = await db.collection('listings').get()
 
-    // Filter for active 'crafted' listings and sort by createdAt descending
+    // Filter for active listings and sort by createdAt descending
     allListingDocs = snap.docs
-      .filter(doc => {
-        const data = doc.data()
-        return data.active === true && (data.type === 'crafted' || !data.type) // Default to 'crafted' if no type (for backwards compatibility)
-      })
+      .filter(doc => doc.data().active === true)
       .sort((a, b) => {
         const timeA = a.data().createdAt?.toMillis?.() || 0
         const timeB = b.data().createdAt?.toMillis?.() || 0
@@ -40,42 +37,6 @@ export async function loadListings() {
     setStatus('status', '', 'ok')
   } catch (error) {
     console.error('Error loading listings:', error)
-    setStatus('status', 'Error loading listings', 'error')
-  }
-}
-
-/**
- * Load market (item fencing) listings from Firestore
- */
-export async function loadMarketListings() {
-  const db = getFirestore()
-  if (!db) {
-    console.error('Firestore not initialized')
-    return
-  }
-
-  try {
-    setStatus('status', 'Loading listings…', 'loading')
-    
-    // Load all listings and filter for 'item' type
-    const snap = await db.collection('listings').get()
-
-    // Filter for active 'item' listings and sort by createdAt descending
-    allListingDocs = snap.docs
-      .filter(doc => {
-        const data = doc.data()
-        return data.active === true && data.type === 'item'
-      })
-      .sort((a, b) => {
-        const timeA = a.data().createdAt?.toMillis?.() || 0
-        const timeB = b.data().createdAt?.toMillis?.() || 0
-        return timeB - timeA
-      })
-
-    renderMarketListings(allListingDocs)
-    setStatus('status', '', 'ok')
-  } catch (error) {
-    console.error('Error loading market listings:', error)
     setStatus('status', 'Error loading listings', 'error')
   }
 }
@@ -128,45 +89,6 @@ export function renderListings(docs) {
         ${descLine}
         <div class="card-footer">
           <a href="/order.html?id=${encodeURIComponent(doc.id)}" class="order-link">Place Order</a>
-        </div>
-      </div>
-    `
-  }).join('')
-}
-
-/**
- * Render market (item fencing) listings to the grid
- */
-export function renderMarketListings(docs) {
-  const grid = document.getElementById('listings-grid')
-  if (!grid) return
-
-  if (docs.length === 0) {
-    grid.innerHTML = '<div class="empty-state">No items available</div>'
-    return
-  }
-
-  grid.innerHTML = docs.map(doc => {
-    const d = doc.data()
-    const serverLine = d.server ? `<div class="server">🌐 ${escapeHtml(d.server)}</div>` : ''
-    const pstLine = d.pstAvailability ? `<div class="pst">🕒 ${escapeHtml(d.pstAvailability)}</div>` : ''
-    const itemName = escapeHtml(d.itemName || 'Unknown Item')
-    const amount = d.amount || 0
-    const price = d.pricePerUnit || 0
-    const total = amount * price
-    const notesLine = d.notes ? `<div class="notes" style="font-size:0.85rem; color:#a8a8a8; margin-top:0.5rem;">${escapeHtml(d.notes.length > 100 ? d.notes.substring(0, 100) + '...' : d.notes)}</div>` : ''
-
-    return `
-      <div class="listing-crafting-card">
-        <div class="profession" style="color:#c9a961;">📦 Item Listing</div>
-        <div class="crafter-name">${itemName}</div>
-        <div class="commission" style="color:#7cb342;">💰 ${price} councils each</div>
-        <div style="font-size:0.9rem; color:#b0b0b0; margin-top:0.25rem;">Available: ${amount}</div>
-        ${serverLine}
-        ${pstLine}
-        ${notesLine}
-        <div class="card-footer">
-          <a href="/order.html?id=${encodeURIComponent(doc.id)}" class="order-link">Purchase</a>
         </div>
       </div>
     `
