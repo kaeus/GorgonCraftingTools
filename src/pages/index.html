@@ -5,16 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CraftingCorner - Index</title>
   <style>
-    body { visibility: hidden; }
+    body { visibility: hidden; background-color: #000; }
+    #global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
   </style>
   <script type="module" src="../../src/js/main.js"></script>
 </head>
 <body>
 
 <!-- ── Global Loading Overlay ── -->
-<div id="global-loading-overlay">
-  <img src="../../images/loading.png" alt="Loading...">
-</div>
+<div id="global-loading-overlay"></div>
 
 <!-- ── Sidebar ── -->
 <div class="topbar">
