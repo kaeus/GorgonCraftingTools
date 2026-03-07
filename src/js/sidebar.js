@@ -14,6 +14,11 @@ export function renderSidebar() {
   // Define the standard sidebar structure
   const sidebarHTML = `
     <div class="topbar-title">
+      <a href="yourListings.html" class="topbar-image-link" id="post-listing-btn">
+        <img src="./images/manage_listings.png" alt="Manage Your Listings">
+      </a>
+    </div>
+    <div class="topbar-title">
       <a href="market.html" class="topbar-image-link">
         <img src="./images/black_wing_rectangle.png" alt="Black Wing Market">
       </a>
@@ -31,11 +36,6 @@ export function renderSidebar() {
     <div class="topbar-title">
       <a href="#" class="topbar-image-link">
         <img src="./images/crooked_coliseum_card.png" alt="Crooked Coliseum">
-      </a>
-    </div>
-    <div class="topbar-title">
-      <a href="yourListings.html" class="topbar-image-link" id="post-listing-btn">
-        <img src="./images/manage_listings.png" alt="Manage Your Listings">
       </a>
     </div>
     <div id="user-auth-slot">
