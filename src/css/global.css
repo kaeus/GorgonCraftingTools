@@ -1100,3 +1100,160 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"]:focus {
   -moz-appearance: textfield;
 }
+
+/* ── NPC Message System ── */
+.npc-container {
+  z-index: 1000;
+  pointer-events: none;
+  width: 500px;
+  height: 325px;
+}
+
+/* Position variants */
+.npc-position-bottom-right {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+}
+
+.npc-position-bottom-left {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+
+.npc-position-top-right {
+  position: fixed;
+  top: 0;
+  right: 0;
+}
+
+.npc-position-top-left {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.npc-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
+
+.npc-container img[data-npc-role="base"] {
+  transition: none;
+}
+
+/* ── NPC Animation States ── */
+
+/* Active: Slide in with wobble */
+.npc-container.active img[data-npc-role="base"] {
+  opacity: 1;
+  animation: slideInMaxillae 3s linear forwards, wobbleMaxillae 3s ease-in-out forwards;
+}
+
+/* Talking: Dialogue image fades in, base stays visible */
+.npc-container.talking img[data-npc-role="base"] {
+  opacity: 1;
+}
+
+.npc-container.talking img[data-npc-role="dialogue"] {
+  opacity: 1;
+}
+
+/* Fading: Dialogue fades out, base stays visible */
+.npc-container.fading-out img[data-npc-role="base"] {
+  opacity: 1;
+}
+
+.npc-container.fading-out img[data-npc-role="dialogue"] {
+  opacity: 0;
+}
+
+/* Leaving: Slide out with wobble */
+.npc-container.leaving img[data-npc-role="base"] {
+  opacity: 1;
+  animation: slideOutMaxillae 3s linear forwards, wobbleOut 3s ease-in-out forwards;
+}
+
+@keyframes slideInMaxillae {
+  from {
+    transform: translateX(100%) translateY(100%);
+  }
+  to {
+    transform: translateX(0) translateY(0);
+  }
+}
+
+@keyframes wobbleMaxillae {
+  0%, 100% {
+    rotate: 0deg;
+  }
+  12.5% {
+    rotate: -2deg;
+  }
+  25% {
+    rotate: 0deg;
+  }
+  37.5% {
+    rotate: 2deg;
+  }
+  50% {
+    rotate: 0deg;
+  }
+  62.5% {
+    rotate: -2deg;
+  }
+  75% {
+    rotate: 0deg;
+  }
+  87.5% {
+    rotate: 2deg;
+  }
+}
+
+#maxillae-slide.leaving {
+  animation: slideOutMaxillae 3s linear forwards, wobbleOut 3s ease-in-out forwards;
+}
+
+@keyframes slideOutMaxillae {
+  from {
+    transform: translateX(0) translateY(0);
+  }
+  to {
+    transform: translateX(100%) translateY(100%);
+  }
+}
+
+@keyframes wobbleOut {
+  0%, 100% {
+    rotate: 0deg;
+  }
+  12.5% {
+    rotate: -2deg;
+  }
+  25% {
+    rotate: 0deg;
+  }
+  37.5% {
+    rotate: 2deg;
+  }
+  50% {
+    rotate: 0deg;
+  }
+  62.5% {
+    rotate: -2deg;
+  }
+  75% {
+    rotate: 0deg;
+  }
+  87.5% {
+    rotate: 2deg;
+  }
+}

@@ -24,9 +24,19 @@ export async function loadListings() {
     // Load all listings and filter/sort in JavaScript to avoid needing Firestore indexes
     const snap = await db.collection('listings').get()
 
-    // Filter for active listings and sort by createdAt descending
+    // Determine which type of listings to show based on current page
+    const isMarketPage = window.location.pathname.includes('market.html')
+    const requiredType = isMarketPage ? 'item' : 'crafting'
+
+    // Filter for active listings of the correct type and sort by createdAt descending
     allListingDocs = snap.docs
-      .filter(doc => doc.data().active === true)
+      .filter(doc => {
+        const data = doc.data()
+        // Show listings that:
+        // 1. Are active
+        // 2. Match the required type (or have no type field for backward compatibility with crafting)
+        return data.active === true && (data.type === requiredType || (!data.type && requiredType === 'crafting'))
+      })
       .sort((a, b) => {
         const timeA = a.data().createdAt?.toMillis?.() || 0
         const timeB = b.data().createdAt?.toMillis?.() || 0
@@ -69,21 +79,34 @@ export function renderListings(docs) {
     return
   }
 
+  // Determine which card type to render based on current page
+  const isMarketPage = window.location.pathname.includes('market.html')
+  const cardClass = isMarketPage ? 'listing-item-card' : 'listing-crafting-card'
+
   grid.innerHTML = docs.map(doc => {
     const d = doc.data()
-    const emoji = PROFESSION_EMOJI[d.profession] || '🔨'
+    const emoji = isMarketPage ? '📦' : (PROFESSION_EMOJI[d.profession] || '🔨')
     const serverLine = d.server ? `<div class="server">🌐 ${escapeHtml(d.server)}</div>` : ''
     const pstLine = d.pstAvailability ? `<div class="pst">🕒 ${escapeHtml(d.pstAvailability)}</div>` : ''
-    const levelLine = d.crafterLevel ? ` - Lvl ${d.crafterLevel}` : ''
+    const levelLine = !isMarketPage && d.crafterLevel ? ` - Lvl ${d.crafterLevel}` : ''
     const descLine = d.description 
       ? `<div class="description">${escapeHtml(d.description.length > 100 ? d.description.substring(0, 100) + '...' : d.description)}</div>` 
       : ''
+    
+    // For market page, show item name; for artisan alley, show profession
+    const titleLine = isMarketPage 
+      ? `<div class="item-name"><strong>${escapeHtml(d.itemName || 'Item')}</strong></div>`
+      : `<div class="profession">${emoji} ${escapeHtml(d.profession)}</div>`
+    
+    // For market page, show quantity and price per unit; for artisan alley, show crafter info
+    const detailsLine = isMarketPage
+      ? `<div class="item-details">${d.amount} available @ ${d.pricePerUnit} council each</div>`
+      : `<div class="crafter-name">${escapeHtml(d.crafterName)}${levelLine}</div><div class="commission">${escapeHtml(d.commissionRate)}</div>`
 
     return `
-      <div class="listing-crafting-card">
-        <div class="profession">${emoji} ${escapeHtml(d.profession)}</div>
-        <div class="crafter-name">${escapeHtml(d.crafterName)}${levelLine}</div>
-        <div class="commission">${escapeHtml(d.commissionRate)}</div>
+      <div class="${cardClass}">
+        ${titleLine}
+        ${detailsLine}
         ${serverLine}
         ${pstLine}
         ${descLine}

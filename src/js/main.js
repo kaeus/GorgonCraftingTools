@@ -7,6 +7,7 @@ import * as UtilsModule from './utils.js'
 import * as OrderPageModule from './order-page.js'
 import * as ListingsManagerModule from './listings-manager.js'
 import * as SidebarModule from './sidebar.js'
+import { initNPCMessage } from './npc-message.js'
 
 /**
  * Component Loader
@@ -149,6 +150,10 @@ function setupEventListeners() {
 }
 
 /**
+ * Maxillae Dialogue Sequence
+ * After max_0 slides in, shows random dialogue images then exits
+ */
+/**
  * Initialize page-specific functionality
  * Called when the DOM is ready
  */
@@ -178,11 +183,37 @@ async function initializeApp() {
   // Load initial listings if we're on the market page
   if (document.querySelector('.listings-grid')) {
     await ListingsModule.loadListings()
+    
+    // Initialize NPC message system for maxillae on market page
+    initNPCMessage('maxillae', {
+      position: 'bottom-right',
+      imagesPath: './images/black_wing_market_maxillae/',
+      imagePrefix: 'max_',
+      talkTime: 5000
+    })
   }
   
   // Initialize order page if we're on order.html
   if (document.querySelector('#order-form')) {
     OrderPageModule.initOrderPage()
+  }
+  
+  // Initialize order-view page if we're on order-view.html
+  if (document.querySelector('#order-details')) {
+    const urlParams = new URLSearchParams(window.location.search)
+    const orderId = urlParams.get('id')
+    if (orderId) {
+      const order = await OrdersModule.getOrderById(orderId)
+      if (order) {
+        await OrdersModule.renderOrderDetails(order)
+      } else {
+        const statusDiv = document.getElementById('status')
+        if (statusDiv) {
+          statusDiv.textContent = 'Order not found'
+          statusDiv.className = 'status-bar error'
+        }
+      }
+    }
   }
   
   // Initialize listings manager if we're on yourListings.html

@@ -544,6 +544,7 @@ export async function saveNewListing(listingId) {
 
   try {
     const listingData = {
+      type: 'crafting',
       crafterName,
       profession,
       server: document.getElementById('form-server').value.trim() || null,
@@ -901,9 +902,13 @@ export async function initItemListingForm() {
       
       results.innerHTML = filtered.map((item) => {
         const escapedName = (item.Name || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;')
+        const iconHtml = item.IconId
+          ? `<img src="https://cdn.projectgorgon.com/v461/icons/icon_${item.IconId}.png" alt="${escapeHtml(item.Name)}" style="width:24px; height:24px; margin-right:0.5rem; vertical-align:middle; border:1px solid #505050; border-radius:3px;" onerror="this.style.opacity='0.3'">`
+          : ''
         return `
-          <div class="item-result" data-item-id="${item.id}" data-item-name="${escapedName}" style="padding:0.75rem; cursor:pointer; border-bottom:1px solid #303030; color:#e8e8e8; font-size:0.9rem; transition:background 0.2s;">
-            ${escapeHtml(item.Name)}
+          <div class="item-result" data-item-id="${item.id}" data-item-name="${escapedName}" style="padding:0.75rem; cursor:pointer; border-bottom:1px solid #303030; color:#e8e8e8; font-size:0.9rem; transition:background 0.2s; display:flex; align-items:center;">
+            ${iconHtml}
+            <span>${escapeHtml(item.Name)}</span>
           </div>
         `
       }).join('')

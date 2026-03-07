@@ -859,6 +859,19 @@ export async function submitOrder() {
     const quantity = parseInt(document.getElementById('order-quantity').value) || 1
     const { ingredients, craftCostTotal } = await calculateOrderIngredients(selectedItemRecipe, quantity)
     
+    // Clean ingredients: remove undefined values for Firestore compatibility
+    const cleanedIngredients = {}
+    for (const [name, data] of Object.entries(ingredients)) {
+      cleanedIngredients[name] = {}
+      // Only include defined values
+      if (data.desc !== undefined) cleanedIngredients[name].desc = data.desc
+      if (data.recipeQuantity !== undefined) cleanedIngredients[name].recipeQuantity = data.recipeQuantity
+      if (data.craftQuantity !== undefined) cleanedIngredients[name].craftQuantity = data.craftQuantity
+      if (data.finalQuantity !== undefined) cleanedIngredients[name].finalQuantity = data.finalQuantity
+      if (data.costPerUnit !== undefined) cleanedIngredients[name].costPerUnit = data.costPerUnit
+      if (data.totalCost !== undefined) cleanedIngredients[name].totalCost = data.totalCost
+    }
+    
     // Calculate commission
     const commissionStr = (currentListing.commissionRate || '50%').replace('%', '')
     const commissionRate = parseInt(commissionStr) / 100
@@ -872,7 +885,7 @@ export async function submitOrder() {
       quantity: quantity,
       characterName: charName,
       notes: document.getElementById('order-notes').value,
-      ingredients: ingredients,
+      ingredients: cleanedIngredients,
       craftCostTotal: craftCostTotal,
       commissionRate: commissionStr,
       commissionCost: commissionCost,
