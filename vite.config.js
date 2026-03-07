@@ -12,9 +12,10 @@ export default defineConfig({
       input: {
         index: path.resolve(__dirname, 'src/index.html'),
         market: path.resolve(__dirname, 'src/market.html'),
+        'artisan_alley': path.resolve(__dirname, 'src/artisan_alley.html'),
         order: path.resolve(__dirname, 'src/order.html'),
         'order-view': path.resolve(__dirname, 'src/order-view.html'),
-        'craftingOrders': path.resolve(__dirname, 'src/craftingOrders.html'),
+        'yourListings': path.resolve(__dirname, 'src/yourListings.html'),
         admin: path.resolve(__dirname, 'src/admin.html')
       },
       output: {

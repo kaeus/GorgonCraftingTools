@@ -3,40 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Black Wing Market</title>
+  <title>Black Wing Market - CraftingCorner</title>
   <script type="module" src="./js/main.js"></script>
 </head>
 <body>
 
-<!-- ── Sidebar ── -->
-<div class="topbar">
-  <div class="topbar-title">
-    <a href="market.html" class="market-link">
-      <img src="./images/black_wing_rectangle.png" alt="Black Wing Market">
-    </a>
-  </div>
-  <a href="craftingOrders.html" class="action-btn ghost" data-action="post-listing">Manage Your Listings</a>
-  <div class="topbar-title">
-    <img src="./images/crooked_coliseum_card.png" alt="Crooked Coliseum">
-  </div>
-  <div class="topbar-title">
-    <img src="./images/artisan_alley.png" alt="Artisan Alley">
-  </div>
-  <div id="user-auth-slot">
-    <button class="action-btn" data-action="open-auth">Sign In</button>
-  </div>
-</div>
+<!-- ── Sidebar (rendered by sidebar.js) ── -->
+<div class="topbar"></div>
 
 <!-- ── Main page ── -->
 <div class="page">
-  <h1>Crafting Workboard</h1>
-  <p class="subtitle">Project Gorgon · Browse crafter listings and place orders</p>
+  <h1>Black Wing Market</h1>
+  <p class="subtitle">A tangled bazaar where coin speaks louder than conscience. Rare goods, questionable wares, and items better left unasked about pass from shadowed hands to eager buyers. If you can pay the price, someone here can sell you almost anything.</p>
 
   <div id="status" class="status-bar loading">Loading listings…</div>
 
   <!-- Active listings -->
   <div class="section-header">
-    <h2>Active Crafters</h2>
+    <h2>Featured "Merchants"</h2>
   </div>
   <div class="filter-bar">
     <label for="server-filter">Server</label>

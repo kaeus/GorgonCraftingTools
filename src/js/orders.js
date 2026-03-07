@@ -16,13 +16,18 @@ export function subscribeMyOrders(uid, callback) {
     return null
   }
 
+  // Load all orders and filter/sort in JavaScript to avoid requiring Firestore indexes
   return db.collection('orders')
-    .where('customerUid', '==', uid)
-    .orderBy('createdAt', 'desc')
     .onSnapshot(snap => {
-      callback(snap.docs)
-    }, err => {
-      console.error('Error subscribing to orders:', err)
+      const userOrders = snap.docs
+        .filter(doc => doc.data().customerUid === uid)
+        .sort((a, b) => {
+          const timeA = a.data().createdAt?.toMillis?.() || 0
+          const timeB = b.data().createdAt?.toMillis?.() || 0
+          return timeB - timeA
+        })
+      
+      callback(userOrders)
     })
 }
 
@@ -47,7 +52,7 @@ export function renderMyOrders(docs) {
     const d = doc.data()
     const canCancel = d.status === 'pending'
     const cancelBtn = canCancel
-      ? `<button class="cancel-btn" data-action="cancel-order" data-order-id="${doc.id}">Cancel</button>`
+      ? `<button class="cancel-btn" onclick="cancelOrder('${doc.id}')">Cancel</button>`
       : ''
     const date = formatDate(d.createdAt)
 
@@ -58,7 +63,7 @@ export function renderMyOrders(docs) {
         <td><span class="badge ${d.status}">${d.status}</span></td>
         <td>${date}</td>
         <td>${cancelBtn}</td>
-        <td><button class="delete-order-btn" data-action="delete-order" data-order-id="${doc.id}">Delete</button></td>
+        <td><button class="delete-order-btn" onclick="deleteOrder('${doc.id}')">Delete</button></td>
       </tr>
     `
   }).join('')
@@ -91,7 +96,8 @@ export async function cancelOrder(orderId) {
 
   try {
     await db.collection('orders').doc(orderId).update({
-      status: 'cancelled'
+      status: 'cancelled',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     })
   } catch (error) {
     console.error('Error cancelling order:', error)

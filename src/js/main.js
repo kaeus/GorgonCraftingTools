@@ -5,6 +5,8 @@ import * as ListingsModule from './listings.js'
 import * as OrdersModule from './orders.js'
 import * as UtilsModule from './utils.js'
 import * as OrderPageModule from './order-page.js'
+import * as ListingsManagerModule from './listings-manager.js'
+import * as SidebarModule from './sidebar.js'
 
 /**
  * Component Loader
@@ -61,6 +63,22 @@ function setupEventListeners() {
     if (e.target.matches('[data-action="close-auth"]')) {
       AuthModule.closeAuthModal()
     }
+    if (e.target.matches('[data-action="close-listing-type"]')) {
+      const modal = document.getElementById('listing-type-modal')
+      if (modal) modal.classList.remove('open')
+    }
+    if (e.target.matches('[data-action="close-item-listing"]')) {
+      const modal = document.getElementById('item-listing-modal')
+      if (modal) {
+        modal.classList.remove('open')
+        // Reset form for next use
+        window.resetItemListingForm?.()
+      }
+    }
+    if (e.target.matches('[data-action="close-service-listing"]')) {
+      const modal = document.getElementById('service-listing-modal')
+      if (modal) modal.classList.remove('open')
+    }
     if (e.target.matches('[data-action="sign-in-google"]')) {
       AuthModule.signInGoogle()
     }
@@ -72,14 +90,6 @@ function setupEventListeners() {
     }
     if (e.target.matches('[data-action="submit-order"]')) {
       OrderPageModule.submitOrder()
-    }
-    if (e.target.matches('[data-action="cancel-order"]')) {
-      const orderId = e.target.dataset.orderId
-      window.cancelOrder(orderId)
-    }
-    if (e.target.matches('[data-action="delete-order"]')) {
-      const orderId = e.target.dataset.orderId
-      window.deleteOrder(orderId)
     }
   })
 
@@ -103,15 +113,12 @@ function setupEventListeners() {
     if (e.target.id === 'server-filter') {
       ListingsModule.applyFilter()
     }
-    if (e.target.id === 'status-filter') {
-      ListingsModule.applyAdminFilter()
-    }
   })
 
   // Listing card click handlers
   document.addEventListener('click', (e) => {
     const listingCard = e.target.closest('[data-listing-id]')
-    if (listingCard && e.target.matches('.action-btn, .listing-card')) {
+    if (listingCard && e.target.matches('.action-btn, .listing-crafting-card')) {
       const listingId = listingCard.dataset.listingId
       window.location.href = `order.html?id=${listingId}`
     }
@@ -125,69 +132,17 @@ function setupEventListeners() {
   })
 
   // Posting listing button
-  document.addEventListener('click', async (e) => {
+  document.addEventListener('click', (e) => {
     if (e.target.matches('[data-action="post-listing"]')) {
-      window.location.href = 'craftingOrders.html'
-    }
-    if (e.target.matches('[data-action="edit-listing"]')) {
-      const listingId = e.target.dataset.listingId
-      console.log('Edit listing:', listingId)
-      // TODO: Implement edit functionality
-    }
-    if (e.target.matches('[data-action="delete-listing"]')) {
-      const listingId = e.target.dataset.listingId
-      if (confirm('Delete this listing?')) {
-        await ListingsModule.deleteListing(listingId)
-        const user = await FirebaseModule.getCurrentUser()
-        if (user) {
-          await ListingsModule.loadUserListings(user.uid)
-        }
-      }
+      window.location.href = 'yourListings.html'
     }
   })
 
-  // New listing form submission
-  document.addEventListener('submit', async (e) => {
-    if (e.target.id === 'new-listing-form') {
-      e.preventDefault()
-      const user = await FirebaseModule.getCurrentUser()
-      if (!user) {
-        AuthModule.openAuthModal()
-        return
-      }
-
-      const listingData = {
-        crafterName: document.getElementById('listing-name').value,
-        profession: document.getElementById('listing-profession').value,
-        server: document.getElementById('listing-server').value,
-        crafterLevel: document.getElementById('listing-level').value || null,
-        commissionRate: document.getElementById('listing-commission').value,
-        pstAvailability: document.getElementById('listing-pst').value || null,
-        description: document.getElementById('listing-description').value || null
-      }
-
-      // Check required fields
-      if (!listingData.crafterName || !listingData.profession || !listingData.server || !listingData.commissionRate) {
-        alert('Please fill in all required fields')
-        return
-      }
-
-      // Add createdBy before saving
-      const db = FirebaseModule.getFirestore()
-      try {
-        await db.collection('listings').add({
-          ...listingData,
-          uid: user.uid,
-          createdAt: new Date(),
-          active: true
-        })
-        // Clear form
-        e.target.reset()
-        // Reload listings
-        await ListingsModule.loadUserListings(user.uid)
-      } catch (error) {
-        console.error('Error creating listing:', error)
-        alert('Error creating listing. Please try again.')
+  // Modal backdrop clicks to close
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-backdrop') && e.target.classList.contains('open')) {
+      if (e.target.id === 'listing-type-modal' || e.target.id === 'item-listing-modal' || e.target.id === 'service-listing-modal') {
+        e.target.classList.remove('open')
       }
     }
   })
@@ -200,6 +155,18 @@ function setupEventListeners() {
 function initializeApp() {
   console.log('CraftingCorner app initialized')
   
+  // Render sidebar on all pages
+  if (document.querySelector('#admin-panel')) {
+    // Admin page
+    SidebarModule.renderAdminSidebar()
+  } else if (document.querySelector('#order-form')) {
+    // Order page
+    SidebarModule.renderOrderSidebar()
+  } else {
+    // All other pages (market/listings, etc.)
+    SidebarModule.renderSidebar()
+  }
+  
   // Set up event listeners
   setupEventListeners()
   
@@ -208,9 +175,15 @@ function initializeApp() {
     FirebaseModule.initializeFirebase(FIREBASE_CONFIG)
   }
   
-  // Load initial listings if we're on the market page
+  // Load initial listings based on page
   if (document.querySelector('.listings-grid')) {
-    ListingsModule.loadListings()
+    // Check if we're on the market page or artisan alley page
+    const pageTitle = document.querySelector('h1')?.textContent || ''
+    if (pageTitle.includes('Black Wing Market')) {
+      ListingsModule.loadMarketListings()
+    } else {
+      ListingsModule.loadListings()
+    }
   }
   
   // Initialize order page if we're on order.html
@@ -218,15 +191,25 @@ function initializeApp() {
     OrderPageModule.initOrderPage()
   }
   
+  // Initialize listings manager if we're on yourListings.html
+  if (document.querySelector('#crafting-area')) {
+    FirebaseModule.onAuthStateChanged((user) => {
+      AuthModule.renderUserAuth(user)
+      if (user) {
+        ListingsManagerModule.initListingsManager()
+      } else {
+        document.getElementById('status').textContent = 'You must be signed in to manage listings'
+        document.getElementById('status').className = 'status-bar error'
+      }
+    })
+    return // Skip the generic auth state change listener below
+  }
+  
   // Set up auth state listener
   FirebaseModule.onAuthStateChanged(async (user) => {
     AuthModule.renderUserAuth(user)
     if (user && document.querySelector('#my-orders-container')) {
       OrdersModule.subscribeMyOrders(user.uid, OrdersModule.renderMyOrders)
-    }
-    // Load crafting interface if user is on craftingOrders page
-    if (user && document.querySelector('#crafting-area') !== null) {
-      ListingsModule.loadUserListings(user.uid)
     }
   })
 }
@@ -243,14 +226,26 @@ window.toggleEmailMode = AuthModule.toggleEmailMode
 // Listings functions
 window.applyFilter = ListingsModule.applyFilter
 window.loadListings = ListingsModule.loadListings
+window.loadMarketListings = ListingsModule.loadMarketListings
 window.searchListings = ListingsModule.searchListings
-window.loadAllListings = ListingsModule.loadAllListings
-window.applyAdminFilter = ListingsModule.applyAdminFilter
 
 // Orders functions
 window.cancelOrder = OrdersModule.cancelOrder
 window.deleteOrder = OrdersModule.deleteOrder
 window.createOrder = OrdersModule.createOrder
+
+// Listings manager functions
+window.createNewListing = ListingsManagerModule.createNewListing
+window.selectListingType = ListingsManagerModule.selectListingType
+window.selectItem = ListingsManagerModule.selectItem
+window.saveItemListing = ListingsManagerModule.saveItemListing
+window.resetItemListingForm = ListingsManagerModule.resetItemListingForm
+window.editListing = ListingsManagerModule.editListing
+window.deleteListing = ListingsManagerModule.deleteListing
+window.saveNewListing = ListingsManagerModule.saveNewListing
+window.cancelListingForm = ListingsManagerModule.cancelListingForm
+window.cancelItemListingForm = ListingsManagerModule.cancelItemListingForm
+window.loadGoogleSheet = ListingsManagerModule.loadGoogleSheet
 
 // Order page functions
 window.submitOrder = OrderPageModule.submitOrder

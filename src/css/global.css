@@ -7,7 +7,10 @@
 }
 
 body {
-  background: #0a0a0a;
+  background-color: #0a0a0a;
+  background-image: linear-gradient(rgba(10, 10, 10, 0.50), rgba(10, 10, 10, 0.50)), url('../assets/textures/bg_texture.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
   color: #e8e8e8;
   font-family: 'Segoe UI', system-ui, sans-serif;
   min-height: 100vh;
@@ -67,7 +70,13 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-block;
 }
 
-.market-link:hover img {
+.topbar-image-link {
+  cursor: pointer;
+  display: inline-block;
+}
+
+.market-link:hover img,
+.topbar-image-link:hover img {
   filter: brightness(1.08) drop-shadow(0 2px 8px #0008);
   box-shadow: 0 0 0 2px #e8e8e8cc;
 }
@@ -280,7 +289,7 @@ h1 {
   gap: 1.5rem;
 }
 
-.listing-card {
+.listing-crafting-card {
   position: relative;
   background: #f3efe6;
   background-image: linear-gradient(
@@ -302,7 +311,7 @@ h1 {
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.listing-card::before {
+.listing-crafting-card::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -318,7 +327,7 @@ h1 {
   z-index: 1;
 }
 
-.listing-card::after {
+.listing-crafting-card::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -331,12 +340,12 @@ h1 {
   z-index: 2;
 }
 
-.listing-card > * {
+.listing-crafting-card > * {
   position: relative;
   z-index: 3;
 }
 
-.listing-card:hover {
+.listing-crafting-card:hover {
   transform: translateY(-2px);
   box-shadow:
     inset 0 0 0 2px #f3efe6,
@@ -344,7 +353,7 @@ h1 {
     0 6px 14px rgba(0,0,0,0.2);
 }
 
-.listing-card .profession {
+.listing-crafting-card .profession {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -356,7 +365,7 @@ h1 {
   font-weight: 600;
 }
 
-.listing-card .crafter-name {
+.listing-crafting-card .crafter-name {
   font-size: 1.1rem;
   font-weight: 700;
   color: #1a1a1a;
@@ -365,20 +374,20 @@ h1 {
   text-shadow: 0 1px 0 #fff, 0 2px 0 rgba(0,0,0,0.1);
 }
 
-.listing-card .commission {
+.listing-crafting-card .commission {
   font-size: 0.78rem;
   color: #4a4a4a;
   font-family: "Cormorant", serif;
   font-weight: 400;
 }
 
-.listing-card .pst {
+.listing-crafting-card .pst {
   font-size: 0.76rem;
   color: #6b6b6b;
   font-family: "Cormorant", serif;
 }
 
-.listing-card .description {
+.listing-crafting-card .description {
   font-size: 0.78rem;
   color: #5a5a5a;
   line-height: 1.5;
@@ -387,13 +396,136 @@ h1 {
   font-weight: 300;
 }
 
-.listing-card .server {
+.listing-crafting-card .server {
   font-size: 0.72rem;
   color: #8a8a8a;
   font-family: "Cormorant", serif;
 }
 
-.listing-card .card-footer {
+.listing-crafting-card .card-footer {
+  margin-top: auto;
+  padding-top: 0.8rem;
+  border-top: 2px solid #1a1a1a;
+  opacity: 0.6;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Duplicate placeholder for market item listings */
+.listing-item-card {
+  position: relative;
+  background: #f3efe6;
+  background-image: linear-gradient(
+    rgba(0,0,0,0.015),
+    rgba(255,255,255,0.02)
+  );
+  color: #1a1a1a;
+  padding: 22px;
+  border: 3px solid #1a1a1a;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 0 2px #f3efe6,
+    inset 0 0 0 4px #1a1a1a,
+    0 3px 8px rgba(0,0,0,0.15);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.listing-item-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(0,0,0,0.015),
+    rgba(0,0,0,0.015) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.listing-item-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(0,0,0,0.02),
+    rgba(0,0,0,0.01)
+  );
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.listing-item-card > * {
+  position: relative;
+  z-index: 3;
+}
+
+.listing-item-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 0 2px #f3efe6,
+    inset 0 0 0 4px #1a1a1a,
+    0 6px 14px rgba(0,0,0,0.2);
+}
+
+.listing-item-card .profession {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #6b4423;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+}
+
+.listing-item-card .crafter-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  font-family: "Cinzel", serif;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 0 #fff, 0 2px 0 rgba(0,0,0,0.1);
+}
+
+.listing-item-card .commission {
+  font-size: 0.78rem;
+  color: #4a4a4a;
+  font-family: "Cormorant", serif;
+  font-weight: 400;
+}
+
+.listing-item-card .pst {
+  font-size: 0.76rem;
+  color: #6b6b6b;
+  font-family: "Cormorant", serif;
+}
+
+.listing-item-card .description {
+  font-size: 0.78rem;
+  color: #5a5a5a;
+  line-height: 1.5;
+  margin: 0.4rem 0;
+  font-family: "Cormorant", serif;
+  font-weight: 300;
+}
+
+.listing-item-card .server {
+  font-size: 0.72rem;
+  color: #8a8a8a;
+  font-family: "Cormorant", serif;
+}
+
+.listing-item-card .card-footer {
   margin-top: auto;
   padding-top: 0.8rem;
   border-top: 2px solid #1a1a1a;
