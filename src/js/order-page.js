@@ -184,7 +184,7 @@ async function fetchRecipesForProfession(profession) {
       
       if (recipeSkill === profession.toLowerCase()) {
         // Extract items from ResultItems or ProtoResultItems
-        const resultItemsList = recipe.ResultItems || recipe.ProtoResultItems || []
+        const resultItemsList = (recipe.ResultItems && recipe.ResultItems.length > 0) ? recipe.ResultItems : (recipe.ProtoResultItems || [])
         
         resultItemsList.forEach(resultItem => {
           const itemCode = resultItem.ItemCode
