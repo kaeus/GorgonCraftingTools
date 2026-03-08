@@ -8,6 +8,13 @@ import { escapeHtml, PROFESSION_EMOJI, setStatus } from './utils.js'
 
 let allListingDocs = []
 
+function formatCommission(value) {
+  if (!value) return '—'
+  const num = parseFloat(String(value).replace('%', ''))
+  if (isNaN(num)) return escapeHtml(value)
+  return `${num}%`
+}
+
 /**
  * Load all listings from Firestore
  */
@@ -43,7 +50,8 @@ export async function loadListings() {
         return timeB - timeA
       })
 
-    renderListings(allListingDocs)
+    restoreServerFilter()
+    applyFilter()
     setStatus('status', '', 'ok')
   } catch (error) {
     console.error('Error loading listings:', error)
@@ -59,12 +67,24 @@ export function applyFilter() {
   if (!serverFilter) return
 
   const server = serverFilter.value
-  
+  localStorage.setItem('preferred-server', server)
+
   const filtered = server
     ? allListingDocs.filter(doc => doc.data().server === server)
     : allListingDocs
 
   renderListings(filtered)
+}
+
+/**
+ * Restore saved server filter preference
+ */
+function restoreServerFilter() {
+  const saved = localStorage.getItem('preferred-server')
+  if (!saved) return
+  const serverFilter = document.getElementById('server-filter')
+  if (!serverFilter) return
+  serverFilter.value = saved
 }
 
 /**
@@ -86,22 +106,22 @@ export function renderListings(docs) {
   grid.innerHTML = docs.map(doc => {
     const d = doc.data()
     const emoji = isMarketPage ? '📦' : (PROFESSION_EMOJI[d.profession] || '🔨')
-    const serverLine = d.server ? `<div class="server">🌐 ${escapeHtml(d.server)}</div>` : ''
-    const pstLine = d.pstAvailability ? `<div class="pst">🕒 ${escapeHtml(d.pstAvailability)}</div>` : ''
+    const serverLine = d.server ? `<div class="server">🌐 <span class="card-label">Server</span>${escapeHtml(d.server)}</div>` : ''
+    const pstLine = d.pstAvailability ? `<div class="pst">🕒 <span class="card-label">Hours</span>${escapeHtml(d.pstAvailability)}</div>` : ''
     const levelLine = !isMarketPage && d.crafterLevel ? ` - Lvl ${d.crafterLevel}` : ''
-    const descLine = d.description 
-      ? `<div class="description">${escapeHtml(d.description.length > 100 ? d.description.substring(0, 100) + '...' : d.description)}</div>` 
+    const descLine = d.description
+      ? `<div class="description">${escapeHtml(d.description.length > 100 ? d.description.substring(0, 100) + '...' : d.description)}</div>`
       : ''
-    
+
     // For market page, show item name; for artisan alley, show profession
-    const titleLine = isMarketPage 
+    const titleLine = isMarketPage
       ? `<div class="item-name"><strong>${escapeHtml(d.itemName || 'Item')}</strong></div>`
       : `<div class="profession">${emoji} ${escapeHtml(d.profession)}</div>`
-    
+
     // For market page, show quantity and price per unit; for artisan alley, show crafter info
     const detailsLine = isMarketPage
       ? `<div class="item-details">${d.amount} available @ ${d.pricePerUnit} council each</div>`
-      : `<div class="crafter-name">${escapeHtml(d.crafterName)}${levelLine}</div><div class="commission">${escapeHtml(d.commissionRate)}</div>`
+      : `<div class="crafter-name">${escapeHtml(d.crafterName)}${levelLine}</div><div class="commission"><span class="card-label">Commission</span>${formatCommission(d.commissionRate)}</div>`
 
     return `
       <div class="${cardClass}">

@@ -195,7 +195,7 @@ function renderListingsManager(docs) {
         <td>${escapeHtml(d.crafterName)}</td>
         <td>${escapeHtml(d.server || '—')}</td>
         <td>${statusBadge}</td>
-        <td>
+        <td style="text-align:right;">
           <button class="action-btn ghost" onclick="window.editListing('${doc.id}')">Edit</button>
           <button class="delete-btn" onclick="window.deleteListing('${doc.id}')">Delete</button>
         </td>
@@ -421,8 +421,8 @@ function showListingForm(docSnapshot = null) {
           <input type="text" id="form-crafter-name" value="${escapeHtml(d.crafterName || '')}" placeholder="Your character name" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
         </div>
         <div>
-          <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Profession *</label>
-          <select id="form-profession" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
+          <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Profession *${isEditing ? ' <span style="color:#a8a8a8; font-weight:400; text-transform:none;">(locked — delete and recreate to change)</span>' : ''}</label>
+          <select id="form-profession" ${isEditing ? 'disabled' : ''} style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8; ${isEditing ? 'opacity:0.6; cursor:not-allowed;' : ''}">
             <option value="">Select a profession</option>
             <option value="Weaponcrafting" ${d.profession === 'Weaponcrafting' ? 'selected' : ''}>Weaponcrafting</option>
             <option value="Armorsmithing" ${d.profession === 'Armorsmithing' ? 'selected' : ''}>Armorsmithing</option>
@@ -603,7 +603,11 @@ function setupFormValidation(formId, savedIngredientPrices = {}) {
   
   const inputs = [
     'form-crafter-name',
-    'form-commission'
+    'form-commission',
+    'form-server',
+    'form-level',
+    'form-pst',
+    'form-description'
   ]
 
   inputs.forEach(inputId => {
@@ -613,6 +617,11 @@ function setupFormValidation(formId, savedIngredientPrices = {}) {
       input.addEventListener('change', () => validateForm(formId))
     }
   })
+
+  const activeCheckbox = document.getElementById('form-active')
+  if (activeCheckbox) {
+    activeCheckbox.addEventListener('change', () => validateForm(formId))
+  }
 }
 
 /**
@@ -711,6 +720,8 @@ async function loadAndRenderIngredients(profession, savedPrices = {}) {
     input.addEventListener('input', () => validateForm(''))
     input.addEventListener('change', () => validateForm(''))
   })
+  // Re-validate now that saved prices are restored in the DOM
+  validateForm('')
 
   // Wire up filter inputs
   function applyFilter(container, query) {
@@ -762,13 +773,7 @@ function validateForm(formId) {
   if (!submitBtn) return
 
   // Check if all required fields are filled
-  const allFieldsFilled = crafterName && profession && commissionRate
-  
-  // Check if at least one ingredient has a price
-  const ingredientPrices = getIngredientPrices()
-  const hasIngredientsWithPrices = Object.keys(ingredientPrices).length > 0
-
-  const isValid = allFieldsFilled && hasIngredientsWithPrices
+  const isValid = crafterName && profession && commissionRate
 
   // Update button state
   submitBtn.disabled = !isValid

@@ -18,7 +18,7 @@ export function renderSidebar() {
         <img src="./images/manage_listings.png" alt="Manage Your Listings">
       </a>
     </div>
-    <div class="topbar-title">
+    <div class="topbar-title tbd">
       <a href="market.html" class="topbar-image-link">
         <img src="./images/black_wing_rectangle.png" alt="Black Wing Market">
       </a>
@@ -28,12 +28,12 @@ export function renderSidebar() {
         <img src="./images/artisan_alley.png" alt="Artisan Alley">
       </a>
     </div>
-    <div class="topbar-title">
+    <div class="topbar-title tbd">
       <a href="#" class="topbar-image-link">
         <img src="./images/legs_list.png" alt="Legs List">
       </a>
     </div>
-    <div class="topbar-title">
+    <div class="topbar-title tbd">
       <a href="#" class="topbar-image-link">
         <img src="./images/crooked_coliseum_card.png" alt="Crooked Coliseum">
       </a>
@@ -63,12 +63,12 @@ export function renderAdminSidebar() {
         <img src="./images/artisan_alley.png" alt="Artisan Alley">
       </a>
     </div>
-    <div class="topbar-title">
+    <div class="topbar-title tbd">
       <a href="#" class="topbar-image-link">
         <img src="./images/legs_list.png" alt="Legs List">
       </a>
     </div>
-    <div class="topbar-title">
+    <div class="topbar-title tbd">
       <a href="#" class="topbar-image-link">
         <img src="./images/crooked_coliseum_card.png" alt="Crooked Coliseum">
       </a>
@@ -77,7 +77,7 @@ export function renderAdminSidebar() {
       <button class="action-btn" data-action="open-auth">Sign In</button>
     </div>
   `
-  
+
   topbar.innerHTML = sidebarHTML
 }
 
@@ -91,7 +91,7 @@ export function renderOrderSidebar() {
   
   // Order page sidebar
   const sidebarHTML = `
-    <div class="topbar-title">
+    <div class="topbar-title tbd">
       <a href="market.html" class="topbar-image-link">
         <img src="./images/black_wing_rectangle.png" alt="Black Wing Market">
       </a>
@@ -106,12 +106,12 @@ export function renderOrderSidebar() {
         <img src="./images/artisan_alley.png" alt="Artisan Alley">
       </a>
     </div>
-    <div class="topbar-title">
+    <div class="topbar-title tbd">
       <a href="#" class="topbar-image-link">
         <img src="./images/legs_list.png" alt="Legs List">
       </a>
     </div>
-    <div class="topbar-title">
+    <div class="topbar-title tbd">
       <a href="#" class="topbar-image-link">
         <img src="./images/crooked_coliseum_card.png" alt="Crooked Coliseum">
       </a>

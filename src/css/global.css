@@ -68,6 +68,32 @@ h1, h2, h3, h4, h5, h6 {
   gap: 1.5rem;
 }
 
+/* ── TBD Overlay ── */
+.tbd {
+  position: relative;
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+  cursor: not-allowed;
+}
+
+.tbd::after {
+  content: 'Coming Soon';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #ff4444;
+  text-shadow: 0 0 8px rgba(255, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
 .topbar-title {
   display: flex;
   justify-content: center;
@@ -408,21 +434,21 @@ h1 {
 }
 
 .listing-crafting-card .commission {
-  font-size: 0.78rem;
-  color: #4a4a4a;
+  font-size: 0.84rem;
+  color: #3a3a3a;
   font-family: "Cormorant", serif;
-  font-weight: 400;
+  font-weight: 600;
 }
 
 .listing-crafting-card .pst {
-  font-size: 0.76rem;
-  color: #6b6b6b;
+  font-size: 0.84rem;
+  color: #555555;
   font-family: "Cormorant", serif;
 }
 
 .listing-crafting-card .description {
-  font-size: 0.78rem;
-  color: #5a5a5a;
+  font-size: 0.85rem;
+  color: #4a4a4a;
   line-height: 1.5;
   margin: 0.4rem 0;
   font-family: "Cormorant", serif;
@@ -430,9 +456,19 @@ h1 {
 }
 
 .listing-crafting-card .server {
-  font-size: 0.72rem;
-  color: #8a8a8a;
+  font-size: 0.84rem;
+  color: #666666;
   font-family: "Cormorant", serif;
+}
+
+.listing-crafting-card .card-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #6b4423;
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  margin-right: 0.3rem;
 }
 
 .listing-crafting-card .card-footer {
