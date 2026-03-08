@@ -3,7 +3,7 @@
  * Tracks fight odds, tips, and featured matchups for the Crooked Coliseum.
  *
  * Firestore document key: "{server}:{date}"
- * Date rolls to the next day after 5PM GMT.
+ * Date rolls to the next day after 4AM GMT.
  */
 
 export const FIGHTERS = ['Corrak', 'Dura', 'Gloz', 'Leo', 'Otis', 'Ushug', 'Vizlark']
@@ -24,13 +24,13 @@ let unsubscribeTips = null
 
 /**
  * Returns the coliseum "day" date string.
- * After 5PM GMT the day rolls over to tomorrow.
+ * After 4AM GMT the day rolls over to tomorrow.
  */
 function getColiseumDate() {
   const now = new Date()
-  if (now.getUTCHours() >= 17) {
+  if (now.getUTCHours() < 4) {
     const tomorrow = new Date(now)
-    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1)
+    tomorrow.setUTCDate(tomorrow.getUTCDate() - 1)
     return tomorrow.toISOString().split('T')[0]
   }
   return now.toISOString().split('T')[0]
