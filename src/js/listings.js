@@ -15,6 +15,7 @@ function formatCommission(value) {
   return `${num}%`
 }
 
+
 /**
  * Load all listings from Firestore
  */
@@ -101,37 +102,62 @@ export function renderListings(docs) {
 
   // Determine which card type to render based on current page
   const isMarketPage = window.location.pathname.includes('market.html')
-  const cardClass = isMarketPage ? 'listing-item-card' : 'listing-crafting-card'
 
   grid.innerHTML = docs.map(doc => {
     const d = doc.data()
     const emoji = isMarketPage ? '📦' : (PROFESSION_EMOJI[d.profession] || '🔨')
-    const serverLine = d.server ? `<div class="server">🌐 <span class="card-label">Server</span>${escapeHtml(d.server)}</div>` : ''
-    const pstLine = d.pstAvailability ? `<div class="pst">🕒 <span class="card-label">Hours</span>${escapeHtml(d.pstAvailability)}</div>` : ''
-    const levelLine = !isMarketPage && d.crafterLevel ? ` - Lvl ${d.crafterLevel}` : ''
-    const descLine = d.description
-      ? `<div class="description">${escapeHtml(d.description.length > 100 ? d.description.substring(0, 100) + '...' : d.description)}</div>`
+
+    if (isMarketPage) {
+      return `
+        <div class="listing-item-card">
+          <div class="item-name"><strong>${escapeHtml(d.itemName || 'Item')}</strong></div>
+          <div class="item-details">${d.amount} available @ ${d.pricePerUnit} council each</div>
+          ${d.server ? `<div class="server">🌐 <span class="card-label">Server</span>${escapeHtml(d.server)}</div>` : ''}
+          <div class="card-footer">
+            <a href="/order.html?id=${encodeURIComponent(doc.id)}" class="order-link">Place Order</a>
+          </div>
+        </div>
+      `
+    }
+
+    // Crafter card (new design)
+    const levelBadge = d.crafterLevel ? `<div class="profession-badge">${d.crafterLevel}</div>` : ''
+    const levelRow = d.crafterLevel
+      ? `<div class="stat-row"><span class="stat-label">Level</span><span class="stat-value level">${escapeHtml(String(d.crafterLevel))}</span></div>`
       : ''
-
-    // For market page, show item name; for artisan alley, show profession
-    const titleLine = isMarketPage
-      ? `<div class="item-name"><strong>${escapeHtml(d.itemName || 'Item')}</strong></div>`
-      : `<div class="profession">${emoji} ${escapeHtml(d.profession)}</div>`
-
-    // For market page, show quantity and price per unit; for artisan alley, show crafter info
-    const detailsLine = isMarketPage
-      ? `<div class="item-details">${d.amount} available @ ${d.pricePerUnit} council each</div>`
-      : `<div class="crafter-name">${escapeHtml(d.crafterName)}${levelLine}</div><div class="commission"><span class="card-label">Commission</span>${formatCommission(d.commissionRate)}</div>`
+    const hoursRow = d.pstAvailability
+      ? `<div class="stat-row"><span class="stat-label">Availability</span><span class="stat-value">${escapeHtml(d.pstAvailability)}</span></div>`
+      : ''
+    const noteBlock = d.description ? `
+      <div class="note-row">
+        <div class="note-label">Note</div>
+        <div class="tooltip-wrapper">
+          <div class="note-text">${escapeHtml(d.description)}</div>
+          <div class="tooltip-bubble">${escapeHtml(d.description)}</div>
+        </div>
+      </div>` : ''
 
     return `
-      <div class="${cardClass}">
-        ${titleLine}
-        ${detailsLine}
-        ${serverLine}
-        ${pstLine}
-        ${descLine}
+      <div class="listing-crafting-card">
+        <div class="card-header">
+          <div class="profession-icon">
+            ${emoji}
+            ${levelBadge}
+          </div>
+          <div class="header-text">
+            <div class="crafter-name">${escapeHtml(d.crafterName)}</div>
+            <div class="profession-label">${escapeHtml(d.profession)}</div>
+          </div>
+        </div>
+        <div class="card-body">
+          ${levelRow}
+          <div class="stat-row"><span class="stat-label">Commission</span><span class="stat-value commission">${formatCommission(d.commissionRate)}</span></div>
+          ${hoursRow}
+          ${noteBlock}
+        </div>
         <div class="card-footer">
-          <a href="/order.html?id=${encodeURIComponent(doc.id)}" class="order-link">Place Order</a>
+          ${d.server ? `<div class="server-tag">${escapeHtml(d.server)}</div>` : '<div></div>'}
+          <a href="/order.html?id=${encodeURIComponent(doc.id)}" class="place-order-btn">Place Order</a>
         </div>
       </div>
     `

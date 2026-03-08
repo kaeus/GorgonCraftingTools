@@ -322,7 +322,7 @@ async function showItemListingForm() {
           
           <!-- PST Availability -->
           <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">PST Availability</label>
+            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Availability</label>
             <input type="text" id="item-pst" placeholder="e.g. 6 PM - 10 PM" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
           </div>
           
@@ -458,12 +458,12 @@ function showListingForm(docSnapshot = null) {
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
         <div>
-          <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">PST Availability</label>
+          <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Availability</label>
           <input type="text" id="form-pst" value="${escapeHtml(d.pstAvailability || '')}" placeholder="e.g. 6 PM - 10 PM" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
         </div>
         <div>
-          <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Commission Rate *</label>
-          <input type="text" id="form-commission" value="${escapeHtml(d.commissionRate || '50%')}" placeholder="e.g. 50%" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
+          <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Commission Rate % *</label>
+          <input type="number" id="form-commission" min="0" max="100" step="1" value="${parseFloat(d.commissionRate) || 50}" placeholder="50" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
         </div>
       </div>
 
