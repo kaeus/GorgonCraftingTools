@@ -293,38 +293,32 @@ async function calculateOrderIngredients(recipe, craftQuantity) {
     
     // Try to find in crafter's sheet with multiple strategies
     let ingredientData = null
-    let usedKey = null
-    
+
     // Strategy 1: Try Desc directly (most likely, as crafters enter what they see)
     if (desc) {
       const descLower = desc.toLowerCase()
       console.log('Strategy 1 - Trying desc:', descLower)
       ingredientData = crafterIngredients[descLower]
-      if (ingredientData) {
-        usedKey = desc
-        console.log('✓ Found using Desc')
-      }
+      if (ingredientData) console.log('✓ Found using Desc')
     }
-    
+
     // Strategy 1.5: Fuzzy match - find crafter ingredient that shares main words with desc
     // E.g., "Basic Spider Silk" could match "Spider Silk"
     if (!ingredientData && desc) {
       const descWords = desc.toLowerCase().split(/\s+/).filter(w => w.length > 2)
       console.log('Strategy 1.5 - Fuzzy matching with words:', descWords)
-      
+
       for (const [crafterKey, crafterData] of Object.entries(crafterIngredients)) {
         const crafterWords = crafterKey.split(/\s+/)
-        // Check if crafter ingredient contains most of the recipe ingredient words
         const matchCount = descWords.filter(word => crafterWords.some(cw => cw.includes(word) || word.includes(cw))).length
         if (matchCount >= Math.max(1, descWords.length - 1)) {
           console.log(`✓ Found fuzzy match: "${desc}" -> "${crafterData.displayName}"`)
           ingredientData = crafterData
-          usedKey = `${desc} (fuzzy matched to ${crafterData.displayName})`
           break
         }
       }
     }
-    
+
     // Strategy 2: Try ItemCode → Item Name lookup
     if (!ingredientData && ingredient.itemCode !== undefined) {
       const itemsResponse = await fetch('https://cdn.projectgorgon.com/v461/data/items.json')
@@ -335,66 +329,53 @@ async function calculateOrderIngredients(recipe, craftQuantity) {
         const itemNameLower = itemInfo.Name.toLowerCase()
         console.log('Strategy 2 - Trying ItemCode → name:', itemNameLower)
         ingredientData = crafterIngredients[itemNameLower]
-        if (ingredientData) {
-          usedKey = itemInfo.Name
-          console.log('✓ Found using ItemCode → Item Name')
-        }
+        if (ingredientData) console.log('✓ Found using ItemCode → Item Name')
       }
     }
-    
+
     // Strategy 3: Try resolved item name
     if (!ingredientData && itemName) {
       const nameLower = itemName.toLowerCase()
       console.log('Strategy 3 - Trying resolved name:', nameLower)
       ingredientData = crafterIngredients[nameLower]
-      if (ingredientData) {
-        usedKey = itemName
-        console.log('✓ Found using resolved name')
-      }
+      if (ingredientData) console.log('✓ Found using resolved name')
     }
-    
+
     // Strategy 4: Try ItemKey directly
     if (!ingredientData && itemKey) {
       const keyLower = itemKey.toLowerCase()
       console.log('Strategy 4 - Trying itemKey:', keyLower)
       ingredientData = crafterIngredients[keyLower]
-      if (ingredientData) {
-        usedKey = itemKey
-        console.log('✓ Found using itemKey')
-      }
+      if (ingredientData) console.log('✓ Found using itemKey')
     }
-    
+
     // Strategy 5: Search for items with this ItemKey in their Keywords
     if (!ingredientData && itemKey) {
       console.log('Strategy 5 - Searching items with ItemKey:', itemKey)
-      
-      // Fetch items data to find items with this keyword
+
       const itemsResponse = await fetch('https://cdn.projectgorgon.com/v461/data/items.json')
       const itemsData = itemsResponse.ok ? await itemsResponse.json() : {}
-      
-      // Find all items that have this ItemKey in their Keywords
+
       const matchingItems = []
-      for (let [itemDatabaseKey, itemData] of Object.entries(itemsData)) {
+      for (let [, itemData] of Object.entries(itemsData)) {
         if (itemData && itemData.Keywords && Array.isArray(itemData.Keywords)) {
           if (itemData.Keywords.includes(itemKey) && itemData.Name) {
             matchingItems.push(itemData)
           }
         }
       }
-      
+
       console.log(`Found ${matchingItems.length} items with ItemKey "${itemKey}":`, matchingItems.map(i => i.Name))
-      
-      // Check if the crafter has priced any of these items
+
       for (let item of matchingItems) {
         const itemNameLower = item.Name.toLowerCase()
         if (crafterIngredients[itemNameLower]) {
           ingredientData = crafterIngredients[itemNameLower]
-          usedKey = `${item.Name} (matches ${itemKey})`
           console.log(`✓ Found crafter price for matching item: ${item.Name}`)
           break
         }
       }
-      
+
       if (!ingredientData && matchingItems.length > 0) {
         console.warn(`No crafter price for items with ItemKey "${itemKey}". Available items:`, matchingItems.map(i => i.Name))
       }
@@ -402,24 +383,18 @@ async function calculateOrderIngredients(recipe, craftQuantity) {
     
     if (!ingredientData) {
       console.warn('❌ Ingredient not found in ANY strategy:', { desc, itemKey, itemName })
-      console.log('Crafter ingredient prices:')
-      Object.entries(crafterIngredients).forEach(([key, data]) => {
-        console.log(`  "${key}" -> ${data.displayName} (cost: ${data.cost})`)
-      })
-      continue // Skip this ingredient if not priced by crafter
     }
-    
-    console.log('✓ Found ingredient in crafter pricing using:', usedKey, '→', ingredientData)
-    
+
     const costPerUnit = ingredientData?.cost || 0
-    
+    const unpriced = !ingredientData
+
     // Calculate final quantity: recipe qty × craft qty
     const finalQuantity = recipeQuantity * craftQuantity
-    
+
     // Calculate cost: final qty × cost per unit
     const ingredientCost = finalQuantity * costPerUnit
-    
-    const displayName = ingredientData.displayName || usedKey || desc
+
+    const displayName = ingredientData?.displayName || desc || itemKey || 'Unknown Ingredient'
     ingredients[displayName] = {
       itemName: itemName,
       itemKey: itemKey,
@@ -428,7 +403,8 @@ async function calculateOrderIngredients(recipe, craftQuantity) {
       craftQuantity: craftQuantity,
       finalQuantity: finalQuantity,
       costPerUnit: costPerUnit,
-      totalCost: ingredientCost
+      totalCost: ingredientCost,
+      unpriced: unpriced
     }
     
     craftCostTotal += ingredientCost
@@ -494,7 +470,7 @@ async function showItemSuggestions(searchTerm) {
   } else {
     suggestionsDiv.innerHTML = matches.map(item => {
       const iconHtml = item.iconUrl
-        ? `<img src="${item.iconUrl}" alt="${escapeHtml(item.name)}" style="width:24px; height:24px; margin-right:0.5rem; vertical-align:middle; border:1px solid #505050; border-radius:3px;" onerror="this.style.opacity='0.3'">`
+        ? `<img src="${item.iconUrl}" alt="${escapeHtml(item.name)}" style="width:32px; height:32px; margin-right:0.5rem; vertical-align:middle; border:1px solid #505050; border-radius:3px;" onerror="this.style.opacity='0.3'">`
         : ''
       return `
         <div class="item-suggestion" data-item-id="${item.id}" style="
@@ -586,10 +562,11 @@ function showRecipeSelectionModal(item) {
   
   // Build recipe options
   const recipeOptionsHtml = item.recipes.map((recipe, index) => {
+    console.log(recipe)
     const ingredients = recipe.ingredients.length > 0 
-      ? recipe.ingredients.slice(0, 3).map((ing, i) => {
+      ? recipe.ingredients.map((ing, i) => {
           const desc = ing.desc || ing.itemName || ing.itemKey || 'Unknown ingredient'
-          const qty = ing.stackSize > 1 ? ` x${ing.stackSize}` : ''
+          const qty = ing.stackSize >= 1 ? ` x${ing.stackSize}` : ''
           return `<div style="font-size:0.8rem; color:#a8a8a8;">Ingredient ${i+1}: ${desc}${qty}</div>`
         }).join('')
       : '<div style="font-size:0.8rem; color:#a8a8a8;">No ingredients listed</div>'
@@ -608,7 +585,7 @@ function showRecipeSelectionModal(item) {
         text-align: left;
         transition: all 0.2s;
       " onmouseover="this.style.background='#252525'; this.style.borderColor='#7cb342';" onmouseout="this.style.background='#1a1a1a'; this.style.borderColor='#505050';">
-        <div style="font-weight:bold; margin-bottom:0.5rem;">Recipe ${index + 1}</div>
+        <div style="font-weight:bold; margin-bottom:0.5rem;">Recipe: ${recipe.full.Name || index+1}</div>
         ${ingredients}
       </button>
     `
@@ -771,19 +748,42 @@ async function updatePricingDisplay() {
     // Create ingredients display
     let ingredientsHtml = ''
     if (Object.keys(ingredients).length > 0) {
-      ingredientsHtml = '<div style="margin-bottom:1rem;"><div style="font-weight:bold; margin-bottom:0.75rem;">Ingredients Needed:</div>'
-      
-      Object.entries(ingredients).forEach(([itemName, data]) => {
-        const ingredientTotal = data.finalQuantity * data.costPerUnit
-        ingredientsHtml += `
-          <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:0.5rem;">
-            <span>${escapeHtml(itemName)} x ${data.finalQuantity.toFixed(2)}</span>
-            <span>${(ingredientTotal).toFixed(0)} councils</span>
-          </div>
+      const iconsMap = await loadItemsWithIcons()
+      const rows = Object.entries(ingredients).sort(([a], [b]) => a.localeCompare(b)).map(([itemName, data]) => {
+        const iconData = iconsMap[itemName.toLowerCase()]
+        const iconHtml = iconData
+          ? `<img src="${iconData.iconUrl}" alt="" style="width:32px; height:32px; border:1px solid #505050; border-radius:3px; vertical-align:middle; margin-right:6px; object-fit:contain;" onerror="this.style.display='none'">`
+          : ''
+        const unpricedNote = data.unpriced
+          ? ` <span style="font-size:10px; color:#f59e0b; opacity:0.8;">(unpriced)</span>`
+          : ''
+        const costStyle = data.unpriced ? 'color:#a8a8a8; font-style:italic;' : ''
+        return `
+          <tr style="height:36px; border-bottom:1px solid rgba(255,255,255,0.06);">
+            <td style="padding:0 1rem; text-align:left; width:50%;">${iconHtml}${escapeHtml(itemName)}${unpricedNote}</td>
+            <td style="padding:0 1rem; text-align:right; width:15%;">${data.finalQuantity.toFixed(0)}</td>
+            <td style="padding:0 1rem; text-align:right; width:15%; ${costStyle}">${data.costPerUnit.toFixed(0)}</td>
+            <td style="padding:0 1rem; text-align:right; width:20%; font-weight:500; ${costStyle}">${data.totalCost.toFixed(0)}</td>
+          </tr>
         `
-      })
-      
-      ingredientsHtml += '</div>'
+      }).join('')
+
+      ingredientsHtml = `
+        <div style="margin-bottom:1rem;">
+          <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:#a8a8a8; opacity:0.6; margin-bottom:12px;">Ingredients</div>
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="text-align:left; padding:0 1rem; height:36px; font-size:11px; color:#a8a8a8; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; width:50%;">Ingredient</th>
+                <th style="text-align:right; padding:0 1rem; height:36px; font-size:11px; color:#a8a8a8; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; width:15%;">Qty</th>
+                <th style="text-align:right; padding:0 1rem; height:36px; font-size:11px; color:#a8a8a8; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; width:15%;">Cost/Unit</th>
+                <th style="text-align:right; padding:0 1rem; height:36px; font-size:11px; color:#a8a8a8; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; width:20%;">Total</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `
     }
     
     // Rebuild pricing div with new layout

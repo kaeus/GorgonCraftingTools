@@ -16,17 +16,15 @@ export function subscribeMyOrders(uid, callback) {
     return null
   }
 
-  // Load all orders and filter/sort in JavaScript to avoid requiring Firestore indexes
   return db.collection('orders')
+    .where('customerUid', '==', uid)
     .onSnapshot(snap => {
-      const userOrders = snap.docs
-        .filter(doc => doc.data().customerUid === uid)
-        .sort((a, b) => {
-          const timeA = a.data().createdAt?.toMillis?.() || 0
-          const timeB = b.data().createdAt?.toMillis?.() || 0
-          return timeB - timeA
-        })
-      
+      const userOrders = snap.docs.sort((a, b) => {
+        const timeA = a.data().createdAt?.toMillis?.() || 0
+        const timeB = b.data().createdAt?.toMillis?.() || 0
+        return timeB - timeA
+      })
+
       callback(userOrders)
     })
 }
@@ -59,11 +57,12 @@ export function renderMyOrders(docs) {
     return `
       <tr>
         <td style="max-width:150px;"><strong>${escapeHtml(d.crafterName)}</strong></td>
-        <td>${escapeHtml(d.profession)}</td>
+        <td>${escapeHtml(d.itemName || d.profession)}</td>
         <td><span class="badge ${d.status}">${d.status}</span></td>
         <td>${date}</td>
         <td>${cancelBtn}</td>
         <td><button class="delete-order-btn" onclick="deleteOrder('${doc.id}')">Delete</button></td>
+        <td><a href="order-view.html?id=${doc.id}" class="action-btn" style="padding:0.3rem 0.75rem; font-size:0.8rem;">View</a></td>
       </tr>
     `
   }).join('')
@@ -73,9 +72,10 @@ export function renderMyOrders(docs) {
       <thead>
         <tr>
           <th>Crafter</th>
-          <th>Profession</th>
+          <th>Item</th>
           <th>Status</th>
           <th>Date</th>
+          <th></th>
           <th></th>
           <th></th>
         </tr>
@@ -183,7 +183,7 @@ export async function getOrderById(orderId) {
 /**
  * Render order details on the order-view page
  */
-export async function renderOrderDetails(order) {
+export async function renderOrderDetails(order, currentUser = null) {
   const statusDiv = document.getElementById('status')
   const detailsDiv = document.getElementById('order-details')
   
@@ -195,17 +195,19 @@ export async function renderOrderDetails(order) {
     return
   }
 
-  // Fetch items data to get icon
+  // Fetch items data to get icon for the ordered item + build name→icon map for ingredients
   let itemIconUrl = null
+  const ingredientIconMap = {}
   try {
     const response = await fetch('https://cdn.projectgorgon.com/v461/data/items.json')
     if (response.ok) {
       const itemsData = await response.json()
-      // Find item by name
-      for (const [key, item] of Object.entries(itemsData)) {
+      for (const [, item] of Object.entries(itemsData)) {
+        if (item.Name && item.IconId) {
+          ingredientIconMap[item.Name.toLowerCase()] = `https://cdn.projectgorgon.com/v461/icons/icon_${item.IconId}.png`
+        }
         if (item.Name === order.itemName && item.IconId) {
           itemIconUrl = `https://cdn.projectgorgon.com/v461/icons/icon_${item.IconId}.png`
-          break
         }
       }
     }
@@ -214,7 +216,7 @@ export async function renderOrderDetails(order) {
   }
 
   // Format the date
-  const createdDate = order.createdAt?.toDate?.() 
+  const createdDate = order.createdAt?.toDate?.()
     ? new Date(order.createdAt.toDate()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
     : '—'
 
@@ -233,14 +235,23 @@ export async function renderOrderDetails(order) {
   // Build ingredients table rows
   let ingredientsHtml = ''
   if (order.ingredients && Object.keys(order.ingredients).length > 0) {
-    ingredientsHtml = Object.entries(order.ingredients).map(([name, data]) => {
+    ingredientsHtml = Object.entries(order.ingredients).sort(([a], [b]) => a.localeCompare(b)).map(([name, data]) => {
       const totalCost = data.totalCost || 0
+      const iconUrl = ingredientIconMap[name.toLowerCase()]
+      const iconHtml = iconUrl
+        ? `<img src="${iconUrl}" alt="" style="width:32px; height:32px; border:1px solid #505050; border-radius:3px; vertical-align:middle; margin-right:6px; object-fit:contain;" onerror="this.style.display='none'">`
+        : ''
+      const isUnpriced = data.unpriced || (data.costPerUnit || 0) === 0
+      const unpricedNote = isUnpriced
+        ? ` <span style="font-size:10px; color:#f59e0b; opacity:0.8;">(unpriced)</span>`
+        : ''
+      const costStyle = isUnpriced ? 'color:#a8a8a8; font-style:italic;' : ''
       return `
         <tr style="height: 36px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
-          <td style="padding: 0 1rem; text-align: left; width: 50%;">${escapeHtml(name)}</td>
+          <td style="padding: 0 1rem; text-align: left; width: 50%;">${iconHtml}${escapeHtml(name)}${unpricedNote}</td>
           <td style="padding: 0 1rem; text-align: right; width: 15%;">${(data.finalQuantity || 0).toFixed(0)}</td>
-          <td style="padding: 0 1rem; text-align: right; width: 15%;">${(data.costPerUnit || 0).toFixed(0)}</td>
-          <td style="padding: 0 1rem; text-align: right; width: 20%; font-weight: 500;">${totalCost.toFixed(0)}</td>
+          <td style="padding: 0 1rem; text-align: right; width: 15%; ${costStyle}">${(data.costPerUnit || 0).toFixed(0)}</td>
+          <td style="padding: 0 1rem; text-align: right; width: 20%; font-weight: 500; ${costStyle}">${totalCost.toFixed(0)}</td>
         </tr>
       `
     }).join('')
@@ -501,6 +512,40 @@ export async function renderOrderDetails(order) {
           <span>${(order.finalTotal || 0).toFixed(0)}</span>
         </div>
       </div>
+
+      ${(() => {
+        if (!currentUser) return ''
+        const isCustomer = order.customerUid === currentUser.uid
+        const isCrafter = order.crafterUid === currentUser.uid
+        const buttons = []
+
+        if (isCustomer && order.status === 'pending') {
+          buttons.push(`<button class="cancel-btn" onclick="cancelOrderAndReload('${order.id}')">Cancel Order</button>`)
+        }
+        if (isCrafter && order.status === 'pending') {
+          buttons.push(`<button class="action-btn" onclick="markOrderInProgress('${order.id}')">Mark In Progress</button>`)
+        }
+        if (isCrafter && order.status === 'in_progress') {
+          buttons.push(`<button class="action-btn" onclick="markOrderComplete('${order.id}')">Mark Complete</button>`)
+        }
+        if (isCustomer || isCrafter) {
+          buttons.push(`<button class="delete-order-btn" onclick="deleteOrderAndRedirect('${order.id}')">Delete</button>`)
+        }
+
+        if (buttons.length === 0) return ''
+        return `
+          <div style="
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 20px;
+            padding-top: 16px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+          ">
+            ${buttons.join('')}
+          </div>
+        `
+      })()}
     </div>
   `
 
@@ -509,6 +554,151 @@ export async function renderOrderDetails(order) {
     statusDiv.style.display = 'none'
   }
   detailsDiv.style.display = 'block'
+}
+
+/**
+ * Subscribe to orders placed with the current user (as a crafter)
+ */
+export function subscribeCrafterOrders(uid, callback) {
+  const db = getFirestore()
+  if (!db) {
+    console.error('Firestore not initialized')
+    return null
+  }
+
+  return db.collection('orders')
+    .where('crafterUid', '==', uid)
+    .onSnapshot(snap => {
+      const crafterOrders = snap.docs.sort((a, b) => {
+        const timeA = a.data().createdAt?.toMillis?.() || 0
+        const timeB = b.data().createdAt?.toMillis?.() || 0
+        return timeB - timeA
+      })
+
+      callback(crafterOrders)
+    })
+}
+
+/**
+ * Render incoming orders table (crafter view)
+ */
+export function renderIncomingOrders(docs) {
+  const container = document.getElementById('incoming-orders-container')
+  const section = document.getElementById('incoming-orders-section')
+
+  if (!container) return
+
+  if (docs.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="padding:1.5rem 0;">No orders have been placed with you yet.</div>'
+    if (section) section.classList.remove('section-hidden')
+    return
+  }
+
+  if (section) section.classList.remove('section-hidden')
+
+  const rows = docs.map(doc => {
+    const d = doc.data()
+    const date = formatDate(d.createdAt)
+
+    return `
+      <tr>
+        <td style="max-width:150px;"><strong>${escapeHtml(d.characterName || d.customerEmail || '—')}</strong></td>
+        <td>${escapeHtml(d.itemName || '—')}</td>
+        <td>${d.quantity || 1}</td>
+        <td><span class="badge ${d.status}">${d.status}</span></td>
+        <td>${date}</td>
+        <td><a href="order-view.html?id=${doc.id}" class="action-btn" style="padding:0.3rem 0.75rem; font-size:0.8rem;">View</a></td>
+      </tr>
+    `
+  }).join('')
+
+  container.innerHTML = `
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+  `
+}
+
+/**
+ * Mark an order as in-progress (crafter action)
+ */
+export async function markOrderInProgress(orderId) {
+  const db = getFirestore()
+  if (!db) return
+  try {
+    await db.collection('orders').doc(orderId).update({
+      status: 'in_progress',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    window.location.reload()
+  } catch (error) {
+    console.error('Error updating order:', error)
+    alert('Failed to update order: ' + error.message)
+  }
+}
+
+/**
+ * Mark an order as complete (crafter action)
+ */
+export async function markOrderComplete(orderId) {
+  const db = getFirestore()
+  if (!db) return
+  try {
+    await db.collection('orders').doc(orderId).update({
+      status: 'done',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    window.location.reload()
+  } catch (error) {
+    console.error('Error updating order:', error)
+    alert('Failed to update order: ' + error.message)
+  }
+}
+
+/**
+ * Cancel order and reload to show updated status
+ */
+export async function cancelOrderAndReload(orderId) {
+  const db = getFirestore()
+  if (!db) return
+  try {
+    await db.collection('orders').doc(orderId).update({
+      status: 'cancelled',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    window.location.reload()
+  } catch (error) {
+    console.error('Error cancelling order:', error)
+    alert('Failed to cancel order: ' + error.message)
+  }
+}
+
+/**
+ * Delete order and redirect back
+ */
+export async function deleteOrderAndRedirect(orderId) {
+  const db = getFirestore()
+  if (!db) return
+  if (!confirm('Are you sure you want to delete this order?')) return
+  try {
+    await db.collection('orders').doc(orderId).delete()
+    window.history.back()
+  } catch (error) {
+    console.error('Error deleting order:', error)
+    alert('Failed to delete order: ' + error.message)
+  }
 }
 
 /**

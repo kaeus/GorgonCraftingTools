@@ -433,6 +433,7 @@ function showListingForm(docSnapshot = null) {
             <option value="Cooking" ${d.profession === 'Cooking' ? 'selected' : ''}>Cooking</option>
             <option value="Engraving" ${d.profession === 'Engraving' ? 'selected' : ''}>Engraving</option>
             <option value="Scribing" ${d.profession === 'Scribing' ? 'selected' : ''}>Scribing</option>
+            <option value="Toolcrafting" ${d.profession === 'Toolcrafting' ? 'selected' : ''}>Toolcrafting</option>
           </select>
         </div>
       </div>
@@ -473,6 +474,7 @@ function showListingForm(docSnapshot = null) {
 
       <div style="margin-bottom:1rem;">
         <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Ingredient Prices *</label>
+        <input type="text" id="ingredient-filter-fixed" placeholder="Filter ingredients..." style="width:100%; padding:0.5rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8; margin-bottom:0.5rem; box-sizing:border-box;">
         <div id="ingredient-pricing-fixed" style="border:1px solid #505050; border-radius:5px; padding:1rem; background:#1a1a1a; max-height:400px; overflow-y:auto;">
           <div style="color:#a8a8a8; text-align:center; padding:2rem;">Select a profession above to load ingredients</div>
         </div>
@@ -483,6 +485,7 @@ function showListingForm(docSnapshot = null) {
           Variable Ingredient Prices *
           <span class="info-icon" title="Some recipe ingredient requirements can be met via varying ingredients (e.g. elf skull vs human skull). Consider your cheapest option in the category (even zero if it is an existing item to be modified)." style="display:inline-flex; align-items:center; justify-content:center; width:1.2rem; height:1.2rem; background:#505050; border-radius:50%; font-size:0.7rem; cursor:help; text-transform:none;">?</span>
         </label>
+        <input type="text" id="ingredient-filter-variable" placeholder="Filter ingredients..." style="width:100%; padding:0.5rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8; margin-bottom:0.5rem; box-sizing:border-box;">
         <div id="ingredient-pricing-variable" style="border:1px solid #505050; border-radius:5px; padding:1rem; background:#1a1a1a; max-height:400px; overflow-y:auto;">
           <div style="color:#a8a8a8; text-align:center; padding:2rem;">Select a profession above to load ingredients</div>
         </div>
@@ -510,7 +513,7 @@ function showListingForm(docSnapshot = null) {
 
   // Set up event listeners for validation
   const formId = isEditing ? docSnapshot.id : 'new'
-  setupFormValidation(formId)
+  setupFormValidation(formId, d.ingredientPrices || {})
   
   // Initialize button state
   validateForm(formId)
@@ -582,19 +585,19 @@ export async function saveNewListing(listingId) {
 /**
  * Set up real-time validation for form inputs
  */
-function setupFormValidation(formId) {
+function setupFormValidation(formId, savedIngredientPrices = {}) {
   const professionSelect = document.getElementById('form-profession')
-  
+
   if (professionSelect) {
     professionSelect.addEventListener('change', async (e) => {
       await loadAndRenderIngredients(e.target.value)
       validateForm(formId)
     })
-    
+
     // Load ingredients if editing existing listing with profession
     const currentProfession = professionSelect.value
     if (currentProfession) {
-      loadAndRenderIngredients(currentProfession)
+      loadAndRenderIngredients(currentProfession, savedIngredientPrices)
     }
   }
   
@@ -615,7 +618,7 @@ function setupFormValidation(formId) {
 /**
  * Load and render ingredients for selected profession
  */
-async function loadAndRenderIngredients(profession) {
+async function loadAndRenderIngredients(profession, savedPrices = {}) {
   const fixedContainer = document.getElementById('ingredient-pricing-fixed')
   const variableContainer = document.getElementById('ingredient-pricing-variable')
   
@@ -701,11 +704,35 @@ async function loadAndRenderIngredients(profession) {
     variableContainer.innerHTML = '<div style="color:#a8a8a8; text-align:center; padding:2rem;">No variable ingredients for this profession</div>'
   }
   
-  // Add event listeners to ingredient inputs
+  // Add event listeners to ingredient inputs and restore saved prices
   document.querySelectorAll('.ingredient-price-input').forEach(input => {
+    const saved = savedPrices[input.dataset.ingredient]
+    if (saved !== undefined) input.value = saved
     input.addEventListener('input', () => validateForm(''))
     input.addEventListener('change', () => validateForm(''))
   })
+
+  // Wire up filter inputs
+  function applyFilter(container, query) {
+    const q = query.toLowerCase()
+    Array.from(container.children).forEach(row => {
+      const ing = row.querySelector('[data-ingredient]')
+      if (!ing) return
+      row.style.display = ing.dataset.ingredient.toLowerCase().includes(q) ? 'flex' : 'none'
+    })
+  }
+
+  const filterFixed = document.getElementById('ingredient-filter-fixed')
+  const filterVariable = document.getElementById('ingredient-filter-variable')
+
+  if (filterFixed) {
+    filterFixed.addEventListener('input', () => applyFilter(fixedContainer, filterFixed.value))
+    applyFilter(fixedContainer, filterFixed.value)
+  }
+  if (filterVariable) {
+    filterVariable.addEventListener('input', () => applyFilter(variableContainer, filterVariable.value))
+    applyFilter(variableContainer, filterVariable.value)
+  }
 }
 
 /**

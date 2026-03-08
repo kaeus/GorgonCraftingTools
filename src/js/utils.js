@@ -39,7 +39,8 @@ export const PROFESSION_EMOJI = {
   'Alchemy': '🧪',
   'Cooking': '🍳',
   'Engraving': '✏️',
-  'Scribing': '📜'
+  'Scribing': '📜',
+  'Toolcrafting': '🔨',
 }
 
 /**

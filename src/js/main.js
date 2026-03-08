@@ -203,16 +203,23 @@ async function initializeApp() {
     const urlParams = new URLSearchParams(window.location.search)
     const orderId = urlParams.get('id')
     if (orderId) {
-      const order = await OrdersModule.getOrderById(orderId)
-      if (order) {
-        await OrdersModule.renderOrderDetails(order)
-      } else {
-        const statusDiv = document.getElementById('status')
-        if (statusDiv) {
-          statusDiv.textContent = 'Order not found'
-          statusDiv.className = 'status-bar error'
-        }
-      }
+      await new Promise((resolve) => {
+        const unsubscribe = FirebaseModule.onAuthStateChanged(async (user) => {
+          AuthModule.renderUserAuth(user)
+          const order = await OrdersModule.getOrderById(orderId)
+          if (order) {
+            await OrdersModule.renderOrderDetails(order, user)
+          } else {
+            const statusDiv = document.getElementById('status')
+            if (statusDiv) {
+              statusDiv.textContent = 'Order not found'
+              statusDiv.className = 'status-bar error'
+            }
+          }
+          unsubscribe()
+          resolve()
+        })
+      })
     }
   }
   
@@ -224,6 +231,7 @@ async function initializeApp() {
         AuthModule.renderUserAuth(user)
         if (user) {
           await ListingsManagerModule.initListingsManager()
+          OrdersModule.subscribeCrafterOrders(user.uid, OrdersModule.renderIncomingOrders)
         } else {
           document.getElementById('status').textContent = 'You must be signed in to manage listings'
           document.getElementById('status').className = 'status-bar error'
@@ -300,6 +308,12 @@ window.searchListings = ListingsModule.searchListings
 window.cancelOrder = OrdersModule.cancelOrder
 window.deleteOrder = OrdersModule.deleteOrder
 window.createOrder = OrdersModule.createOrder
+window.cancelOrderAndReload = OrdersModule.cancelOrderAndReload
+window.deleteOrderAndRedirect = OrdersModule.deleteOrderAndRedirect
+window.markOrderInProgress = OrdersModule.markOrderInProgress
+window.markOrderComplete = OrdersModule.markOrderComplete
+window.subscribeCrafterOrders = OrdersModule.subscribeCrafterOrders
+window.renderIncomingOrders = OrdersModule.renderIncomingOrders
 
 // Listings manager functions
 window.createNewListing = ListingsManagerModule.createNewListing
