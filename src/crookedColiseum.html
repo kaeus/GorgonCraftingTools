@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crooked Coliseum - CraftingCorner</title>
+  <style>
+    body { visibility: hidden; background-color: #000; }
+    #global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
+  </style>
+  <script type="module" src="./js/main.js"></script>
+</head>
+<body>
+
+<!-- ── Global Loading Overlay ── -->
+<div id="global-loading-overlay"></div>
+
+<!-- ── Sidebar (rendered by sidebar.js) ── -->
+<div class="topbar"></div>
+
+<!-- ── Main page ── -->
+<div class="page coliseum-page" id="coliseum-page">
+  <h1>Crooked Coliseum</h1>
+  <p class="subtitle">Track the underground fights and calculate your betting edge. Tips are shared across all players on your server.</p>
+
+  <!-- Server + Configure Tips -->
+  <div class="coliseum-controls">
+    <div class="filter-bar coliseum-filter-bar">
+      <label for="coliseum-server-filter">Server</label>
+      <select id="coliseum-server-filter">
+        <option value="">Select Server…</option>
+        <option>Arisetsu</option>
+        <option>Dreva</option>
+        <option>Laeth</option>
+        <option>Miraverre</option>
+        <option>Strekios</option>
+      </select>
+    </div>
+    <button class="action-btn" id="configure-tips-btn" disabled title="Sign in to configure tips">
+      Configure Tips
+    </button>
+    <span class="tips-count-badge" id="tips-count-badge" style="display:none;"></span>
+  </div>
+
+  <div id="coliseum-status" class="status-bar" style="display:none;"></div>
+
+  <!-- Main Layout: Odds + Sidebar (hidden until a server is selected) -->
+  <div id="coliseum-content" class="coliseum-layout" style="display:none;">
+
+    <!-- Left: Odds Grid + Fighter Selector -->
+    <div class="coliseum-main">
+
+      <div class="section-header">
+        <h2>Odds Matrix</h2>
+      </div>
+      <p class="coliseum-hint">Row fighter's chance of winning against each column fighter.</p>
+      <div id="odds-grid-container"></div>
+
+      <div class="section-header" style="margin-top: 2rem;">
+        <h2>Fighter Selector</h2>
+      </div>
+      <p class="coliseum-hint">Click two fighters to compare their odds head-to-head.</p>
+      <div id="fighter-selector"></div>
+
+    </div>
+
+    <!-- Right: Featured Fights -->
+    <div class="coliseum-sidebar">
+      <div class="section-header">
+        <h2>Featured Fights</h2>
+      </div>
+      <p class="coliseum-hint">Matchups with a +10% or higher advantage.</p>
+      <div id="featured-fights-list">
+        <p class="empty-state-small">No featured fights yet.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- No-server placeholder -->
+  <div id="coliseum-no-server" class="coliseum-no-server">
+    <p>Select a server above to view fight odds and tips.</p>
+  </div>
+
+</div>
+
+<!-- ── Tips Modal ── -->
+<div class="modal-backdrop" id="tips-modal">
+  <div class="modal modal-wide">
+    <button class="modal-close" id="tips-modal-close">✕</button>
+    <h3>Configure Tips</h3>
+    <p class="tips-modal-desc">Check the boxes that apply for today's fights. Changes are saved automatically and shared with your server.</p>
+
+    <div id="tips-modal-body">
+
+      <!-- Advantages + Disadvantages side by side -->
+      <div class="tips-section tips-adv-dis-row">
+        <div class="tips-column">
+          <h4 class="tips-section-title">Advantages <span class="tips-section-badge bonus">+5%</span></h4>
+          <div id="tips-global-adv" class="tips-checkboxes-col"></div>
+        </div>
+        <div class="tips-col-divider"></div>
+        <div class="tips-column">
+          <h4 class="tips-section-title">Disadvantages <span class="tips-section-badge penalty">−5%</span></h4>
+          <div id="tips-global-dis" class="tips-checkboxes-col"></div>
+        </div>
+      </div>
+
+      <div class="tips-section">
+        <h4 class="tips-section-title">Fight Advantages <span class="tips-section-badge bonus">+10%</span></h4>
+        <p class="tips-section-desc">Specific matchup edges. Format: Fighter > Opponent.</p>
+        <div id="tips-fight-adv" class="tips-fight-flat"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Auth modal ── -->
+<div class="modal-backdrop" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" data-action="close-auth">✕</button>
+    <h3>Sign In</h3>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-google" data-tab="google">Google</button>
+      <button class="modal-tab" id="tab-email" data-tab="email">Email</button>
+    </div>
+
+    <!-- Google tab -->
+    <div id="pane-google">
+      <button class="google-btn" data-action="sign-in-google">
+        <svg class="google-icon" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </button>
+      <div id="google-error" class="modal-error" style="display:none;"></div>
+    </div>
+
+    <!-- Email tab -->
+    <div id="pane-email" style="display:none;">
+      <div id="email-error" class="modal-error" style="display:none;"></div>
+      <div id="email-name-wrap" style="display:none;">
+        <label for="auth-name">Display Name</label>
+        <input type="text" id="auth-name" placeholder="Your in-game name">
+      </div>
+      <label for="auth-email">Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email">
+      <label for="auth-password">Password</label>
+      <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password">
+      <button class="modal-submit" id="email-submit" data-action="sign-in-email">Sign In</button>
+      <div class="modal-toggle">
+        <span id="toggle-text">Don't have an account?</span>
+        <a data-action="toggle-email-mode"> Register</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<div class="footer"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="/firebase-config.js"></script>
+
+</body>
+</html>

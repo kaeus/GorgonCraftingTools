@@ -1426,3 +1426,557 @@ input[type="number"]:focus {
     rotate: 2deg;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Crooked Coliseum
+   ═══════════════════════════════════════════════════════════ */
+
+.coliseum-page {
+  max-width: 1100px;
+}
+
+/* ── Controls bar ── */
+.coliseum-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.coliseum-filter-bar {
+  margin-bottom: 0;
+}
+
+.tips-count-badge {
+  background: #8b0000;
+  color: #f5f5f5;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* ── Two-column layout ── */
+.coliseum-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.coliseum-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.coliseum-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: #141414;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.coliseum-hint {
+  font-size: 0.78rem;
+  color: #909090;
+  margin-bottom: 0.75rem;
+  font-style: italic;
+}
+
+/* ── Odds Table ── */
+.odds-grid-scroll {
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+}
+
+.odds-table {
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.odds-table th,
+.odds-table td {
+  padding: 0.3rem 0.25rem;
+  border: 1px solid #2a2a2a;
+  text-align: center;
+  width: 54px;
+}
+
+/* Row-label column can be a bit wider */
+.odds-table td.fighter-label,
+.odds-table th.corner-cell {
+  width: 68px;
+}
+
+.odds-table thead th {
+  background: #1a1a1a;
+  color: #a8a8a8;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.corner-cell {
+  color: #505050 !important;
+  font-size: 0.65rem !important;
+}
+
+.fighter-label {
+  background: #1a1a1a;
+  color: #d0d0d0;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.self-cell {
+  background: #0f0f0f;
+  color: #383838;
+}
+
+.odds-cell {
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.odds-cell.odds-bold {
+  font-weight: 800;
+}
+
+.odds-cell:hover {
+  filter: brightness(1.2);
+  cursor: default;
+}
+
+.odds-adv {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.odds-positive {
+  background: rgba(30, 80, 30, 0.45);
+  color: #6fcf6f;
+}
+
+.odds-negative {
+  background: rgba(80, 20, 20, 0.45);
+  color: #cf6f6f;
+}
+
+.odds-neutral {
+  background: #1a1a1a;
+  color: #909090;
+}
+
+.odds-legend {
+  font-size: 0.72rem;
+  color: #909090;
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+/* ── Fighter Selector ── */
+.fighter-chips-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.fighter-reset-btn {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.fighter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.fighter-chip {
+  background: #1a1a1a;
+  border: 1px solid #404040;
+  color: #c0c0c0;
+  border-radius: 4px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.05em;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.fighter-chip:hover {
+  background: #252525;
+  border-color: #606060;
+  color: #e0e0e0;
+}
+
+.fighter-chip.selected {
+  background: #3a1010;
+  border-color: #8b0000;
+  color: #f5f5f5;
+}
+
+.fight-result {
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  padding: 1.25rem;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fight-result-hint {
+  color: #505050;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.fight-result-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Fighter slots — symmetric, centered, ready for images */
+.result-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 1;
+  max-width: 160px;
+}
+
+/* Image placeholder — swap for <img> when artwork is ready */
+.result-fighter-img-slot {
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
+  background: #1e1e1e;
+  border: 1px dashed #333;
+  flex-shrink: 0;
+}
+
+.result-fighter-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.result-fighter-sub {
+  font-size: 0.75rem;
+  color: #808080;
+}
+
+/* State-based coloring */
+.result-slot.winner .result-fighter-name { color: #6fcf6f; }
+.result-slot.winner .result-fighter-img-slot { border-color: #2e6b2e; background: #152015; }
+.result-slot.loser  .result-fighter-name { color: #cf6f6f; }
+.result-slot.loser  .result-fighter-img-slot { border-color: #5a2020; background: #1a1010; }
+.result-slot.neutral .result-fighter-name { color: #c0c0c0; }
+
+/* Center column */
+.result-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.result-adv-badge {
+  background: #1e4d1e;
+  color: #6fcf6f;
+  border-radius: 3px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.result-favored-over,
+.result-tie-label {
+  font-size: 0.7rem;
+  color: #606060;
+  font-style: italic;
+}
+
+.result-odds-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #909090;
+  font-family: 'Cinzel', serif;
+}
+
+/* ── Featured Fights ── */
+.empty-state-small {
+  color: #505050;
+  font-style: italic;
+  font-size: 0.8rem;
+  padding: 0.5rem 0;
+}
+
+.featured-fight-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #222;
+  gap: 0.5rem;
+}
+
+.featured-fight-item:last-child {
+  border-bottom: none;
+}
+
+.featured-fight-matchup {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.featured-fighter {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #d0d0d0;
+}
+
+.featured-vs {
+  font-size: 0.65rem;
+  color: #505050;
+  font-style: italic;
+}
+
+.featured-opponent {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  color: #909090;
+}
+
+.featured-adv {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6fcf6f;
+  flex-shrink: 0;
+}
+
+/* ── Tips Modal ── */
+.modal-wide {
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.tips-modal-desc {
+  font-size: 0.8rem;
+  color: #808080;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+.tips-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #282828;
+}
+
+.tips-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.tips-section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: #d0d0d0;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tips-section-badge {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.tips-section-badge.bonus {
+  background: #1e4d1e;
+  color: #6fcf6f;
+}
+
+.tips-section-badge.penalty {
+  background: #4d1e1e;
+  color: #cf6f6f;
+}
+
+.tips-section-desc {
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 0.75rem;
+  font-style: italic;
+}
+
+/* Side-by-side adv/dis columns */
+.tips-adv-dis-row {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+}
+
+.tips-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.tips-col-divider {
+  width: 1px;
+  background: #2a2a2a;
+  align-self: stretch;
+  margin: 0 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Vertical column of checkboxes */
+.tips-checkboxes-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+/* Fight advantages — grouped by fighter */
+.tips-fight-flat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fight-adv-group {
+  border: 1px solid #252525;
+  border-radius: 5px;
+  padding: 0.5rem 0.75rem;
+  background: #111;
+}
+
+.fight-adv-fighter-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  color: #707070;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.fight-adv-opponents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 1.25rem;
+}
+
+.tip-matchup {
+  font-family: 'Cinzel', serif;
+  font-size: 0.73rem;
+  letter-spacing: 0.03em;
+  color: #c0c0c0;
+}
+
+/* Legacy — keep for safety */
+.tips-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+}
+
+.tip-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: #c0c0c0;
+  padding: 0.25rem 0;
+  user-select: none;
+}
+
+.tip-checkbox-label:hover {
+  color: #e0e0e0;
+}
+
+.tip-checkbox-label input[type="checkbox"] {
+  accent-color: #8b0000;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.tip-fighter-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.tip-bonus {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #6fcf6f;
+}
+
+.tip-penalty {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #cf6f6f;
+}
+
+
+/* ── No-server placeholder ── */
+.coliseum-no-server {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: #505050;
+  font-style: italic;
+  font-size: 0.9rem;
+  border: 1px dashed #252525;
+  border-radius: 6px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .coliseum-layout {
+    flex-direction: column;
+  }
+
+  .coliseum-sidebar {
+    width: 100%;
+  }
+}

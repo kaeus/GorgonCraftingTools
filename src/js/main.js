@@ -8,6 +8,7 @@ import * as OrderPageModule from './order-page.js'
 import * as ListingsManagerModule from './listings-manager.js'
 import * as SidebarModule from './sidebar.js'
 import { initNPCMessage } from './npc-message.js'
+import * as ColiseumModule from './crooked-coliseum.js'
 
 /**
  * Component Loader
@@ -239,6 +240,13 @@ async function initializeApp() {
         unsubscribe()
         resolve()
       })
+    })
+  } else if (document.querySelector('#coliseum-page')) {
+    // Initialize the Crooked Coliseum page
+    ColiseumModule.initColiseum()
+    FirebaseModule.onAuthStateChanged((user) => {
+      AuthModule.renderUserAuth(user)
+      ColiseumModule.setCurrentUser(user)
     })
   } else {
     // Set up auth state listener for other pages

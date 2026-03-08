@@ -33,8 +33,8 @@ export function renderSidebar() {
         <img src="./images/legs_list.png" alt="Legs List">
       </a>
     </div>
-    <div class="topbar-title tbd">
-      <a href="#" class="topbar-image-link">
+    <div class="topbar-title">
+      <a href="crookedColiseum.html" class="topbar-image-link">
         <img src="./images/crooked_coliseum_card.png" alt="Crooked Coliseum">
       </a>
     </div>
@@ -42,7 +42,7 @@ export function renderSidebar() {
       <button class="action-btn" data-action="open-auth">Sign In</button>
     </div>
   `
-  
+
   // Clear and populate the topbar
   topbar.innerHTML = sidebarHTML
 }
