@@ -184,6 +184,7 @@ async function initializeApp() {
   // Load initial listings if we're on the market page
   if (document.querySelector('.listings-grid')) {
     await ListingsModule.loadListings()
+    ListingsModule.initMarketItemSearch()
     
     // Initialize NPC message system for maxillae on market page
     initNPCMessage('maxillae', {
@@ -331,11 +332,13 @@ window.selectListingType = ListingsManagerModule.selectListingType
 window.selectItem = ListingsManagerModule.selectItem
 window.saveItemListing = ListingsManagerModule.saveItemListing
 window.resetItemListingForm = ListingsManagerModule.resetItemListingForm
+window.cancelItemListingForm = ListingsManagerModule.cancelItemListingForm
+window.saveFetcherListing = ListingsManagerModule.saveFetcherListing
+window.cancelFetcherListingForm = ListingsManagerModule.cancelFetcherListingForm
 window.editListing = ListingsManagerModule.editListing
 window.deleteListing = ListingsManagerModule.deleteListing
 window.saveNewListing = ListingsManagerModule.saveNewListing
 window.cancelListingForm = ListingsManagerModule.cancelListingForm
-window.cancelItemListingForm = ListingsManagerModule.cancelItemListingForm
 window.loadGoogleSheet = ListingsManagerModule.loadGoogleSheet
 
 // Order page functions

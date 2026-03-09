@@ -283,6 +283,8 @@ export function selectListingType(type) {
     showListingForm(null)
   } else if (type === 'item') {
     showItemListingForm()
+  } else if (type === 'fetcher') {
+    showFetcherListingForm()
   } else if (type === 'service') {
     showServiceListingModal()
   }
@@ -294,6 +296,9 @@ export function selectListingType(type) {
 async function showItemListingForm() {
   const craftingArea = document.getElementById('crafting-area')
   if (!craftingArea) return
+
+  // Show the crafting area
+  craftingArea.style.display = 'block'
 
   const formHtml = `
     <div style="margin-bottom:2rem; padding:1.5rem; background:#0a0a0a; border:1px solid #505050; border-radius:5px;">
@@ -379,6 +384,83 @@ async function showItemListingForm() {
   
   // Initialize the form
   await initItemListingForm()
+}
+
+/**
+ * Show fetcher listing form in crafting area
+ */
+async function showFetcherListingForm() {
+  const craftingArea = document.getElementById('crafting-area')
+  if (!craftingArea) return
+
+  // Show the crafting area
+  craftingArea.style.display = 'block'
+
+  const formHtml = `
+    <div style="margin-bottom:2rem; padding:1.5rem; background:#0a0a0a; border:1px solid #505050; border-radius:5px;">
+      <h3 style="margin-bottom:1.5rem; font-size:1.1rem;">Offer Your Services as a Fetcher</h3>
+      <p style="color:#a8a8a8; font-size:0.9rem; margin-bottom:1rem;">List your services if you can acquire rare and hard-to-find items.</p>
+      <div id="fetcher-form-container">
+        <div style="display:grid; gap:1rem;">
+          <!-- Character Name -->
+          <div>
+            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Character Name *</label>
+            <input type="text" id="fetcher-character-name" placeholder="Your character name" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
+          </div>
+          
+          <!-- Server -->
+          <div>
+            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Server *</label>
+            <select id="fetcher-server" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
+              <option value="">Select a server</option>
+              <option value="Arisetsu">Arisetsu</option>
+              <option value="Dreva">Dreva</option>
+              <option value="Laeth">Laeth</option>
+              <option value="Miraverre">Miraverre</option>
+              <option value="Strekios">Strekios</option>
+            </select>
+          </div>
+          
+          <!-- Availability -->
+          <div>
+            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Availability</label>
+            <input type="text" id="fetcher-pst" placeholder="e.g. 6 PM - 10 PM" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
+          </div>
+          
+          <!-- Commission Rate -->
+          <div>
+            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Commission Rate % *</label>
+            <input type="number" id="fetcher-commission" min="0" max="100" step="1" value="50" placeholder="50" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
+          </div>
+          
+          <!-- Description -->
+          <div>
+            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Description</label>
+            <textarea id="fetcher-notes" placeholder="Tell potential clients what you specialize in or any terms..." style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8; min-height:80px; font-family:inherit; resize:vertical;"></textarea>
+          </div>
+          
+          <!-- Error Message -->
+          <div id="fetcher-form-error" style="color:#ff6b6b; background:#2a1a1a; border:1px solid #4a3030; border-radius:4px; padding:0.6rem; display:none;"></div>
+          
+          <!-- Buttons -->
+          <div style="display:flex; gap:1rem;">
+            <button class="action-btn" id="fetcher-submit-btn" onclick="window.saveFetcherListing()" disabled style="opacity:0.5; cursor:not-allowed;">Create Listing</button>
+            <button class="action-btn ghost" onclick="window.cancelFetcherListingForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+
+  craftingArea.innerHTML = formHtml
+  
+  // Enable submit button
+  const submitBtn = document.getElementById('fetcher-submit-btn')
+  if (submitBtn) {
+    submitBtn.disabled = false
+    submitBtn.style.opacity = '1'
+    submitBtn.style.cursor = 'pointer'
+  }
 }
 
 /**
@@ -798,6 +880,43 @@ export async function cancelItemListingForm() {
   const auth = getAuth()
   if (auth?.currentUser) {
     await loadUserListings(auth.currentUser.uid)
+  }
+}
+
+/**
+ * Cancel fetcher listing form
+ */
+export function cancelFetcherListingForm() {
+  const craftingArea = document.getElementById('crafting-area')
+  if (craftingArea) {
+    craftingArea.style.display = 'none'
+    craftingArea.innerHTML = ''
+  }
+}
+
+/**
+ * Save fetcher listing (placeholder)
+ */
+export async function saveFetcherListing() {
+  const charName = document.getElementById('fetcher-character-name')?.value
+  const server = document.getElementById('fetcher-server')?.value
+  const commission = document.getElementById('fetcher-commission')?.value
+  const notes = document.getElementById('fetcher-notes')?.value
+  const errorDiv = document.getElementById('fetcher-form-error')
+  
+  if (!charName || !server || !commission) {
+    if (errorDiv) {
+      errorDiv.textContent = 'Please fill in all required fields'
+      errorDiv.style.display = 'block'
+    }
+    return
+  }
+  
+  // Placeholder implementation - would need full Firebase integration
+  if (errorDiv) {
+    errorDiv.textContent = 'Fetcher listings are not yet fully implemented'
+    errorDiv.style.color = '#ffc107'
+    errorDiv.style.display = 'block'
   }
 }
 

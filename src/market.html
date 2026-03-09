@@ -22,8 +22,18 @@
 <div class="page">
   <h1>Black Wing Market</h1>
   <p class="subtitle">A tangled bazaar where coin speaks louder than conscience. Rare goods, questionable wares, and items better left unasked about pass from shadowed hands to eager buyers. If you can pay the price, someone here can sell you almost anything.</p>
+  <p class="subtitle">If what you seek isn't here, one of the bazaar's many acquisition specialists, known as "fetchers", can find it. Of course, the pay must be high enough to earn their attention.... and their silence.</p>
 
   <div id="status" class="status-bar loading">Loading listings…</div>
+
+  <!-- Item Search -->
+  <div class="section-header">
+    <h2>Item</h2>
+  </div>
+  <div id="item-search-wrapper" style="position:relative; margin-bottom:2rem;">
+    <input type="text" id="market-item-search" placeholder="— Type to search… —" autocomplete="off" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#0a0a0a; color:#e8e8e8; font-family:inherit;">
+    <div id="item-search-suggestions" style="position:absolute; top:100%; left:0; right:0; background:#0a0a0a; border:1px solid #505050; border-top:none; border-radius:0 0 5px 5px; max-height:250px; overflow-y:auto; z-index:1000; margin-top:0; display:none;"></div>
+  </div>
   
   <!-- Crafting area for item listing form -->
   <div id="crafting-area" style="display:none;">
@@ -33,7 +43,8 @@
   <!-- Active listings -->
   <div class="section-header">
     <h2>Featured "Merchants"</h2>
-    <button class="action-btn" onclick="window.selectListingType('item')">+ Sell Your Items</button>
+    <button class="action-btn" onclick="window.selectListingType('item')">+ Fence Your Items</button>
+    <button class="action-btn" onclick="window.selectListingType('fetcher')">+ Hire a Fetcher</button>
   </div>
   <div class="filter-bar">
     <label for="server-filter">Server</label>

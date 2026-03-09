@@ -7,6 +7,7 @@ import { getFirestore } from './firebase.js'
 import { escapeHtml, PROFESSION_EMOJI, setStatus } from './utils.js'
 
 let allListingDocs = []
+let marketItemsDatabase = null // Cache for CDN items
 
 function formatCommission(value) {
   if (!value) return '—'
@@ -193,3 +194,169 @@ export async function getListingById(listingId) {
     return null
   }
 }
+
+/**
+ * Load items database from CDN
+ */
+async function loadMarketItemsDatabase() {
+  if (marketItemsDatabase) return marketItemsDatabase
+
+  try {
+    const response = await fetch('https://cdn.projectgorgon.com/v461/data/items.json')
+    if (!response.ok) throw new Error('Failed to load items')
+    const data = await response.json()
+
+    // Handle various response structures
+    if (Array.isArray(data)) {
+      marketItemsDatabase = data
+    } else if (data.items && Array.isArray(data.items)) {
+      marketItemsDatabase = data.items
+    } else if (data.data && Array.isArray(data.data)) {
+      marketItemsDatabase = data.data
+    } else {
+      // If it's an object with string keys, convert to array
+      const entries = Object.entries(data)
+      if (entries.length > 0) {
+        marketItemsDatabase = entries.map(([key, value]) => ({ key, ...value }))
+      } else {
+        console.error('Unexpected items database structure:', data)
+        return []
+      }
+    }
+
+    return marketItemsDatabase
+  } catch (error) {
+    console.error('Error loading item database:', error)
+    return []
+  }
+}
+
+/**
+ * Initialize market item search
+ */
+export async function initMarketItemSearch() {
+  const searchInput = document.getElementById('market-item-search')
+  const suggestionsDiv = document.getElementById('item-search-suggestions')
+  if (!searchInput || !suggestionsDiv) return
+
+  // Load items database
+  const items = await loadMarketItemsDatabase()
+  if (!items || items.length === 0) {
+    searchInput.placeholder = '✗ Failed to load items'
+    return
+  }
+
+  let searchTimeout
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout)
+    const query = e.target.value.toLowerCase().trim()
+
+    if (query.length < 2) {
+      suggestionsDiv.style.display = 'none'
+      return
+    }
+
+    searchTimeout = setTimeout(() => {
+      showMarketItemSuggestions(query, items)
+    }, 100)
+  })
+
+  // Hide suggestions when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#item-search-wrapper')) {
+      hideMarketItemSuggestions()
+    }
+  })
+
+  // Show items when input is focused
+  searchInput.addEventListener('focus', () => {
+    if (searchInput.value.length >= 2) {
+      showMarketItemSuggestions(searchInput.value.toLowerCase(), items)
+    }
+  })
+}
+
+/**
+ * Show market item suggestions dropdown
+ */
+function showMarketItemSuggestions(searchTerm, items) {
+  const suggestionsDiv = document.getElementById('item-search-suggestions')
+  if (!suggestionsDiv) return
+
+  const term = searchTerm.toLowerCase().trim()
+  const filtered = items.filter(item =>
+    item.Name && item.Name.toLowerCase().includes(term)
+  ).slice(0, 20)
+
+  if (filtered.length === 0) {
+    suggestionsDiv.innerHTML = '<div style="padding:0.75rem; color:#a8a8a8;">No items found</div>'
+  } else {
+    suggestionsDiv.innerHTML = filtered.map(item => {
+      const iconHtml = item.IconId
+        ? `<img src="https://cdn.projectgorgon.com/v461/icons/icon_${item.IconId}.png" alt="${escapeHtml(item.Name)}" style="width:32px; height:32px; margin-right:0.5rem; vertical-align:middle; border:1px solid #505050; border-radius:3px;" onerror="this.style.opacity='0.3'">`
+        : ''
+      return `
+        <div class="market-item-suggestion" data-item-name="${escapeHtml(item.Name)}" style="
+          padding: 0.75rem;
+          border-bottom: 1px solid #505050;
+          cursor: pointer;
+          transition: background 0.2s;
+          display: flex;
+          align-items: center;
+        " onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='transparent'">
+          ${iconHtml}
+          <div style="font-weight:bold;">${escapeHtml(item.Name)}</div>
+        </div>
+      `
+    }).join('')
+
+    // Add click listeners to suggestions
+    suggestionsDiv.querySelectorAll('.market-item-suggestion').forEach(el => {
+      el.addEventListener('click', () => {
+        selectMarketItem(el.dataset.itemName)
+      })
+    })
+  }
+
+  suggestionsDiv.style.display = 'block'
+}
+
+/**
+ * Hide market item suggestions dropdown
+ */
+function hideMarketItemSuggestions() {
+  const suggestionsDiv = document.getElementById('item-search-suggestions')
+  if (suggestionsDiv) {
+    suggestionsDiv.style.display = 'none'
+  }
+}
+
+/**
+ * Select a market item and filter listings
+ */
+function selectMarketItem(itemName) {
+  const searchInput = document.getElementById('market-item-search')
+  if (searchInput) {
+    searchInput.value = itemName
+  }
+  hideMarketItemSuggestions()
+
+  // Filter and render listings for selected item
+  const filtered = allListingDocs.filter(doc =>
+    doc.data().itemName === itemName
+  )
+  renderListings(filtered)
+}
+
+/**
+ * Clear market item search and show all listings
+ */
+export function clearMarketItemSearch() {
+  const searchInput = document.getElementById('market-item-search')
+  if (searchInput) {
+    searchInput.value = ''
+  }
+  hideMarketItemSuggestions()
+  renderListings(allListingDocs)
+}
+
