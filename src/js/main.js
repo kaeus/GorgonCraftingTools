@@ -224,8 +224,10 @@ async function initializeApp() {
     }
   }
   
-  // Initialize listings manager if we're on yourListings.html
-  if (document.querySelector('#crafting-area')) {
+  // Initialize listings manager if we're on yourListings.html (but not artisan_alley or market)
+  const isArtisanAlley = window.location.pathname.includes('artisan_alley.html')
+  const isMarket = window.location.pathname.includes('market.html')
+  if (document.querySelector('#crafting-area') && !isArtisanAlley && !isMarket) {
     // Wait for auth state to settle
     await new Promise((resolve) => {
       const unsubscribe = FirebaseModule.onAuthStateChanged(async (user) => {

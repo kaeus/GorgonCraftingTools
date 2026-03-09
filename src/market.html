@@ -24,11 +24,16 @@
   <p class="subtitle">A tangled bazaar where coin speaks louder than conscience. Rare goods, questionable wares, and items better left unasked about pass from shadowed hands to eager buyers. If you can pay the price, someone here can sell you almost anything.</p>
 
   <div id="status" class="status-bar loading">Loading listings…</div>
+  
+  <!-- Crafting area for item listing form -->
+  <div id="crafting-area" style="display:none;">
+    <!-- Crafting UI will be rendered here -->
+  </div>
 
   <!-- Active listings -->
   <div class="section-header">
     <h2>Featured "Merchants"</h2>
-    <button class="action-btn">Sell Your Items</button>
+    <button class="action-btn" onclick="window.selectListingType('item')">+ Sell Your Items</button>
   </div>
   <div class="filter-bar">
     <label for="server-filter">Server</label>
