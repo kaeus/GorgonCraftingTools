@@ -153,6 +153,7 @@ export async function createOrder(orderData) {
       commissionRate: orderData.commissionRate || '50%',
       commissionCost: orderData.commissionCost || 0,
       finalTotal: orderData.finalTotal || 0,
+      selectedSkills: orderData.selectedSkills || { primarySkill: null, secondarySkill: null },
       status: 'pending',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     })
@@ -198,6 +199,8 @@ export async function renderOrderDetails(order, currentUser = null) {
   // Fetch items data to get icon for the ordered item + build name→icon map for ingredients
   let itemIconUrl = null
   const ingredientIconMap = {}
+  let gemMapping = null
+  
   try {
     const response = await fetch('https://cdn.projectgorgon.com/v461/data/items.json')
     if (response.ok) {
@@ -213,6 +216,16 @@ export async function renderOrderDetails(order, currentUser = null) {
     }
   } catch (error) {
     console.error('Error fetching items data:', error)
+  }
+  
+  // Load gem skill mapping
+  try {
+    const response = await fetch('./public/gem_skill_mapping.json')
+    if (response.ok) {
+      gemMapping = await response.json()
+    }
+  } catch (error) {
+    console.error('Error fetching gem mapping:', error)
   }
 
   // Format the date
@@ -232,29 +245,149 @@ export async function renderOrderDetails(order, currentUser = null) {
     ">${escapeHtml(order.status || 'pending').toUpperCase()}</span>
   `
 
-  // Build ingredients table rows
-  let ingredientsHtml = ''
+  // Build ingredients sections (crystal and regular)
+  let crystalsHtml = ''
+  let regularIngredientsHtml = ''
+  
   if (order.ingredients && Object.keys(order.ingredients).length > 0) {
-    ingredientsHtml = Object.entries(order.ingredients).sort(([a], [b]) => a.localeCompare(b)).map(([name, data]) => {
-      const totalCost = data.totalCost || 0
-      const iconUrl = ingredientIconMap[name.toLowerCase()]
-      const iconHtml = iconUrl
-        ? `<img src="${iconUrl}" alt="" style="width:32px; height:32px; border:1px solid #505050; border-radius:3px; vertical-align:middle; margin-right:6px; object-fit:contain;" onerror="this.style.display='none'">`
-        : ''
-      const isUnpriced = data.unpriced || (data.costPerUnit || 0) === 0
-      const unpricedNote = isUnpriced
-        ? ` <span style="font-size:10px; color:#f59e0b; opacity:0.8;">(unpriced)</span>`
-        : ''
-      const costStyle = isUnpriced ? 'color:#a8a8a8; font-style:italic;' : ''
-      return `
-        <tr style="height: 36px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
-          <td style="padding: 0 1rem; text-align: left; width: 50%;">${iconHtml}${escapeHtml(name)}${unpricedNote}</td>
-          <td style="padding: 0 1rem; text-align: right; width: 15%;">${(data.finalQuantity || 0).toFixed(0)}</td>
-          <td style="padding: 0 1rem; text-align: right; width: 15%; ${costStyle}">${(data.costPerUnit || 0).toFixed(0)}</td>
-          <td style="padding: 0 1rem; text-align: right; width: 20%; font-weight: 500; ${costStyle}">${totalCost.toFixed(0)}</td>
-        </tr>
+    const gems = gemMapping?.gems || {}
+    const crystalIngredients = {}
+    const regularIngredients = {}
+    
+    // Separate ingredients into crystal and regular
+    for (const [name, data] of Object.entries(order.ingredients)) {
+      const isCrystalSlot = name.toLowerCase().includes('primary crystal') || 
+                            name.toLowerCase().includes('auxiliary crystal')
+      if (isCrystalSlot) {
+        crystalIngredients[name] = data
+      } else {
+        regularIngredients[name] = data
+      }
+    }
+    
+    // Build crystal ingredients table
+    if (Object.keys(crystalIngredients).length > 0) {
+      const crystalRows = Object.entries(crystalIngredients).sort(([a], [b]) => a.localeCompare(b)).map(([name, data]) => {
+        let displayName = name
+        let displayIcon = ingredientIconMap[name.toLowerCase()]
+        
+        // For Primary/Auxiliary crystals with selected skills, show gem name and icon
+        if (order.selectedSkills && (order.selectedSkills.primarySkill || order.selectedSkills.secondarySkill)) {
+          const isPrimaryCrystal = name.toLowerCase().includes('primary crystal')
+          const isAuxiliaryCrystal = name.toLowerCase().includes('auxiliary crystal')
+          
+          if (isPrimaryCrystal && order.selectedSkills.primarySkill) {
+            // Find gem for primary skill
+            for (const [gemName, gemData] of Object.entries(gems)) {
+              if (gemData.primary_skill === order.selectedSkills.primarySkill) {
+                displayName = `Primary Crystal (${gemName})`
+                displayIcon = { iconUrl: `https://cdn.projectgorgon.com/v461/icons/icon_${gemData.icon_id}.png` }
+                break
+              }
+            }
+          } else if (isAuxiliaryCrystal && order.selectedSkills.secondarySkill) {
+            // Find gem for secondary skill
+            for (const [gemName, gemData] of Object.entries(gems)) {
+              if (gemData.primary_skill === order.selectedSkills.secondarySkill) {
+                displayName = `Auxiliary Crystal (${gemName})`
+                displayIcon = { iconUrl: `https://cdn.projectgorgon.com/v461/icons/icon_${gemData.icon_id}.png` }
+                break
+              }
+            }
+          }
+        }
+        
+        const iconUrl = displayIcon?.iconUrl || displayIcon
+        const iconHtml = iconUrl
+          ? `<img src="${iconUrl}" alt="" style="width:32px; height:32px; border:1px solid #505050; border-radius:3px; vertical-align:middle; margin-right:6px; object-fit:contain;" onerror="this.style.display='none'">`
+          : ''
+        const isUnpriced = data.unpriced || (data.costPerUnit || 0) === 0
+        const unpricedNote = isUnpriced
+          ? ` <span style="font-size:10px; color:#f59e0b; opacity:0.8;">(unpriced)</span>`
+          : ''
+        const costStyle = isUnpriced ? 'color:#a8a8a8; font-style:italic;' : ''
+        const totalCost = data.totalCost || 0
+        
+        return `
+          <tr style="height: 36px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+            <td style="padding: 0 1rem; text-align: left; width: 50%;">${iconHtml}${escapeHtml(displayName)}${unpricedNote}</td>
+            <td style="padding: 0 1rem; text-align: right; width: 15%;">${(data.finalQuantity || 0).toFixed(0)}</td>
+            <td style="padding: 0 1rem; text-align: right; width: 15%; ${costStyle}">${(data.costPerUnit || 0).toFixed(0)}</td>
+            <td style="padding: 0 1rem; text-align: right; width: 20%; font-weight: 500; ${costStyle}">${totalCost.toFixed(0)}</td>
+          </tr>
+        `
+      }).join('')
+      
+      crystalsHtml = `
+        <div style="margin-bottom: 20px;">
+          <div style="
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.6;
+            color: #a8a8a8;
+            margin-bottom: 12px;
+          ">💎 Primary / Auxiliary Crystals</div>
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th style="text-align: right; padding: 0 1rem; height: 36px; font-size: 11px; color: #a8a8a8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; width: 15%;">Qty</th>
+                <th style="text-align: right; padding: 0 1rem; height: 36px; font-size: 11px; color: #a8a8a8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; width: 15%;">Cost/Unit</th>
+                <th style="text-align: right; padding: 0 1rem; height: 36px; font-size: 11px; color: #a8a8a8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; width: 20%;">Total</th>
+              </tr>
+            </thead>
+            <tbody>${crystalRows}</tbody>
+          </table>
+        </div>
       `
-    }).join('')
+    }
+    
+    // Build regular ingredients table
+    if (Object.keys(regularIngredients).length > 0) {
+      const regularRows = Object.entries(regularIngredients).sort(([a], [b]) => a.localeCompare(b)).map(([name, data]) => {
+        const totalCost = data.totalCost || 0
+        const iconUrl = ingredientIconMap[name.toLowerCase()]
+        const iconHtml = iconUrl
+          ? `<img src="${iconUrl}" alt="" style="width:32px; height:32px; border:1px solid #505050; border-radius:3px; vertical-align:middle; margin-right:6px; object-fit:contain;" onerror="this.style.display='none'">`
+          : ''
+        const isUnpriced = data.unpriced || (data.costPerUnit || 0) === 0
+        const unpricedNote = isUnpriced
+          ? ` <span style="font-size:10px; color:#f59e0b; opacity:0.8;">(unpriced)</span>`
+          : ''
+        const costStyle = isUnpriced ? 'color:#a8a8a8; font-style:italic;' : ''
+        return `
+          <tr style="height: 36px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+            <td style="padding: 0 1rem; text-align: left; width: 50%;">${iconHtml}${escapeHtml(name)}${unpricedNote}</td>
+            <td style="padding: 0 1rem; text-align: right; width: 15%;">${(data.finalQuantity || 0).toFixed(0)}</td>
+            <td style="padding: 0 1rem; text-align: right; width: 15%; ${costStyle}">${(data.costPerUnit || 0).toFixed(0)}</td>
+            <td style="padding: 0 1rem; text-align: right; width: 20%; font-weight: 500; ${costStyle}">${totalCost.toFixed(0)}</td>
+          </tr>
+        `
+      }).join('')
+      
+      regularIngredientsHtml = `
+        <div style="margin-bottom: 20px;">
+          <div style="
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.6;
+            color: #a8a8a8;
+            margin-bottom: 12px;
+          ">Ingredients</div>
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th style="text-align: right; padding: 0 1rem; height: 36px; font-size: 11px; color: #a8a8a8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; width: 15%;">Qty</th>
+                <th style="text-align: right; padding: 0 1rem; height: 36px; font-size: 11px; color: #a8a8a8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; width: 15%;">Cost/Unit</th>
+                <th style="text-align: right; padding: 0 1rem; height: 36px; font-size: 11px; color: #a8a8a8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; width: 20%;">Total</th>
+              </tr>
+            </thead>
+            <tbody>${regularRows}</tbody>
+          </table>
+        </div>
+      `
+    }
   }
 
   // Item display with icon
@@ -387,84 +520,15 @@ export async function renderOrderDetails(order, currentUser = null) {
       "></div>
 
       <!-- INGREDIENTS SECTION -->
-      <div style="margin-bottom: 20px;">
+      ${crystalsHtml}
+      ${regularIngredientsHtml}
+      ${!crystalsHtml && !regularIngredientsHtml ? `
         <div style="
-          font-size: 11px;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          opacity: 0.6;
           color: #a8a8a8;
-          margin-bottom: 12px;
-        ">Ingredients</div>
-
-        ${ingredientsHtml ? `
-          <table style="
-            width: 100%;
-            border-collapse: collapse;
-          ">
-            <thead>
-              <tr>
-                <th style="
-                  text-align: left;
-                  padding: 0 1rem;
-                  height: 36px;
-                  font-size: 11px;
-                  color: #a8a8a8;
-                  font-weight: 600;
-                  text-transform: uppercase;
-                  letter-spacing: 0.08em;
-                  opacity: 0.6;
-                  width: 50%;
-                ">Ingredient</th>
-                <th style="
-                  text-align: right;
-                  padding: 0 1rem;
-                  height: 36px;
-                  font-size: 11px;
-                  color: #a8a8a8;
-                  font-weight: 600;
-                  text-transform: uppercase;
-                  letter-spacing: 0.08em;
-                  opacity: 0.6;
-                  width: 15%;
-                ">Qty</th>
-                <th style="
-                  text-align: right;
-                  padding: 0 1rem;
-                  height: 36px;
-                  font-size: 11px;
-                  color: #a8a8a8;
-                  font-weight: 600;
-                  text-transform: uppercase;
-                  letter-spacing: 0.08em;
-                  opacity: 0.6;
-                  width: 15%;
-                ">Cost/Unit</th>
-                <th style="
-                  text-align: right;
-                  padding: 0 1rem;
-                  height: 36px;
-                  font-size: 11px;
-                  color: #a8a8a8;
-                  font-weight: 600;
-                  text-transform: uppercase;
-                  letter-spacing: 0.08em;
-                  opacity: 0.6;
-                  width: 20%;
-                ">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${ingredientsHtml}
-            </tbody>
-          </table>
-        ` : `
-          <div style="
-            color: #a8a8a8;
-            font-size: 14px;
-          ">No ingredients recorded</div>
-        `}
-      </div>
+          font-size: 14px;
+          margin-bottom: 20px;
+        ">No ingredients recorded</div>
+      ` : ''}
 
       <!-- DIVIDER -->
       <div style="

@@ -1244,6 +1244,7 @@ export async function submitOrder() {
       commissionRate: commissionStr,
       commissionCost: commissionCost,
       finalTotal: finalTotal,
+      selectedSkills: selectedSkills,
     }
     
     const orderId = await Orders.createOrder(orderData)
