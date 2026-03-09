@@ -1,0 +1,999 @@
+﻿{
+  "total_gems_found": 690,
+  "gems_with_skills": 44,
+  "gems": {
+    "Fluorite": {
+      "id": "item_18021",
+      "keywords": [
+        "BlueCrystal",
+        "Crystal",
+        "Fluorite=500",
+        "Gem=200"
+      ],
+      "description": "This particular piece of fluorite is blue with white bands. Used in magic, it helps you communicate with animals. It also focuses the mind inwards.\n\nAssociated Primary Skill: Animal Handling\nAssociated Secondary Skill: Meditation",
+      "icon_id": 5203,
+      "primary_skill": "Animal Handling",
+      "secondary_skill": "Meditation"
+    },
+    "Peridot": {
+      "id": "item_18022",
+      "keywords": [
+        "AlchemyIngredient",
+        "Crystal",
+        "Gem=200",
+        "GreenCrystal",
+        "Peridot=500"
+      ],
+      "description": "It's a small peridot, mint green in color. Used in magic, it wards off distracting thoughts and helps align your accuracy.\n\nAssociated Primary Skill: Archery\nAssociated Secondary Skill: Calligraphy",
+      "icon_id": 5220,
+      "primary_skill": "Archery",
+      "secondary_skill": "Calligraphy"
+    },
+    "Onyx": {
+      "id": "item_18023",
+      "keywords": [
+        "Crystal",
+        "Gem=200",
+        "Onyx=500",
+        "RawOnyx",
+        "WhiteCrystal"
+      ],
+      "description": "A small crystal made up of black and white bands. Used in magic, it guards against physical dangers.\n\nAssociated Primary Skill: Shield\nAssociated Secondary Skills: Armor Patching, Tanning, Leatherworking",
+      "icon_id": 5205,
+      "primary_skill": "Shield",
+      "secondary_skill": null
+    },
+    "Sardonyx": {
+      "id": "item_18024",
+      "keywords": [
+        "AlchemyIngredient",
+        "Crystal",
+        "Gem=200",
+        "OrangeCrystal",
+        "Sardonyx=500"
+      ],
+      "description": "This small gem is brownish orange. Used in magic, it provides extra courage or energy to someone under great stress.\n\nAssociated Primary Skill: Warden\nAssociated Secondary Skill: Tailoring",
+      "icon_id": 5206,
+      "primary_skill": "Warden",
+      "secondary_skill": "Tailoring"
+    },
+    "Citrine": {
+      "id": "item_18025",
+      "keywords": [
+        "Citrine=500",
+        "Crystal",
+        "Gem=200",
+        "OrangeCrystal"
+      ],
+      "description": "A small orange gem with many magical uses. Humans appreciate it for its ability to reduce anxiety.\n\nAssociated Primary Skill: Battle Chemistry",
+      "icon_id": 5207,
+      "primary_skill": "Battle Chemistry",
+      "secondary_skill": null
+    },
+    "Quartz": {
+      "id": "item_18027",
+      "keywords": [
+        "Crystal",
+        "Gem=200",
+        "Quartz=500",
+        "WhiteCrystal"
+      ],
+      "description": "A small piece of white quartz. High-quality pieces like this one can amplify elemental magic.\n\nAssociated Primary Skill: Fire Magic",
+      "icon_id": 5201,
+      "primary_skill": "Fire Magic",
+      "secondary_skill": null
+    },
+    "Garnet": {
+      "id": "item_18028",
+      "keywords": [
+        "Crystal",
+        "Garnet=500",
+        "Gem=200",
+        "OrangeCrystal",
+        "RawGarnet",
+        "RedGem"
+      ],
+      "description": "A dark red stone, known for its curative properties.\n\nAssociated Primary Skill: Druid\n\nAssociated Secondary Skill: First Aid",
+      "icon_id": 5209,
+      "primary_skill": "Druid",
+      "secondary_skill": "First Aid"
+    },
+    "Aquamarine": {
+      "id": "item_18029",
+      "keywords": [
+        "AbilityIngredient",
+        "Aquamarine=500",
+        "BasicAquamarine",
+        "Crystal",
+        "Gem=200",
+        "GreenCrystal"
+      ],
+      "description": "A small gem, light blue-green in color. It's a traditional protective stone for fishermen.\n\nAssociated Primary Skill: Fishing\nAssociated Secondary Skill: Teleportation",
+      "icon_id": 5210,
+      "primary_skill": "Fishing",
+      "secondary_skill": "Teleportation"
+    },
+    "Obsidian": {
+      "id": "item_18030",
+      "keywords": [
+        "BlueCrystal",
+        "Crystal",
+        "Gem=200",
+        "Obsidian=500"
+      ],
+      "description": "A small black stone. Knives that incorporate obsidian can be enchanted more thoroughly than regular blades.\n\nAssociated Primary Skill: Knives\nAssociated Secondary Skill: Toolcrafting",
+      "icon_id": 5211,
+      "primary_skill": "Knives",
+      "secondary_skill": "Toolcrafting"
+    },
+    "Moss Agate": {
+      "id": "item_18031",
+      "keywords": [
+        "Crystal",
+        "Gem=200",
+        "MossAgate=500",
+        "WhiteCrystal"
+      ],
+      "description": "A white stone with dark green veins, the moss agate is also known as the Gardener's Talisman.\n\nAssociated Primary Skill: Hammer\n\nAssociated Secondary Skills: Gardening, Mycology",
+      "icon_id": 5212,
+      "primary_skill": "Hammer",
+      "secondary_skill": null
+    },
+    "Topaz": {
+      "id": "item_18032",
+      "keywords": [
+        "Crystal",
+        "Gem=200",
+        "OrangeCrystal",
+        "RawTopaz",
+        "Topaz=500"
+      ],
+      "description": "A small yellow topaz. An incredibly versatile magical stone.\n\nAssociated Primary Skill: Mentalism",
+      "icon_id": 5213,
+      "primary_skill": "Mentalism",
+      "secondary_skill": null
+    },
+    "Amethyst": {
+      "id": "item_18033",
+      "keywords": [
+        "Amethyst=500",
+        "BlueCrystal",
+        "Crystal",
+        "Gem=200"
+      ],
+      "description": "A purple stone, used in magic to facilitate travel.\n\nAssociated Primary Skill: Teleportation",
+      "icon_id": 5200,
+      "primary_skill": "Teleportation",
+      "secondary_skill": null
+    },
+    "Blue Spinel": {
+      "id": "item_18034",
+      "keywords": [
+        "BlueCrystal",
+        "BlueSpinel=500",
+        "Crystal",
+        "Gem=200"
+      ],
+      "description": "A lovely dark blue stone, with limited but potent magic uses.\n\nAssociated Primary Skill: Staff",
+      "icon_id": 5214,
+      "primary_skill": "Staff",
+      "secondary_skill": null
+    },
+    "Carnelian": {
+      "id": "item_18035",
+      "keywords": [
+        "Carnelian=500",
+        "Crystal",
+        "Gem=200",
+        "OrangeCrystal",
+        "RedGem"
+      ],
+      "description": "A red gem. Used in magic, it balances the senses and sharpens the mind to imminent danger.\n\nAssociated Primary Skill: Sword",
+      "icon_id": 5215,
+      "primary_skill": "Sword",
+      "secondary_skill": null
+    },
+    "Agate": {
+      "id": "item_18036",
+      "keywords": [
+        "Agate=500",
+        "Crystal",
+        "Gem=200",
+        "WhiteCrystal"
+      ],
+      "description": "This banded gem is used in magic to promote grace and give power to the body.\n\nAssociated Primary Skill: Unarmed",
+      "icon_id": 5216,
+      "primary_skill": "Unarmed",
+      "secondary_skill": null
+    },
+    "Bloodstone": {
+      "id": "item_18037",
+      "keywords": [
+        "Bloodstone=500",
+        "Crystal",
+        "Gem=200",
+        "GreenCrystal"
+      ],
+      "description": "This gem is dark green with red spots. In magic it is used to command nature.\n\nAssociated Primary Skill: Weather Witching",
+      "icon_id": 5217,
+      "primary_skill": "Weather Witching",
+      "secondary_skill": null
+    },
+    "Moonstone": {
+      "id": "item_18038",
+      "keywords": [
+        "AbilityIngredient",
+        "BasicMoonstone",
+        "Crystal",
+        "Gem=200",
+        "Moonstone=500",
+        "WhiteCrystal"
+      ],
+      "description": "Milky white, this gem is useful in magic that relates to 'new beginnings.'\n\nAssociated Primary Skill: Lycanthropy",
+      "icon_id": 5218,
+      "primary_skill": "Lycanthropy",
+      "secondary_skill": null
+    },
+    "Lapis Lazuli": {
+      "id": "item_18039",
+      "keywords": [
+        "BlueCrystal",
+        "Crystal",
+        "Gem=200",
+        "LapisLazuli=500",
+        "RawLapisLazuli"
+      ],
+      "description": "A soft blue rock. It's useful in curatives and curse removal potions.\n\nAssociated Primary Skill: Priest\nAssociated Secondary Skill: Alchemy",
+      "icon_id": 5204,
+      "primary_skill": "Priest",
+      "secondary_skill": "Alchemy"
+    },
+    "Tsavorite": {
+      "id": "item_18040",
+      "keywords": [
+        "Crystal",
+        "Gem=200",
+        "GreenCrystal",
+        "Tsavorite=500"
+      ],
+      "description": "A pretty green gem. Used in magic, it increases comprehension of scientific concepts.\n\nAssociated Primary Skill: Ice Magic\nAssociated Secondary Skill: Geology",
+      "icon_id": 5202,
+      "primary_skill": "Ice Magic",
+      "secondary_skill": "Geology"
+    },
+    "Tourmaline": {
+      "id": "item_18041",
+      "keywords": [
+        "Crystal",
+        "Gem=200",
+        "GreenCrystal",
+        "Tourmaline=500"
+      ],
+      "description": "A scintillating stone. Used in magic, it can mesmerize and soothe.\n\nAssociated Primary Skill: Psychology",
+      "icon_id": 5862,
+      "primary_skill": "Psychology",
+      "secondary_skill": null
+    },
+    "Serpentine": {
+      "id": "item_18042",
+      "keywords": [
+        "Crystal",
+        "Gem=200",
+        "OrangeCrystal",
+        "Serpentine=500"
+      ],
+      "description": "A dull yellow-green stone. Used in magic, it can pierce the barrier between life and death.\n\nAssociated Primary Skill: Necromancy",
+      "icon_id": 5221,
+      "primary_skill": "Necromancy",
+      "secondary_skill": null
+    },
+    "Azurite": {
+      "id": "item_18054",
+      "keywords": [
+        "Azurite=500",
+        "BlueCrystal",
+        "Crystal",
+        "Gem=200"
+      ],
+      "description": "A deep blue gem evocative of dark stormy oceans or winter skies. In magic it enhances musical skill.\n\nAssociated Primary Skill: Bard",
+      "icon_id": 5716,
+      "primary_skill": "Bard",
+      "secondary_skill": null
+    },
+    "Massive Fluorite": {
+      "id": "item_18321",
+      "keywords": [
+        "BlueCrystal",
+        "Crystal",
+        "Fluorite=2000",
+        "Gem=1000",
+        "MassiveCrystal",
+        "MassiveFluorite",
+        "MassiveGem"
+      ],
+      "description": "This large piece of fluorite is blue with white bands. Used in magic, it helps you communicate with animals. It also focuses the mind inwards.\n\nAssociated Primary Skill: Animal Handling\nAssociated Secondary Skill: Meditation",
+      "icon_id": 6864,
+      "primary_skill": "Animal Handling",
+      "secondary_skill": "Meditation"
+    },
+    "Massive Peridot": {
+      "id": "item_18322",
+      "keywords": [
+        "Crystal",
+        "Gem=1000",
+        "GreenCrystal",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassivePeridot",
+        "Peridot=2000"
+      ],
+      "description": "It's a huge peridot, mint green in color. Used in magic, it wards off distracting thoughts and helps align your accuracy.\n\nAssociated Primary Skill: Archery\nAssociated Secondary Skill: Calligraphy",
+      "icon_id": 6879,
+      "primary_skill": "Archery",
+      "secondary_skill": "Calligraphy"
+    },
+    "Massive Onyx": {
+      "id": "item_18323",
+      "keywords": [
+        "Crystal",
+        "Gem=1000",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassiveOnyx",
+        "Onyx=2000",
+        "RawOnyx",
+        "WhiteCrystal"
+      ],
+      "description": "A chunky crystal made up of black and white bands. Used in magic, it guards against physical dangers.\n\nAssociated Primary Skill: Shield\nAssociated Secondary Skills: Armor Patching, Tanning, Leatherworking",
+      "icon_id": 6866,
+      "primary_skill": "Shield",
+      "secondary_skill": null
+    },
+    "Massive Sardonyx": {
+      "id": "item_18324",
+      "keywords": [
+        "Crystal",
+        "Gem=1000",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassiveSardonyx",
+        "OrangeCrystal",
+        "Sardonyx=2000"
+      ],
+      "description": "This large gem is brownish orange. Used in magic, it provides extra courage or energy to someone under great stress.\n\nAssociated Primary Skill: Warden\nAssociated Secondary Skill: Tailoring",
+      "icon_id": 6867,
+      "primary_skill": "Warden",
+      "secondary_skill": "Tailoring"
+    },
+    "Massive Citrine": {
+      "id": "item_18325",
+      "keywords": [
+        "Citrine=2000",
+        "Crystal",
+        "Gem=1000",
+        "MassiveCitrine",
+        "MassiveCrystal",
+        "MassiveGem",
+        "OrangeCrystal"
+      ],
+      "description": "A large orange gem with many magical uses. Humans appreciate it for its ability to reduce anxiety.\n\nAssociated Primary Skill: Battle Chemistry",
+      "icon_id": 6868,
+      "primary_skill": "Battle Chemistry",
+      "secondary_skill": null
+    },
+    "Massive Quartz": {
+      "id": "item_18327",
+      "keywords": [
+        "Crystal",
+        "Gem=1000",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassiveQuartz",
+        "Quartz=2000",
+        "WhiteCrystal"
+      ],
+      "description": "A huge piece of white quartz. High-quality pieces like this one can amplify elemental magic.\n\nAssociated Primary Skill: Fire Magic",
+      "icon_id": 6862,
+      "primary_skill": "Fire Magic",
+      "secondary_skill": null
+    },
+    "Massive Garnet": {
+      "id": "item_18328",
+      "keywords": [
+        "Crystal",
+        "Garnet=2000",
+        "Gem=1000",
+        "MassiveCrystal",
+        "MassiveGarnet",
+        "MassiveGem",
+        "OrangeCrystal",
+        "RawGarnet",
+        "RedGem"
+      ],
+      "description": "A big dark red stone, known for its curative properties.\n\nAssociated Primary Skill: Druid\n\nAssociated Secondary Skill: First Aid",
+      "icon_id": 6870,
+      "primary_skill": "Druid",
+      "secondary_skill": "First Aid"
+    },
+    "Massive Aquamarine": {
+      "id": "item_18329",
+      "keywords": [
+        "AbilityIngredient",
+        "Aquamarine=2000",
+        "BasicAquamarine",
+        "Crystal",
+        "Gem=1000",
+        "GreenCrystal",
+        "MassiveAquamarine",
+        "MassiveCrystal",
+        "MassiveGem"
+      ],
+      "description": "A huge gem, light blue-green in color. It's a traditional protective stone for fishermen.\n\nAssociated Primary Skill: Fishing\nAssociated Secondary Skill: Teleportation",
+      "icon_id": 6871,
+      "primary_skill": "Fishing",
+      "secondary_skill": "Teleportation"
+    },
+    "Massive Obsidian": {
+      "id": "item_18330",
+      "keywords": [
+        "BlueCrystal",
+        "Crystal",
+        "Gem=1000",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassiveObsidian",
+        "Obsidian=2000"
+      ],
+      "description": "A small black stone. Knives that incorporate obsidian can be enchanted more thoroughly than regular blades.\n\nAssociated Primary Skill: Knives\nAssociated Secondary Skill: Toolcrafting",
+      "icon_id": 6872,
+      "primary_skill": "Knives",
+      "secondary_skill": "Toolcrafting"
+    },
+    "Massive Moss Agate": {
+      "id": "item_18331",
+      "keywords": [
+        "Crystal",
+        "Gem=1000",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassiveMossAgate",
+        "MossAgate=2000",
+        "WhiteCrystal"
+      ],
+      "description": "A white stone with dark green veins, the moss agate is also known as the Gardener's Talisman.\n\nAssociated Primary Skill: Hammer\n\nAssociated Secondary Skills: Gardening, Mycology",
+      "icon_id": 6873,
+      "primary_skill": "Hammer",
+      "secondary_skill": null
+    },
+    "Massive Topaz": {
+      "id": "item_18332",
+      "keywords": [
+        "Crystal",
+        "Gem=1000",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassiveTopaz",
+        "OrangeCrystal",
+        "RawTopaz",
+        "Topaz=2000"
+      ],
+      "description": "A massive yellow topaz. An incredibly versatile magical stone.\n\nAssociated Primary Skill: Mentalism",
+      "icon_id": 6874,
+      "primary_skill": "Mentalism",
+      "secondary_skill": null
+    },
+    "Massive Amethyst": {
+      "id": "item_18333",
+      "keywords": [
+        "Amethyst=2000",
+        "BlueCrystal",
+        "Crystal",
+        "Gem=1000",
+        "MassiveAmethyst",
+        "MassiveCrystal",
+        "MassiveGem"
+      ],
+      "description": "A purple stone, used in magic to facilitate travel.\n\nAssociated Primary Skill: Teleportation",
+      "icon_id": 6861,
+      "primary_skill": "Teleportation",
+      "secondary_skill": null
+    },
+    "Massive Blue Spinel": {
+      "id": "item_18334",
+      "keywords": [
+        "BlueCrystal",
+        "BlueSpinel=2000",
+        "Crystal",
+        "Gem=1000",
+        "MassiveBlueSpinel",
+        "MassiveCrystal",
+        "MassiveGem"
+      ],
+      "description": "A big dark blue stone, with limited but potent magic uses.\n\nAssociated Primary Skill: Staff",
+      "icon_id": 6875,
+      "primary_skill": "Staff",
+      "secondary_skill": null
+    },
+    "Massive Carnelian": {
+      "id": "item_18335",
+      "keywords": [
+        "Carnelian=2000",
+        "Crystal",
+        "Gem=1000",
+        "MassiveCarnelian",
+        "MassiveCrystal",
+        "MassiveGem",
+        "OrangeCrystal",
+        "RedGem"
+      ],
+      "description": "A honkin' big red gem. Used in magic, it balances the senses and sharpens the mind to imminent danger.\n\nAssociated Primary Skill: Sword",
+      "icon_id": 6876,
+      "primary_skill": "Sword",
+      "secondary_skill": null
+    },
+    "Massive Agate": {
+      "id": "item_18336",
+      "keywords": [
+        "Agate=2000",
+        "Crystal",
+        "Gem=1000",
+        "MassiveAgate",
+        "MassiveCrystal",
+        "MassiveGem",
+        "WhiteCrystal"
+      ],
+      "description": "This big banded gem is used in magic to promote grace and give power to the body.\n\nAssociated Primary Skill: Unarmed",
+      "icon_id": 6877,
+      "primary_skill": "Unarmed",
+      "secondary_skill": null
+    },
+    "Massive Bloodstone": {
+      "id": "item_18337",
+      "keywords": [
+        "Bloodstone=2000",
+        "Crystal",
+        "Gem=1000",
+        "GreenCrystal",
+        "MassiveBloodstone",
+        "MassiveCrystal",
+        "MassiveGem"
+      ],
+      "description": "This megagem is dark green with red spots. In magic it is used to command nature.\n\nAssociated Primary Skill: Weather Witching",
+      "icon_id": 6878,
+      "primary_skill": "Weather Witching",
+      "secondary_skill": null
+    },
+    "Massive Moonstone": {
+      "id": "item_18338",
+      "keywords": [
+        "AbilityIngredient",
+        "BasicMoonstone",
+        "Crystal",
+        "Gem=1000",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassiveMoonstone",
+        "Moonstone=200",
+        "WhiteCrystal"
+      ],
+      "description": "Milky white, this big crystal is useful in magic that relates to 'new beginnings.'\n\nAssociated Primary Skill: Lycanthropy",
+      "icon_id": 6882,
+      "primary_skill": "Lycanthropy",
+      "secondary_skill": null
+    },
+    "Massive Lapis Lazuli": {
+      "id": "item_18339",
+      "keywords": [
+        "BlueCrystal",
+        "Crystal",
+        "Gem=1000",
+        "LapisLazuli=2000",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassiveLapisLazuli",
+        "RawLapisLazuli"
+      ],
+      "description": "A big blue rock. It's useful in curatives and curse removal potions.\n\nAssociated Primary Skill: Priest\nAssociated Secondary Skill: Alchemy",
+      "icon_id": 6865,
+      "primary_skill": "Priest",
+      "secondary_skill": "Alchemy"
+    },
+    "Massive Tsavorite": {
+      "id": "item_18340",
+      "keywords": [
+        "Crystal",
+        "Gem=1000",
+        "GreenCrystal",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassiveTsavorite",
+        "Tsavorite=2000"
+      ],
+      "description": "A massive green gem. Used in magic, it increases comprehension of scientific concepts.\n\nAssociated Primary Skill: Ice Magic\nAssociated Secondary Skill: Geology",
+      "icon_id": 6863,
+      "primary_skill": "Ice Magic",
+      "secondary_skill": "Geology"
+    },
+    "Massive Tourmaline": {
+      "id": "item_18341",
+      "keywords": [
+        "Crystal",
+        "Gem=1000",
+        "GreenCrystal",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassiveTourmaline",
+        "Tourmaline=2000"
+      ],
+      "description": "A large scintillating stone. Used in magic, it can mesmerize and soothe.\n\nAssociated Primary Skill: Psychology",
+      "icon_id": 6883,
+      "primary_skill": "Psychology",
+      "secondary_skill": null
+    },
+    "Massive Serpentine": {
+      "id": "item_18342",
+      "keywords": [
+        "Crystal",
+        "Gem=1000",
+        "MassiveCrystal",
+        "MassiveGem",
+        "MassiveSerpentine",
+        "OrangeCrystal",
+        "Serpentine=2000"
+      ],
+      "description": "A big yellow-green stone. Used in magic, it can pierce the barrier between life and death.\n\nAssociated Primary Skill: Necromancy",
+      "icon_id": 6880,
+      "primary_skill": "Necromancy",
+      "secondary_skill": null
+    },
+    "Massive Azurite": {
+      "id": "item_18344",
+      "keywords": [
+        "Azurite=2000",
+        "BlueCrystal",
+        "Crystal",
+        "Gem=1000",
+        "MassiveAzurite",
+        "MassiveCrystal",
+        "MassiveGem"
+      ],
+      "description": "A huge blue gem evocative of dark stormy oceans or winter skies. In magic it enhances musical skill.\n\nAssociated Primary Skill: Bard",
+      "icon_id": 6884,
+      "primary_skill": "Bard",
+      "secondary_skill": null
+    }
+  },
+  "skill_to_gems": {
+    "Animal Handling": [
+      "Fluorite",
+      "Massive Fluorite"
+    ],
+    "Meditation": [
+      "Fluorite",
+      "Massive Fluorite"
+    ],
+    "Archery": [
+      "Massive Peridot",
+      "Peridot"
+    ],
+    "Calligraphy": [
+      "Massive Peridot",
+      "Peridot"
+    ],
+    "Shield": [
+      "Massive Onyx",
+      "Onyx"
+    ],
+    "Warden": [
+      "Massive Sardonyx",
+      "Sardonyx"
+    ],
+    "Tailoring": [
+      "Massive Sardonyx",
+      "Sardonyx"
+    ],
+    "Battle Chemistry": [
+      "Citrine",
+      "Massive Citrine"
+    ],
+    "Fire Magic": [
+      "Massive Quartz",
+      "Quartz"
+    ],
+    "Druid": [
+      "Garnet",
+      "Massive Garnet"
+    ],
+    "First Aid": [
+      "Garnet",
+      "Massive Garnet"
+    ],
+    "Fishing": [
+      "Aquamarine",
+      "Massive Aquamarine"
+    ],
+    "Teleportation": [
+      "Amethyst",
+      "Aquamarine",
+      "Massive Amethyst",
+      "Massive Aquamarine"
+    ],
+    "Knives": [
+      "Massive Obsidian",
+      "Obsidian"
+    ],
+    "Toolcrafting": [
+      "Massive Obsidian",
+      "Obsidian"
+    ],
+    "Hammer": [
+      "Massive Moss Agate",
+      "Moss Agate"
+    ],
+    "Mentalism": [
+      "Massive Topaz",
+      "Topaz"
+    ],
+    "Staff": [
+      "Blue Spinel",
+      "Massive Blue Spinel"
+    ],
+    "Sword": [
+      "Carnelian",
+      "Massive Carnelian"
+    ],
+    "Unarmed": [
+      "Agate",
+      "Massive Agate"
+    ],
+    "Weather Witching": [
+      "Bloodstone",
+      "Massive Bloodstone"
+    ],
+    "Lycanthropy": [
+      "Massive Moonstone",
+      "Moonstone"
+    ],
+    "Priest": [
+      "Lapis Lazuli",
+      "Massive Lapis Lazuli"
+    ],
+    "Alchemy": [
+      "Lapis Lazuli",
+      "Massive Lapis Lazuli"
+    ],
+    "Ice Magic": [
+      "Massive Tsavorite",
+      "Tsavorite"
+    ],
+    "Geology": [
+      "Massive Tsavorite",
+      "Tsavorite"
+    ],
+    "Psychology": [
+      "Massive Tourmaline",
+      "Tourmaline"
+    ],
+    "Necromancy": [
+      "Massive Serpentine",
+      "Serpentine"
+    ],
+    "Bard": [
+      "Azurite",
+      "Massive Azurite"
+    ]
+  },
+  "gem_to_skills": {
+    "Fluorite": {
+      "primary": "Animal Handling",
+      "secondary": "Meditation"
+    },
+    "Peridot": {
+      "primary": "Archery",
+      "secondary": "Calligraphy"
+    },
+    "Onyx": {
+      "primary": "Shield",
+      "secondary": null
+    },
+    "Sardonyx": {
+      "primary": "Warden",
+      "secondary": "Tailoring"
+    },
+    "Citrine": {
+      "primary": "Battle Chemistry",
+      "secondary": null
+    },
+    "Quartz": {
+      "primary": "Fire Magic",
+      "secondary": null
+    },
+    "Garnet": {
+      "primary": "Druid",
+      "secondary": "First Aid"
+    },
+    "Aquamarine": {
+      "primary": "Fishing",
+      "secondary": "Teleportation"
+    },
+    "Obsidian": {
+      "primary": "Knives",
+      "secondary": "Toolcrafting"
+    },
+    "Moss Agate": {
+      "primary": "Hammer",
+      "secondary": null
+    },
+    "Topaz": {
+      "primary": "Mentalism",
+      "secondary": null
+    },
+    "Amethyst": {
+      "primary": "Teleportation",
+      "secondary": null
+    },
+    "Blue Spinel": {
+      "primary": "Staff",
+      "secondary": null
+    },
+    "Carnelian": {
+      "primary": "Sword",
+      "secondary": null
+    },
+    "Agate": {
+      "primary": "Unarmed",
+      "secondary": null
+    },
+    "Bloodstone": {
+      "primary": "Weather Witching",
+      "secondary": null
+    },
+    "Moonstone": {
+      "primary": "Lycanthropy",
+      "secondary": null
+    },
+    "Lapis Lazuli": {
+      "primary": "Priest",
+      "secondary": "Alchemy"
+    },
+    "Tsavorite": {
+      "primary": "Ice Magic",
+      "secondary": "Geology"
+    },
+    "Tourmaline": {
+      "primary": "Psychology",
+      "secondary": null
+    },
+    "Serpentine": {
+      "primary": "Necromancy",
+      "secondary": null
+    },
+    "Azurite": {
+      "primary": "Bard",
+      "secondary": null
+    },
+    "Massive Fluorite": {
+      "primary": "Animal Handling",
+      "secondary": "Meditation"
+    },
+    "Massive Peridot": {
+      "primary": "Archery",
+      "secondary": "Calligraphy"
+    },
+    "Massive Onyx": {
+      "primary": "Shield",
+      "secondary": null
+    },
+    "Massive Sardonyx": {
+      "primary": "Warden",
+      "secondary": "Tailoring"
+    },
+    "Massive Citrine": {
+      "primary": "Battle Chemistry",
+      "secondary": null
+    },
+    "Massive Quartz": {
+      "primary": "Fire Magic",
+      "secondary": null
+    },
+    "Massive Garnet": {
+      "primary": "Druid",
+      "secondary": "First Aid"
+    },
+    "Massive Aquamarine": {
+      "primary": "Fishing",
+      "secondary": "Teleportation"
+    },
+    "Massive Obsidian": {
+      "primary": "Knives",
+      "secondary": "Toolcrafting"
+    },
+    "Massive Moss Agate": {
+      "primary": "Hammer",
+      "secondary": null
+    },
+    "Massive Topaz": {
+      "primary": "Mentalism",
+      "secondary": null
+    },
+    "Massive Amethyst": {
+      "primary": "Teleportation",
+      "secondary": null
+    },
+    "Massive Blue Spinel": {
+      "primary": "Staff",
+      "secondary": null
+    },
+    "Massive Carnelian": {
+      "primary": "Sword",
+      "secondary": null
+    },
+    "Massive Agate": {
+      "primary": "Unarmed",
+      "secondary": null
+    },
+    "Massive Bloodstone": {
+      "primary": "Weather Witching",
+      "secondary": null
+    },
+    "Massive Moonstone": {
+      "primary": "Lycanthropy",
+      "secondary": null
+    },
+    "Massive Lapis Lazuli": {
+      "primary": "Priest",
+      "secondary": "Alchemy"
+    },
+    "Massive Tsavorite": {
+      "primary": "Ice Magic",
+      "secondary": "Geology"
+    },
+    "Massive Tourmaline": {
+      "primary": "Psychology",
+      "secondary": null
+    },
+    "Massive Serpentine": {
+      "primary": "Necromancy",
+      "secondary": null
+    },
+    "Massive Azurite": {
+      "primary": "Bard",
+      "secondary": null
+    }
+  },
+  "primary_skills": [
+    "Animal Handling",
+    "Archery",
+    "Bard",
+    "Battle Chemistry",
+    "Druid",
+    "Fire Magic",
+    "Fishing",
+    "Hammer",
+    "Ice Magic",
+    "Knives",
+    "Lycanthropy",
+    "Mentalism",
+    "Necromancy",
+    "Priest",
+    "Psychology",
+    "Shield",
+    "Staff",
+    "Sword",
+    "Teleportation",
+    "Unarmed",
+    "Warden",
+    "Weather Witching"
+  ],
+  "secondary_skills": [
+    "Alchemy",
+    "Calligraphy",
+    "First Aid",
+    "Geology",
+    "Meditation",
+    "Tailoring",
+    "Teleportation",
+    "Toolcrafting"
+  ]
+}
+

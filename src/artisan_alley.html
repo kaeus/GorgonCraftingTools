@@ -24,21 +24,15 @@
   <p class="subtitle">Need something made rather than bought? Wander the lantern-lit stalls of Artisan Alley and find a craftsperson willing to take coin for their skill. From discreet repairs to bespoke creations, the right artisan can turn raw materials—and enough councils—into exactly what you need.</p>
 
   <div id="status" class="status-bar loading">Loading listings…</div>
-
-  <!-- My Orders (logged-in customers) -->
-  <div id="my-orders-section" class="section-hidden">
-    <div class="section-header">
-      <h2>My Orders</h2>
-    </div>
-    <div id="my-orders-container">
-      <div class="empty-state" style="padding:1.5rem 0;">Loading your orders…</div>
-    </div>
-    <div class="divider"></div>
+  
+  <div id="crafting-area" style="display:none;">
+    <!-- Crafting UI will be rendered here -->
   </div>
 
   <!-- Active listings -->
   <div class="section-header">
     <h2>Active Crafters</h2>
+    <button class="action-btn" onclick="window.selectListingType('crafted')">Sell Your Skills</button>
   </div>
   <div class="filter-bar">
     <label for="server-filter">Server</label>

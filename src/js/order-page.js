@@ -17,6 +17,8 @@ let selectedItemRecipe = null // Full recipe data for selected item
 let itemsCache = null // Cache for items data (ItemCode -> Name mapping)
 let itemsWithIcons = null // Cache for items with icon URLs
 let itemKeyToNameMap = {} // Map of ItemKey (string) -> Item Name for ingredient resolution
+let gemSkillMapping = null // Cache for gem/crystal skill mappings
+let selectedSkills = {} // Track selected skills for enchanted recipes {primarySkill: string, secondarySkill: string}
 
 /**
  * Initialize order page
@@ -120,6 +122,62 @@ async function getItemName(itemCode) {
 }
 
 /**
+ * Load gem/crystal to skill mappings
+ */
+async function getGemSkillMapping() {
+  if (gemSkillMapping) return gemSkillMapping
+  
+  try {
+    const response = await fetch('/gem_skill_mapping.json')
+    if (!response.ok) throw new Error('Failed to fetch gem skill mapping')
+    gemSkillMapping = await response.json()
+    return gemSkillMapping
+  } catch (error) {
+    console.error('Error loading gem skill mapping:', error)
+    return { gems: {} }
+  }
+}
+
+/**
+ * Check if an ingredient is a crystal/gem and return its Primary Skill
+ * @param {string} ingredientName - The name of the ingredient
+ * @returns {object|null} - { gem_name, primary_skill, secondary_skill, icon_id } or null
+ */
+async function getGemCrystalInfo(ingredientName) {
+  const mapping = await getGemSkillMapping()
+  const gems = mapping.gems || {}
+  
+  // Normalize ingredient name for comparison
+  const normalizedName = ingredientName.toLowerCase().trim()
+  
+  // Check if this ingredient is a gem (exact match or partial)
+  for (const [gemName, gemData] of Object.entries(gems)) {
+    if (gemName.toLowerCase() === normalizedName || 
+        ingredientName.toLowerCase().includes(gemName.toLowerCase())) {
+      return {
+        gem_name: gemName,
+        primary_skill: gemData.primary_skill,
+        secondary_skill: gemData.secondary_skill,
+        icon_id: gemData.icon_id,
+        keywords: gemData.keywords
+      }
+    }
+  }
+  
+  return null
+}
+
+/**
+ * Check if an ingredient should be classified as "Crystal/Gem" (Primary or Auxiliary)
+ * @param {string} ingredientName - The name of the ingredient
+ * @returns {boolean}
+ */
+async function isCrystalOrGem(ingredientName) {
+  const gemInfo = await getGemCrystalInfo(ingredientName)
+  return gemInfo !== null
+}
+
+/**
  * Load items with icon URLs
  */
 async function loadItemsWithIcons() {
@@ -197,7 +255,6 @@ async function fetchRecipesForProfession(profession) {
             if (!itemRecipesMap[item.Name]) {
               itemRecipesMap[item.Name] = {
                 name: item.Name,
-                basePrice: 0,
                 profession: recipe.Skill,
                 iconId: item.IconId,
                 iconUrl: item.IconId ? `https://cdn.projectgorgon.com/v461/icons/icon_${item.IconId}.png` : null,
@@ -484,7 +541,6 @@ async function showItemSuggestions(searchTerm) {
           ${iconHtml}
           <div>
             <div style="font-weight:bold;">${escapeHtml(item.name)}</div>
-            <div style="font-size:0.85rem; color:#a8a8a8;">${item.basePrice} gold base price</div>
           </div>
         </div>
       `
@@ -511,13 +567,13 @@ function hideItemSuggestions() {
   }
 }
 
-/**
- * Select item by ID
- */
 function selectItemById(itemId) {
   const item = craftItems.find(i => i.id === itemId)
   
   if (!item) return
+  
+  // Reset selected skills for new item
+  selectedSkills = {}
   
   // If item has multiple recipes, show recipe selection modal
   if (item.recipes && item.recipes.length > 1) {
@@ -562,6 +618,7 @@ function showRecipeSelectionModal(item) {
   
   // Build recipe options
   const recipeOptionsHtml = item.recipes.map((recipe, index) => {
+    const isEnchanted = recipe.full.Name.includes('Enchanted')
     console.log(recipe)
     const ingredients = recipe.ingredients.length > 0 
       ? recipe.ingredients.map((ing, i) => {
@@ -587,12 +644,13 @@ function showRecipeSelectionModal(item) {
       " onmouseover="this.style.background='#252525'; this.style.borderColor='#7cb342';" onmouseout="this.style.background='#1a1a1a'; this.style.borderColor='#505050';">
         <div style="font-weight:bold; margin-bottom:0.5rem;">Recipe: ${recipe.full.Name || index+1}</div>
         ${ingredients}
+        ${isEnchanted ? '<div style="font-size:0.75rem; color:#fbbf24; margin-top:0.5rem;">✨ Enchanted Recipe</div>' : ''}
       </button>
     `
   }).join('')
   
   modal.innerHTML = `
-    <div style="background:#0a0a0a; border:2px solid #505050; border-radius:8px; padding:2rem; max-width:500px; width:90%;">
+    <div style="background:#0a0a0a; border:2px solid #505050; border-radius:8px; padding:2rem; max-width:600px; width:90%; max-height:90vh; overflow-y:auto;">
       <h3 style="margin-bottom:1rem; color:#e8e8e8;">Multiple recipes found for ${escapeHtml(item.name)}</h3>
       <p style="color:#a8a8a8; margin-bottom:1.5rem;">Select which ingredient list you want to use:</p>
       <div style="max-height:400px; overflow-y:auto; margin-bottom:1.5rem;">
@@ -616,11 +674,208 @@ function showRecipeSelectionModal(item) {
   
   // Add click handlers to recipe options
   modal.querySelectorAll('.recipe-option-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const recipeIndex = parseInt(btn.getAttribute('data-recipe-index'))
-      selectItemWithRecipe(item, item.recipes[recipeIndex])
+      const selectedRecipe = item.recipes[recipeIndex]
+      
+      // Check if recipe is enchanted
+      if (selectedRecipe.full.Name.includes('Enchanted')) {
+        // Show skill selection modal
+        await showEnchantedSkillSelectionModal(item, selectedRecipe)
+      } else {
+        selectItemWithRecipe(item, selectedRecipe)
+      }
       modal.style.display = 'none'
     })
+  })
+}
+
+/**
+ * Show skill selection modal for Enchanted recipes
+ */
+async function showEnchantedSkillSelectionModal(item, recipe) {
+  const gemMapping = await getGemSkillMapping()
+  const gems = gemMapping.gems || {}
+  
+  // Check if recipe has Primary Crystal ingredient
+  const hasPrimaryCrystal = recipe.ingredients.some(ing => 
+    ing.desc && ing.desc.toLowerCase().includes('primary crystal')
+  )
+  
+  // Check if recipe has Auxiliary Crystal ingredient
+  const hasAuxiliaryCrystal = recipe.ingredients.some(ing => 
+    ing.desc && ing.desc.toLowerCase().includes('auxiliary crystal')
+  )
+  
+  // Build unique list of all gem primary skills (used for both Primary and Secondary skill dropdowns)
+  const allSkills = new Set()
+  
+  Object.values(gems).forEach(gem => {
+    if (gem.primary_skill) allSkills.add(gem.primary_skill)
+  })
+  
+  const skillsList = Array.from(allSkills).sort()
+  
+  // Create skill selection modal
+  let skillModal = document.getElementById('enchanted-skill-modal')
+  if (!skillModal) {
+    skillModal = document.createElement('div')
+    skillModal.id = 'enchanted-skill-modal'
+    skillModal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2001;
+    `
+    document.body.appendChild(skillModal)
+  }
+  
+  // Build gem grid for a given skill type (primary or secondary)
+  const buildGemSelect = (selectionType) => {
+    // Create a mapping of skill -> first icon_id for that skill
+    const skillToIcon = {}
+    Object.entries(gems).forEach(([name, gem]) => {
+      if (gem.primary_skill && !skillToIcon[gem.primary_skill] && !name.includes('Massive')) {
+        skillToIcon[gem.primary_skill] = gem.icon_id
+      }
+    })
+    
+    const optionsHtml = skillsList.map(skill => {
+      const iconId = skillToIcon[skill]
+      const iconUrl = iconId ? `https://cdn.projectgorgon.com/v461/icons/icon_${iconId}.png` : ''
+      return `<option value="${skill}" data-icon="${iconUrl}">${skill}</option>`
+    }).join('')
+    
+    return `
+      <select id="${selectionType}-skill-select" class="skill-select" data-selection-type="${selectionType}" style="width:100%; padding:0.5rem 0.5rem 0.5rem 2.5rem; background:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 10 10%22><path fill=%22%23e8e8e8%22 d=%22M2 4l3 3 3-3%22/></svg>') no-repeat right 0.5rem center; background-size:12px; background-color:#1a1a1a; color:#e8e8e8; border:1px solid #505050; border-radius:4px; padding-right:1.5rem; appearance:none;">
+        <option value="">-- Select ${selectionType === 'primary' ? 'Primary' : 'Auxiliary'} Crystal Skill --</option>
+        ${optionsHtml}
+      </select>
+    `
+  }
+  
+  // Build secondary skill field HTML (only show if hasAuxiliaryCrystal)
+  const secondarySkillHtml = hasAuxiliaryCrystal ? `
+    <div style="margin-bottom:1.5rem;">
+      <label style="display:block; font-weight:bold; margin-bottom:0.5rem; color:#e8e8e8;">Auxiliary Crystal Skill</label>
+      <div style="position:relative;">
+        ${buildGemSelect('secondary')}
+        <img id="secondary-skill-icon" src="" alt="" style="position:absolute; left:0.3rem; top:50%; transform:translateY(-50%); width:32px; height:32px; object-fit:contain; pointer-events:none;" />
+      </div>
+    </div>
+  ` : ''
+  
+  // Build primary skill field HTML (only show if hasPrimaryCrystal)
+  const primarySkillHtml = hasPrimaryCrystal ? `
+    <div style="margin-bottom:1.5rem;">
+      <label style="display:block; font-weight:bold; margin-bottom:0.5rem; color:#e8e8e8;">Primary Crystal Skill</label>
+      <div style="position:relative;">
+        ${buildGemSelect('primary')}
+        <img id="primary-skill-icon" src="" alt="" style="position:absolute; left:0.3rem; top:50%; transform:translateY(-50%); width:32px; height:32px; object-fit:contain; pointer-events:none;" />
+      </div>
+    </div>
+  ` : ''
+  
+  skillModal.innerHTML = `
+    <div style="background:#0a0a0a; border:2px solid #505050; border-radius:8px; padding:2rem; max-width:500px; width:90%;">
+      <h3 style="margin-bottom:1rem; color:#e8e8e8;">Enchanted Recipe Skills</h3>
+      <p style="color:#a8a8a8; margin-bottom:1.5rem;">Select the crystal skills for this enchantment:</p>
+      
+      ${primarySkillHtml}
+      
+      ${secondarySkillHtml}
+      
+      <div style="display:flex; gap:1rem;">
+        <button id="confirm-skills-btn" style="
+          flex:1;
+          padding:0.75rem;
+          background:#8dc745;
+          border:1px solid #8dc745;
+          border-radius:5px;
+          color:#000;
+          font-weight:bold;
+          cursor:pointer;
+          font-size:1rem;
+        " onmouseover="this.style.background='#a5e860';" onmouseout="this.style.background='#8dc745';">
+          Confirm Skills
+        </button>
+        <button style="
+          flex:1;
+          padding:0.75rem;
+          background:#505050;
+          border:1px solid #505050;
+          border-radius:5px;
+          color:#e8e8e8;
+          cursor:pointer;
+          font-size:1rem;
+        " onmouseover="this.style.background='#606060';" onmouseout="this.style.background='#505050';" onclick="document.getElementById('enchanted-skill-modal').style.display='none';">
+          Cancel
+        </button>
+      </div>
+    </div>
+  `
+  
+  skillModal.style.display = 'flex'
+  
+  // Handle skill dropdown changes
+  const skillSelects = skillModal.querySelectorAll('.skill-select')
+  skillSelects.forEach(select => {
+    select.addEventListener('change', (e) => {
+      const selectionType = select.getAttribute('data-selection-type')
+      const selectedOption = select.options[select.selectedIndex]
+      const iconUrl = selectedOption.getAttribute('data-icon')
+      const iconImg = document.getElementById(`${selectionType}-skill-icon`)
+      
+      if (iconUrl) {
+        iconImg.src = iconUrl
+        iconImg.style.display = 'block'
+      } else {
+        iconImg.style.display = 'none'
+      }
+    })
+  })
+  
+  // Handle confirmation
+  const confirmBtn = document.getElementById('confirm-skills-btn')
+  const primarySelectElem = document.getElementById('primary-skill-select')
+  const secondarySelectElem = document.getElementById('secondary-skill-select')
+  
+  confirmBtn.addEventListener('click', () => {
+    // Validate Primary Skill only if hasPrimaryCrystal
+    if (hasPrimaryCrystal) {
+      const primarySkill = primarySelectElem.value
+      if (!primarySkill) {
+        alert('Please select a Primary Crystal Skill')
+        return
+      }
+    }
+    
+    // Validate Secondary Skill only if hasAuxiliaryCrystal
+    if (hasAuxiliaryCrystal) {
+      const secondarySkill = secondarySelectElem.value
+      if (!secondarySkill) {
+        alert('Please select an Auxiliary Crystal Skill')
+        return
+      }
+      selectedSkills = {
+        primarySkill: hasPrimaryCrystal ? primarySelectElem.value : null,
+        secondarySkill: secondarySkill
+      }
+    } else {
+      selectedSkills = {
+        primarySkill: hasPrimaryCrystal ? primarySelectElem.value : null,
+        secondarySkill: null
+      }
+    }
+    
+    selectItemWithRecipe(item, recipe)
+    skillModal.style.display = 'none'
   })
 }
 
@@ -745,11 +1000,110 @@ async function updatePricingDisplay() {
     const commissionCost = craftCostTotal * commissionRate
     const finalTotal = craftCostTotal + commissionCost
     
-    // Create ingredients display
-    let ingredientsHtml = ''
-    if (Object.keys(ingredients).length > 0) {
-      const iconsMap = await loadItemsWithIcons()
-      const rows = Object.entries(ingredients).sort(([a], [b]) => a.localeCompare(b)).map(([itemName, data]) => {
+    // Separate ingredients into crystals/gems and regular ingredients
+    const iconsMap = await loadItemsWithIcons()
+    const crystalIngredients = {}
+    const regularIngredients = {}
+    
+    for (const [itemName, data] of Object.entries(ingredients)) {
+      // Check if this is a Primary or Auxiliary Crystal slot
+      const isCrystalSlot = itemName.toLowerCase().includes('primary crystal') || 
+                            itemName.toLowerCase().includes('auxiliary crystal')
+      
+      if (isCrystalSlot) {
+        // Crystal slots always go in crystalIngredients section
+        crystalIngredients[itemName] = data
+      } else {
+        // Check if other items are gems
+        const gemInfo = await getGemCrystalInfo(itemName)
+        if (gemInfo) {
+          crystalIngredients[itemName] = { ...data, gemInfo }
+        } else {
+          regularIngredients[itemName] = data
+        }
+      }
+    }
+    
+    // Build HTML for crystal/gem section (appears at top)
+    let crystalsHtml = ''
+    if (Object.keys(crystalIngredients).length > 0) {
+      // Get gem mapping for crystal label updates
+      const gemMapping = await getGemSkillMapping()
+      const gems = gemMapping.gems || {}
+      
+      const crystalRows = Object.entries(crystalIngredients).sort(([a], [b]) => a.localeCompare(b)).map(([itemName, data]) => {
+        let displayName = itemName
+        let displayIcon = iconsMap[itemName.toLowerCase()]
+        
+        // For enchanted recipes, handle Primary/Auxiliary crystals specially
+        if (selectedItemRecipe.full.Name.includes('Enchanted') && (selectedSkills.primarySkill || selectedSkills.secondarySkill)) {
+          // Check if this is Primary Crystal or Auxiliary Crystal
+          const isPrimaryCrystal = itemName.toLowerCase().includes('primary crystal')
+          const isAuxiliaryCrystal = itemName.toLowerCase().includes('auxiliary crystal')
+          
+          if (isPrimaryCrystal && selectedSkills.primarySkill) {
+            // Find gem for primary skill
+            for (const [gemName, gemData] of Object.entries(gems)) {
+              if (gemData.primary_skill === selectedSkills.primarySkill) {
+                displayName = `Primary Crystal (${gemName})`
+                displayIcon = {
+                  iconUrl: `https://cdn.projectgorgon.com/v461/icons/icon_${gemData.icon_id}.png`
+                }
+                break
+              }
+            }
+          } else if (isAuxiliaryCrystal && selectedSkills.secondarySkill) {
+            // Find gem for secondary skill
+            for (const [gemName, gemData] of Object.entries(gems)) {
+              if (gemData.primary_skill === selectedSkills.secondarySkill) {
+                displayName = `Auxiliary Crystal (${gemName})`
+                displayIcon = {
+                  iconUrl: `https://cdn.projectgorgon.com/v461/icons/icon_${gemData.icon_id}.png`
+                }
+                break
+              }
+            }
+          }
+        }
+        
+        const iconHtml = displayIcon
+          ? `<img src="${displayIcon.iconUrl}" alt="" style="width:32px; height:32px; border:1px solid #505050; border-radius:3px; vertical-align:middle; margin-right:6px; object-fit:contain;" onerror="this.style.display='none'">`
+          : ''
+        const unpricedNote = data.unpriced
+          ? ` <span style="font-size:10px; color:#f59e0b; opacity:0.8;">(unpriced)</span>`
+          : ''
+        const costStyle = data.unpriced ? 'color:#a8a8a8; font-style:italic;' : ''
+        return `
+          <tr style="height:36px; border-bottom:1px solid rgba(255,255,255,0.06);">
+            <td style="padding:0 1rem; text-align:left; width:50%;">${iconHtml}${escapeHtml(displayName)}${unpricedNote}</td>
+            <td style="padding:0 1rem; text-align:right; width:15%;">${data.finalQuantity.toFixed(0)}</td>
+            <td style="padding:0 1rem; text-align:right; width:15%; ${costStyle}">${data.costPerUnit.toFixed(0)}</td>
+            <td style="padding:0 1rem; text-align:right; width:20%; font-weight:500; ${costStyle}">${data.totalCost.toFixed(0)}</td>
+          </tr>
+        `
+      }).join('')
+      
+      crystalsHtml = `
+        <div style="margin-bottom:1rem;">
+          <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:#a8a8a8; opacity:0.6; margin-bottom:12px;">💎 Primary / Auxiliary Crystals</div>
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="text-align:right; padding:0 1rem; height:36px; font-size:11px; color:#a8a8a8; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; width:15%;">Qty</th>
+                <th style="text-align:right; padding:0 1rem; height:36px; font-size:11px; color:#a8a8a8; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; width:15%;">Cost/Unit</th>
+                <th style="text-align:right; padding:0 1rem; height:36px; font-size:11px; color:#a8a8a8; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; width:20%;">Total</th>
+              </tr>
+            </thead>
+            <tbody>${crystalRows}</tbody>
+          </table>
+        </div>
+      `
+    }
+    
+    // Build HTML for regular ingredients section (appears after crystals)
+    let regularIngredientsHtml = ''
+    if (Object.keys(regularIngredients).length > 0) {
+      const rows = Object.entries(regularIngredients).sort(([a], [b]) => a.localeCompare(b)).map(([itemName, data]) => {
         const iconData = iconsMap[itemName.toLowerCase()]
         const iconHtml = iconData
           ? `<img src="${iconData.iconUrl}" alt="" style="width:32px; height:32px; border:1px solid #505050; border-radius:3px; vertical-align:middle; margin-right:6px; object-fit:contain;" onerror="this.style.display='none'">`
@@ -768,13 +1122,12 @@ async function updatePricingDisplay() {
         `
       }).join('')
 
-      ingredientsHtml = `
+      regularIngredientsHtml = `
         <div style="margin-bottom:1rem;">
           <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:#a8a8a8; opacity:0.6; margin-bottom:12px;">Ingredients</div>
           <table style="width:100%; border-collapse:collapse;">
             <thead>
               <tr>
-                <th style="text-align:left; padding:0 1rem; height:36px; font-size:11px; color:#a8a8a8; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; width:50%;">Ingredient</th>
                 <th style="text-align:right; padding:0 1rem; height:36px; font-size:11px; color:#a8a8a8; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; width:15%;">Qty</th>
                 <th style="text-align:right; padding:0 1rem; height:36px; font-size:11px; color:#a8a8a8; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; width:15%;">Cost/Unit</th>
                 <th style="text-align:right; padding:0 1rem; height:36px; font-size:11px; color:#a8a8a8; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; opacity:0.6; width:20%;">Total</th>
@@ -788,7 +1141,8 @@ async function updatePricingDisplay() {
     
     // Rebuild pricing div with new layout
     pricingDiv.innerHTML = `
-      ${ingredientsHtml}
+      ${crystalsHtml}
+      ${regularIngredientsHtml}
       <div style="border-top:1px solid #505050; padding-top:1rem;">
         <div style="display:flex; justify-content:space-between; margin-bottom:0.75rem;">
           <span style="font-weight:bold;">Craft Cost Total:</span>
