@@ -1241,6 +1241,39 @@ export async function saveItemListing() {
   try {
     setStatus('status', 'Creating item listing…', 'loading')
     
+    // Look up item data to get icon URL/ID
+    let iconId = null
+    try {
+      const response = await fetch('https://cdn.projectgorgon.com/v461/data/items.json')
+      if (response.ok) {
+        const data = await response.json()
+        let items = []
+        
+        // Handle various response structures
+        if (Array.isArray(data)) {
+          items = data
+        } else if (data.items && Array.isArray(data.items)) {
+          items = data.items
+        } else if (data.data && Array.isArray(data.data)) {
+          items = data.data
+        } else {
+          const entries = Object.entries(data)
+          if (entries.length > 0) {
+            items = entries.map(([key, value]) => ({ key, ...value }))
+          }
+        }
+        
+        // Find the matching item
+        const itemData = items.find(item => item.Name === itemName)
+        if (itemData && itemData.IconId) {
+          iconId = itemData.IconId
+          console.log('Found icon ID for item:', itemName, 'iconId:', iconId)
+        }
+      }
+    } catch (err) {
+      console.warn('Could not fetch item data for icon:', err)
+    }
+    
     const listingData = {
       type: 'item',
       characterName,
@@ -1250,6 +1283,7 @@ export async function saveItemListing() {
       itemName,
       amount,
       pricePerUnit,
+      iconId: iconId || null,
       notes: notes || null,
       uid: auth.currentUser.uid,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),

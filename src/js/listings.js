@@ -291,7 +291,7 @@ export function renderListings(docs) {
           <div class="item-details">${d.amount} available @ ${d.pricePerUnit} council each</div>
           ${d.server ? `<div class="server">🌐 <span class="card-label">Server</span>${escapeHtml(d.server)}</div>` : ''}
           <div class="card-footer">
-            <a href="/order.html?id=${encodeURIComponent(doc.id)}" class="order-link">Place Order</a>
+            <a href="/itemorder.html?id=${encodeURIComponent(doc.id)}" class="order-link">Place Order</a>
           </div>
         </div>
       `
@@ -334,7 +334,7 @@ export function renderListings(docs) {
         </div>
         <div class="card-footer">
           ${d.server ? `<div class="server-tag">${escapeHtml(d.server)}</div>` : '<div></div>'}
-          <a href="/order.html?id=${encodeURIComponent(doc.id)}" class="place-order-btn">Place Order</a>
+          <a href="/craftorder.html?id=${encodeURIComponent(doc.id)}" class="place-order-btn">Place Order</a>
         </div>
       </div>
     `

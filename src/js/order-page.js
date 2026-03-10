@@ -24,12 +24,32 @@ let selectedSkills = {} // Track selected skills for enchanted recipes {primaryS
  * Initialize order page
  */
 export function initOrderPage() {
+  console.log('[OrderPage] Initializing order page...')
+  console.log('[OrderPage] Current URL:', window.location.href)
+  console.log('[OrderPage] Current page:', window.location.pathname)
+  
   // Get listing ID from URL
   const urlParams = new URLSearchParams(window.location.search)
   const listingId = urlParams.get('id') || urlParams.get('listing')
+  
+  console.log('[OrderPage] Listing ID from URL:', listingId)
 
+  // Detect which type of order page we're on
+  const isItemOrder = document.getElementById('purchase-quantity') !== null
+  console.log('[OrderPage] Is item order page:', isItemOrder)
+  console.log('[OrderPage] purchase-quantity element:', document.getElementById('purchase-quantity'))
+  console.log('[OrderPage] order-item element:', document.getElementById('order-item'))
+  
   if (listingId) {
-    loadListingDetails(listingId)
+    if (isItemOrder) {
+      console.log('[OrderPage] Loading item listing details...')
+      loadItemListingDetails(listingId)
+    } else {
+      console.log('[OrderPage] Loading craft listing details...')
+      loadListingDetails(listingId)
+    }
+  } else {
+    console.warn('[OrderPage] No listing ID found in URL')
   }
 
   // Set up event listeners for this page
@@ -37,6 +57,7 @@ export function initOrderPage() {
 
   // Set up auth state listener
   Firebase.onAuthStateChanged(user => {
+    console.log('[OrderPage] Auth state changed, user:', user ? user.email : 'none')
     Auth.renderUserAuth(user)
   })
 }
@@ -45,36 +66,72 @@ export function initOrderPage() {
  * Set up order page-specific event listeners
  */
 function setupOrderPageListeners() {
-  const itemInput = document.getElementById('order-item')
-  const quantityInput = document.getElementById('order-quantity')
+  console.log('[OrderPage] Setting up event listeners...')
+  
+  // Determine if this is an item order or craft order page
+  const isItemOrder = document.getElementById('purchase-quantity') !== null
+  console.log('[OrderPage] Event setup - isItemOrder:', isItemOrder)
+  
   const charNameInput = document.getElementById('character-name')
   
-  if (itemInput) {
-    itemInput.addEventListener('input', (e) => {
-      handleItemSearch(e.target.value)
+  if (isItemOrder) {
+    console.log('[OrderPage] Setting up ITEM ORDER listeners')
+    // Item order page
+    const purchaseQuantityInput = document.getElementById('purchase-quantity')
+    
+    console.log('[OrderPage] Item order elements:', {
+      purchaseQuantityInput,
+      charNameInput
     })
-    itemInput.addEventListener('focus', () => {
-      // Show dropdown when focused
-      showItemSuggestions(itemInput.value)
+    
+    if (purchaseQuantityInput) {
+      console.log('[OrderPage] Adding quantity change listeners')
+      purchaseQuantityInput.addEventListener('change', updateItemPricingDisplay)
+      purchaseQuantityInput.addEventListener('input', updateItemPricingDisplay)
+    }
+    
+    if (charNameInput) {
+      console.log('[OrderPage] Adding character name listener')
+      charNameInput.addEventListener('input', updatePurchaseSubmitButton)
+    }
+  } else {
+    console.log('[OrderPage] Setting up CRAFT ORDER listeners')
+    // Craft order page
+    const itemInput = document.getElementById('order-item')
+    const quantityInput = document.getElementById('order-quantity')
+    
+    console.log('[OrderPage] Craft order elements:', {
+      itemInput,
+      quantityInput,
+      charNameInput
     })
-    itemInput.addEventListener('blur', () => {
-      // Delay hiding to allow click on suggestions
-      setTimeout(() => {
-        hideItemSuggestions()
-      }, 200)
-    })
-  }
-  
-  if (quantityInput) {
-    quantityInput.addEventListener('change', () => {
-      updatePricingDisplay()
-    })
-  }
-  
-  if (charNameInput) {
-    charNameInput.addEventListener('input', () => {
-      updateSubmitButton()
-    })
+    
+    if (itemInput) {
+      console.log('[OrderPage] Adding item input listeners')
+      itemInput.addEventListener('input', (e) => {
+        handleItemSearch(e.target.value)
+      })
+      itemInput.addEventListener('focus', () => {
+        showItemSuggestions(itemInput.value)
+      })
+      itemInput.addEventListener('blur', () => {
+        setTimeout(() => {
+          hideItemSuggestions()
+        }, 200)
+      })
+    }
+    
+    if (quantityInput) {
+      console.log('[OrderPage] Adding quantity listener')
+      quantityInput.addEventListener('change', () => {
+        updatePricingDisplay()
+      })
+    }
+    
+    if (charNameInput) {
+      console.log('[OrderPage] Adding character name listener for craft order')
+      charNameInput.addEventListener('input', updateSubmitButton)
+    }
   }
 }
 
@@ -975,6 +1032,225 @@ async function loadListingDetails(listingId) {
 }
 
 /**
+ * Load item listing details for purchase orders
+ */
+async function loadItemListingDetails(listingId) {
+  console.log('[OrderPage] loadItemListingDetails called with ID:', listingId)
+  try {
+    console.log('[OrderPage] Attempting to fetch listing from Listings module...')
+    const listing = await Listings.getListingById(listingId)
+    console.log('[OrderPage] Listing data retrieved:', listing)
+    currentListing = listing
+    
+    if (listing) {
+      console.log('[OrderPage] Listing loaded successfully')
+      console.log('[OrderPage] Listing properties:', {
+        sellerName: listing.sellerName,
+        itemName: listing.itemName,
+        pricePerUnit: listing.pricePerUnit,
+        amount: listing.amount,
+        server: listing.server
+      })
+      
+      // This is an item listing (sellerId, itemName, amount, pricePerUnit, etc.)
+      
+      // Populate item details
+      const itemNameEl = document.getElementById('item-name')
+      const itemPriceEl = document.getElementById('item-price')
+      const itemQtyEl = document.getElementById('item-quantity-available')
+      const unitPriceEl = document.getElementById('unit-price')
+      const sellerNameEl = document.getElementById('seller-name')
+      const serverNameEl = document.getElementById('server-name')
+      const availableHelperEl = document.getElementById('available-helper')
+      
+      console.log('[OrderPage] Item detail elements:', {
+        itemName: itemNameEl,
+        itemPrice: itemPriceEl,
+        itemQty: itemQtyEl,
+        unitPrice: unitPriceEl,
+        sellerName: sellerNameEl,
+        serverName: serverNameEl
+      })
+      
+      if (itemNameEl) itemNameEl.textContent = escapeHtml(listing.itemName || 'Unknown Item')
+      if (itemPriceEl) itemPriceEl.textContent = listing.pricePerUnit || 0
+      if (itemQtyEl) itemQtyEl.textContent = listing.amount || 0
+      if (unitPriceEl) unitPriceEl.textContent = listing.pricePerUnit || 0
+      if (sellerNameEl) sellerNameEl.textContent = escapeHtml(listing.sellerName || 'Unknown')
+      if (serverNameEl) serverNameEl.textContent = escapeHtml(listing.server || 'Unknown')
+      if (availableHelperEl) availableHelperEl.textContent = `Available: ${listing.amount || 0} units`
+      
+      // Load and display item icon
+      const loadItemIcon = async () => {
+        const iconImg = document.getElementById('item-icon')
+        if (!iconImg || !listing.itemName) return
+        
+        let iconUrl = null
+        
+        try {
+          console.log('[OrderPage] Looking up item icon for:', listing.itemName)
+          const itemsMap = await loadItemsWithIcons()
+          const itemKey = listing.itemName.toLowerCase()
+          
+          if (itemsMap[itemKey]) {
+            iconUrl = itemsMap[itemKey].iconUrl
+            console.log('[OrderPage] Found icon URL:', iconUrl)
+          } else {
+            console.warn('[OrderPage] Item not found in database:', listing.itemName)
+          }
+        } catch (err) {
+          console.warn('[OrderPage] Could not look up item icon from CDN:', err)
+        }
+        
+        // Set icon URL if we found one
+        if (iconUrl) {
+          iconImg.src = iconUrl
+          console.log('[OrderPage] Item icon URL set')
+        }
+      }
+      
+      loadItemIcon()
+      
+      // Show minimum order size if it exists
+      const minOrderSize = listing.minOrderSize || 1
+      const minOrderDisplay = document.getElementById('min-order-size-display')
+      const minOrderSpan = document.getElementById('min-order-size')
+      if (minOrderSize > 1) {
+        console.log('[OrderPage] Minimum order size: ' + minOrderSize)
+        if (minOrderDisplay) minOrderDisplay.style.display = 'block'
+        if (minOrderSpan) minOrderSpan.textContent = minOrderSize
+      }
+      
+      // Set quantity input constraints
+      const quantityInput = document.getElementById('purchase-quantity')
+      console.log('[OrderPage] Quantity input element:', quantityInput)
+      if (quantityInput) {
+        quantityInput.min = minOrderSize || 1
+        quantityInput.max = listing.amount || 1
+        quantityInput.value = minOrderSize
+        console.log('[OrderPage] Quantity constraints set: min=' + quantityInput.min + ', max=' + quantityInput.max)
+        quantityInput.addEventListener('change', updateItemPricingDisplay)
+        quantityInput.addEventListener('input', updateItemPricingDisplay)
+        updateItemPricingDisplay()
+      }
+      
+      // Setup quantity stepper buttons
+      const qtyMinusBtn = document.getElementById('qty-minus')
+      const qtyPlusBtn = document.getElementById('qty-plus')
+      if (qtyMinusBtn) {
+        qtyMinusBtn.addEventListener('click', () => {
+          const newVal = Math.max(minOrderSize, parseInt(quantityInput.value) - 1)
+          quantityInput.value = newVal
+          updateItemPricingDisplay()
+        })
+      }
+      if (qtyPlusBtn) {
+        qtyPlusBtn.addEventListener('click', () => {
+          const newVal = Math.min(listing.amount, parseInt(quantityInput.value) + 1)
+          quantityInput.value = newVal
+          updateItemPricingDisplay()
+        })
+      }
+      
+      // Initialize submit button state
+      updatePurchaseSubmitButton()
+      
+      const listingInfo = document.getElementById('listing-info')
+      const statusDiv = document.getElementById('status')
+      console.log('[OrderPage] Showing listing info, hiding status')
+      if (listingInfo) listingInfo.style.display = 'block'
+      if (statusDiv) statusDiv.style.display = 'none'
+    } else {
+      console.error('[OrderPage] Listing not found in database')
+      document.getElementById('status').textContent = 'Listing not found'
+      document.getElementById('status').className = 'status-bar error'
+    }
+  } catch (error) {
+    console.error('[OrderPage] Error loading item listing:', error)
+    console.error('[OrderPage] Error stack:', error.stack)
+    document.getElementById('status').textContent = 'Error loading listing: ' + error.message
+    document.getElementById('status').className = 'status-bar error'
+  }
+}
+
+/**
+ * Update pricing display for item purchases
+ */
+function updateItemPricingDisplay() {
+  console.log('[OrderPage] updateItemPricingDisplay called')
+  const quantityInput = document.getElementById('purchase-quantity')
+  const qtyDisplay = document.getElementById('qty-display')
+  const totalPriceSpan = document.getElementById('total-price')
+  const quantityErrorDiv = document.getElementById('quantity-error')
+  const confirmationTotal = document.getElementById('confirmation-total')
+  const confirmationQuantity = document.getElementById('confirmation-quantity')
+  const confirmationItem = document.getElementById('confirmation-item')
+  
+  console.log('[OrderPage] Pricing elements:', {
+    quantityInput: quantityInput,
+    qtyDisplay: qtyDisplay,
+    totalPriceSpan: totalPriceSpan
+  })
+  
+  if (!currentListing) {
+    console.warn('[OrderPage] currentListing not set yet')
+    return
+  }
+  
+  const minOrderSize = currentListing.minOrderSize || 1
+  const maxAvailable = currentListing.amount || 0
+  
+  // Parse quantity, default to minOrderSize if empty
+  let quantity = parseInt(quantityInput?.value) || minOrderSize
+  if (isNaN(quantity) || quantity <= 0) {
+    quantity = minOrderSize
+  }
+  
+  // Validate quantity
+  let error = null
+  if (quantity < minOrderSize) {
+    error = `Minimum order is ${minOrderSize} units`
+    quantity = minOrderSize
+  } else if (quantity > maxAvailable) {
+    error = `Only ${maxAvailable} units available`
+    quantity = maxAvailable
+  }
+  
+  // Display error if present
+  if (quantityErrorDiv) {
+    if (error) {
+      quantityErrorDiv.textContent = error
+      quantityErrorDiv.style.display = 'block'
+      console.warn('[OrderPage] Quantity validation error: ' + error)
+    } else {
+      quantityErrorDiv.style.display = 'none'
+    }
+  }
+  
+  const pricePerUnit = currentListing.pricePerUnit || 0
+  const totalPrice = pricePerUnit * quantity
+  
+  console.log('[OrderPage] Pricing calculation:', {
+    quantity,
+    minOrderSize,
+    maxAvailable,
+    pricePerUnit,
+    totalPrice
+  })
+  
+  if (qtyDisplay) qtyDisplay.textContent = quantity
+  if (totalPriceSpan) totalPriceSpan.textContent = totalPrice
+  
+  // Update confirmation text
+  if (confirmationTotal) confirmationTotal.textContent = totalPrice
+  if (confirmationQuantity) confirmationQuantity.textContent = quantity
+  if (confirmationItem) confirmationItem.textContent = escapeHtml(currentListing.itemName || 'item')
+  
+  // Update submit button state
+  updatePurchaseSubmitButton()
+}
+
+/**
  * Update pricing display based on selected item and quantity
  */
 async function updatePricingDisplay() {
@@ -1188,6 +1464,37 @@ function updateSubmitButton() {
 }
 
 /**
+ * Update purchase submit button state
+ */
+function updatePurchaseSubmitButton() {
+  console.log('[OrderPage] updatePurchaseSubmitButton called')
+  const charName = document.getElementById('character-name').value.trim()
+  const submitBtn = document.getElementById('submit-purchase-btn')
+  
+  console.log('[OrderPage] Purchase button state:', {
+    charName,
+    submitBtn,
+    currentListing: currentListing ? 'loaded' : 'not loaded'
+  })
+  
+  if (!submitBtn) {
+    console.warn('[OrderPage] Submit button not found')
+    return
+  }
+  
+  if (!charName) {
+    submitBtn.disabled = true
+    console.log('[OrderPage] Submit button disabled: no character name')
+  } else if (!currentListing) {
+    submitBtn.disabled = true
+    console.log('[OrderPage] Submit button disabled: listing not loaded')
+  } else {
+    submitBtn.disabled = false
+    console.log('[OrderPage] Submit button enabled: ready to purchase')
+  }
+}
+
+/**
  * Submit order
  */
 export async function submitOrder() {
@@ -1251,5 +1558,114 @@ export async function submitOrder() {
     window.location.href = `order-view.html?id=${orderId}`
   } catch (error) {
     alert('Error creating order: ' + error.message)
+  }
+}
+
+/**
+ * Submit a purchase order for an item
+ */
+export async function submitPurchase() {
+  console.log('[OrderPage] submitPurchase called')
+  const auth = Firebase.getAuth()
+  
+  console.log('[OrderPage] Auth user:', auth?.currentUser?.email || 'not signed in')
+  
+  if (!auth?.currentUser) {
+    console.log('[OrderPage] User not signed in, opening auth modal')
+    Auth.openAuthModal()
+    return
+  }
+
+  if (!currentListing) {
+    console.error('[OrderPage] currentListing not set')
+    alert('Item listing not loaded')
+    return
+  }
+  
+  const charName = document.getElementById('character-name').value.trim()
+  if (!charName) {
+    console.warn('[OrderPage] Character name not provided')
+    alert('Please enter your character name')
+    return
+  }
+
+  try {
+    console.log('[OrderPage] Beginning purchase order submission')
+    const quantityInput = document.getElementById('purchase-quantity')
+    const minOrderSize = currentListing.minOrderSize || 1
+    let quantity = parseInt(quantityInput?.value) || minOrderSize
+    if (isNaN(quantity) || quantity <= 0) {
+      quantity = minOrderSize
+    }
+    
+    // Validate quantity
+    const maxAvailable = currentListing.amount || 0
+    
+    if (quantity < minOrderSize) {
+      alert(`Minimum order is ${minOrderSize} units`)
+      return
+    }
+    if (quantity > maxAvailable) {
+      alert(`Only ${maxAvailable} units available`)
+      return
+    }
+    
+    const totalPrice = (currentListing.pricePerUnit || 0) * quantity
+    
+    console.log('[OrderPage] Purchase details:', {
+      quantity,
+      pricePerUnit: currentListing.pricePerUnit,
+      totalPrice,
+      charName,
+      itemName: currentListing.itemName,
+      minOrderSize,
+      maxAvailable
+    })
+    
+    const purchaseData = {
+      listingId: currentListing.id,
+      itemName: currentListing.itemName,
+      pricePerUnit: currentListing.pricePerUnit,
+      quantity: quantity,
+      totalPrice: totalPrice,
+      characterName: charName,
+      notes: document.getElementById('purchase-notes').value,
+      sellerName: currentListing.sellerName,
+      sellerId: currentListing.sellerId,
+      server: currentListing.server,
+      orderType: 'purchase'
+    }
+    
+    console.log('[OrderPage] Submitting purchase order:', purchaseData)
+    const orderId = await Orders.createOrder(purchaseData)
+    console.log('[OrderPage] Purchase order created with ID:', orderId)
+    
+    // Update the listing to decrement available amount
+    console.log('[OrderPage] Attempting to update listing inventory...')
+    const newAmount = maxAvailable - quantity
+    console.log('[OrderPage] Updating listing: ID=' + currentListing.id + ', old amount=' + maxAvailable + ', new amount=' + newAmount)
+    
+    const listingUpdate = {
+      amount: newAmount
+    }
+    
+    // Update listing in Firestore
+    try {
+      const db = Firebase.getFirestore()
+      if (!db) {
+        throw new Error('Firestore not initialized')
+      }
+      await db.collection('listings').doc(currentListing.id).update(listingUpdate)
+      console.log('[OrderPage] Listing inventory updated successfully')
+    } catch (updateError) {
+      console.error('[OrderPage] Warning: Could not update listing inventory:', updateError)
+      // Don't fail the order if inventory update fails, just log the warning
+    }
+    
+    window.location.href = `order-view.html?id=${orderId}`
+  } catch (error) {
+    console.error('[OrderPage] Error creating purchase order:', error)
+    console.error('[OrderPage] Error stack:', error.stack)
+    alert('Error creating purchase order: ' + error.message)
   }
 }

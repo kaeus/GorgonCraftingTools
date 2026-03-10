@@ -93,6 +93,9 @@ function setupEventListeners() {
     if (e.target.matches('[data-action="submit-order"]')) {
       OrderPageModule.submitOrder()
     }
+    if (e.target.matches('[data-action="submit-purchase"]')) {
+      OrderPageModule.submitPurchase()
+    }
   })
 
   // Tab switching
@@ -122,7 +125,7 @@ function setupEventListeners() {
     const listingCard = e.target.closest('[data-listing-id]')
     if (listingCard && e.target.matches('.action-btn, .listing-crafting-card')) {
       const listingId = listingCard.dataset.listingId
-      window.location.href = `order.html?id=${listingId}`
+      window.location.href = `craftorder.html?id=${listingId}`
     }
   })
 
@@ -164,12 +167,15 @@ async function initializeApp() {
   // Render sidebar on all pages
   if (document.querySelector('#admin-panel')) {
     // Admin page
+    console.log('[Main] Detected admin page')
     SidebarModule.renderAdminSidebar()
-  } else if (document.querySelector('#order-form')) {
-    // Order page
+  } else if (document.querySelector('#order-form') || document.querySelector('#purchase-form')) {
+    // Order page (craft or item)
+    console.log('[Main] Detected order/purchase page')
     SidebarModule.renderOrderSidebar()
   } else {
     // All other pages (market/listings, etc.)
+    console.log('[Main] Detected market/listings page')
     SidebarModule.renderSidebar()
   }
   
@@ -197,8 +203,9 @@ async function initializeApp() {
     })
   }
   
-  // Initialize order page if we're on order.html
-  if (document.querySelector('#order-form')) {
+  // Initialize order page if we're on craftorder.html or itemorder.html
+  if (document.querySelector('#order-form') || document.querySelector('#purchase-form')) {
+    console.log('[Main] Initializing order page module')
     OrderPageModule.initOrderPage()
   }
   
@@ -262,6 +269,15 @@ async function initializeApp() {
       }
     })
   }
+
+  console.log('[Main] App initialization complete')
+  console.log('[Main] Page detected:', window.location.pathname)
+  console.log('[Main] DOM elements checked:')
+  console.log('  - #admin-panel:', document.querySelector('#admin-panel') ? 'yes' : 'no')
+  console.log('  - #order-form:', document.querySelector('#order-form') ? 'yes' : 'no')
+  console.log('  - #purchase-form:', document.querySelector('#purchase-form') ? 'yes' : 'no')
+  console.log('  - #listings-grid:', document.querySelector('#listings-grid') ? 'yes' : 'no')
+  console.log('  - #coliseum-page:', document.querySelector('#coliseum-page') ? 'yes' : 'no')
 
   // Hide the global loading overlay after all content is loaded
   await hideGlobalLoadingOverlay()
