@@ -4,7 +4,7 @@
  */
 
 import { getFirestore, getAuth } from './firebase.js'
-import { escapeHtml, PROFESSION_EMOJI, setStatus } from './utils.js'
+import { escapeHtml, PROFESSION_EMOJI, getProfessions, setStatus } from './utils.js'
 
 let userListings = []
 
@@ -490,6 +490,9 @@ function showListingForm(docSnapshot = null) {
   const craftingArea = document.getElementById('crafting-area')
   if (!craftingArea) return
 
+  // Show the crafting area
+  craftingArea.style.display = 'block'
+
   const isEditing = docSnapshot !== null
   const d = docSnapshot?.data?.() || {}
 
@@ -506,16 +509,7 @@ function showListingForm(docSnapshot = null) {
           <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Profession *${isEditing ? ' <span style="color:#a8a8a8; font-weight:400; text-transform:none;">(locked — delete and recreate to change)</span>' : ''}</label>
           <select id="form-profession" ${isEditing ? 'disabled' : ''} style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8; ${isEditing ? 'opacity:0.6; cursor:not-allowed;' : ''}">
             <option value="">Select a profession</option>
-            <option value="Weaponcrafting" ${d.profession === 'Weaponcrafting' ? 'selected' : ''}>Weaponcrafting</option>
-            <option value="Armorsmithing" ${d.profession === 'Armorsmithing' ? 'selected' : ''}>Armorsmithing</option>
-            <option value="Tailoring" ${d.profession === 'Tailoring' ? 'selected' : ''}>Tailoring</option>
-            <option value="Carpentry" ${d.profession === 'Carpentry' ? 'selected' : ''}>Carpentry</option>
-            <option value="Jewelcrafting" ${d.profession === 'Jewelcrafting' ? 'selected' : ''}>Jewelcrafting</option>
-            <option value="Alchemy" ${d.profession === 'Alchemy' ? 'selected' : ''}>Alchemy</option>
-            <option value="Cooking" ${d.profession === 'Cooking' ? 'selected' : ''}>Cooking</option>
-            <option value="Engraving" ${d.profession === 'Engraving' ? 'selected' : ''}>Engraving</option>
-            <option value="Scribing" ${d.profession === 'Scribing' ? 'selected' : ''}>Scribing</option>
-            <option value="Toolcrafting" ${d.profession === 'Toolcrafting' ? 'selected' : ''}>Toolcrafting</option>
+            ${getProfessions().map(prof => `<option value="${prof}" ${d.profession === prof ? 'selected' : ''}>${prof}</option>`).join('')}
           </select>
         </div>
       </div>
@@ -867,9 +861,19 @@ function validateForm(formId) {
  * Cancel form and go back to listings
  */
 export async function cancelListingForm() {
-  const auth = getAuth()
-  if (auth?.currentUser) {
-    await loadUserListings(auth.currentUser.uid)
+  const craftingArea = document.getElementById('crafting-area')
+  if (craftingArea) {
+    craftingArea.style.display = 'none'
+    craftingArea.innerHTML = ''
+  }
+
+  // If on yourListings page, reload the listings
+  const isYourListingsPage = window.location.pathname.includes('yourListings.html')
+  if (isYourListingsPage) {
+    const auth = getAuth()
+    if (auth?.currentUser) {
+      await loadUserListings(auth.currentUser.uid)
+    }
   }
 }
 
@@ -877,9 +881,19 @@ export async function cancelListingForm() {
  * Cancel item listing form and go back to listings
  */
 export async function cancelItemListingForm() {
-  const auth = getAuth()
-  if (auth?.currentUser) {
-    await loadUserListings(auth.currentUser.uid)
+  const craftingArea = document.getElementById('crafting-area')
+  if (craftingArea) {
+    craftingArea.style.display = 'none'
+    craftingArea.innerHTML = ''
+  }
+
+  // If on yourListings page, reload the listings
+  const isYourListingsPage = window.location.pathname.includes('yourListings.html')
+  if (isYourListingsPage) {
+    const auth = getAuth()
+    if (auth?.currentUser) {
+      await loadUserListings(auth.currentUser.uid)
+    }
   }
 }
 

@@ -1,0 +1,106 @@
+{
+  "meta_categories": {
+    "Textbooks & Educational Materials": {
+      "description": "Knowledge items, textbooks, learning materials, skill guides",
+      "keyword_count": 144
+    },
+    "Recipes & Crafting Skills": {
+      "description": "Recipes, crafting instructions, craft-related keywords",
+      "keyword_count": 77
+    },
+    "Armor Sets by Type": {
+      "description": "Full armor categories by material (Cloth, Leather, Metal, Organic, Wooden)",
+      "keyword_count": 33
+    },
+    "Armor Pieces by Location": {
+      "description": "Body-specific armor pieces, augments",
+      "keyword_count": 10
+    },
+    "Melee Weapons": {
+      "description": "Swords, daggers, hammers, staffs, hand weapons, close-combat weapons",
+      "keyword_count": 52
+    },
+    "Ranged Weapons & Projectiles": {
+      "description": "Bows, crossbows, arrows, ammunition, throwing weapons",
+      "keyword_count": 94
+    },
+    "Food & Cooking Ingredients": {
+      "description": "Fish, meat, vegetables, cooking components, dishes, ingredients",
+      "keyword_count": 1607
+    },
+    "Potions, Drinks & Beverages": {
+      "description": "Potions, poisons, drinks, alcohol, elixirs",
+      "keyword_count": 139
+    },
+    "Jewelry & Adornments": {
+      "description": "Amulets, rings, necklaces, racial jewelry, decorative items",
+      "keyword_count": 19
+    },
+    "Crafting Materials & Gems": {
+      "description": "Ores, crystals, gems, cloth, leather, wood, raw components, metals",
+      "keyword_count": 363
+    },
+    "Books, Scrolls & Documents": {
+      "description": "Books, documents, scrolls, writing items, letters",
+      "keyword_count": 19
+    },
+    "Furniture & Containers": {
+      "description": "Chests, chairs, benches, household items, storage",
+      "keyword_count": 32
+    },
+    "Tools & Specialized Equipment": {
+      "description": "First aid kits, chemistry equipment, tools, patches, kits",
+      "keyword_count": 58
+    },
+    "Wearable Gear & Accessories": {
+      "description": "Belts, clothing, saddles, personal gear, armor slots",
+      "keyword_count": 19
+    },
+    "Treasure, Loot & Quest Items": {
+      "description": "MacGuffins, maps, trophies, valuables, quest items, loot",
+      "keyword_count": 1234
+    },
+    "Currency & Trade Items": {
+      "description": "Money, coins, trade goods, bonds, currency",
+      "keyword_count": 19
+    },
+    "Shields & Protective Gear": {
+      "description": "Shields and shield-like protective items",
+      "keyword_count": 3
+    },
+    "Racial & Cultural Items": {
+      "description": "Race-specific equipment, cultural artifacts, language items",
+      "keyword_count": 49
+    },
+    "System Tags & Metadata": {
+      "description": "Internal tags, lint warnings, system annotations, metadata",
+      "keyword_count": 53
+    }
+  },
+  "summary": {
+    "total_keywords": 4024,
+    "total_categories": 19,
+    "category_breakdown": {
+      "Armor Pieces by Location": 10,
+      "Armor Sets by Type": 33,
+      "Books, Scrolls & Documents": 19,
+      "Crafting Materials & Gems": 363,
+      "Currency & Trade Items": 19,
+      "Food & Cooking Ingredients": 1607,
+      "Furniture & Containers": 32,
+      "Jewelry & Adornments": 19,
+      "Melee Weapons": 52,
+      "Potions, Drinks & Beverages": 139,
+      "Racial & Cultural Items": 49,
+      "Ranged Weapons & Projectiles": 94,
+      "Recipes & Crafting Skills": 77,
+      "Shields & Protective Gear": 3,
+      "System Tags & Metadata": 53,
+      "Textbooks & Educational Materials": 144,
+      "Tools & Specialized Equipment": 58,
+      "Treasure, Loot & Quest Items": 1234,
+      "Wearable Gear & Accessories": 19
+    },
+    "notes": "All 4,024 unique keywords from Project Gorgon's items.json have been categorized into 19 logical meta-categories. Each keyword belongs to exactly one category. The two largest categories are Food & Cooking Ingredients (1,607) and Treasure/Loot/Quest Items (1,234), which together represent 63% of all keywords."
+  }
+}

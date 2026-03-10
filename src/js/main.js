@@ -112,7 +112,7 @@ function setupEventListeners() {
 
   // Filter changes
   document.addEventListener('change', (e) => {
-    if (e.target.id === 'server-filter') {
+    if (e.target.id === 'server-filter' || e.target.id === 'metacategory-filter') {
       ListingsModule.applyFilter()
     }
   })
@@ -185,6 +185,8 @@ async function initializeApp() {
   if (document.querySelector('.listings-grid')) {
     await ListingsModule.loadListings()
     ListingsModule.initMarketItemSearch()
+    ListingsModule.initKeywordSearch()
+    ListingsModule.initCategoryFilters()
     
     // Initialize NPC message system for maxillae on market page
     initNPCMessage('maxillae', {

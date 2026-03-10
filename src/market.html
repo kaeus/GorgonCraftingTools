@@ -28,11 +28,30 @@
 
   <!-- Item Search -->
   <div class="section-header">
-    <h2>Item</h2>
+    <h2>Search by Item Name</h2>
   </div>
   <div id="item-search-wrapper" style="position:relative; margin-bottom:2rem;">
     <input type="text" id="market-item-search" placeholder="— Type to search… —" autocomplete="off" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#0a0a0a; color:#e8e8e8; font-family:inherit;">
     <div id="item-search-suggestions" style="position:absolute; top:100%; left:0; right:0; background:#0a0a0a; border:1px solid #505050; border-top:none; border-radius:0 0 5px 5px; max-height:250px; overflow-y:auto; z-index:1000; margin-top:0; display:none;"></div>
+  </div>
+
+  <!-- Category Filter -->
+  <div class="section-header">
+    <h2>Filter by Metacategory</h2>
+  </div>
+  <div id="category-filter-wrapper" style="margin-bottom:2rem;">
+    <select id="metacategory-filter" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#0a0a0a; color:#e8e8e8; font-family:inherit;">
+      <option value="">All Metacategories</option>
+    </select>
+  </div>
+
+  <!-- Keyword Search Filter -->
+  <div class="section-header">
+    <h2>Keyword Search</h2>
+  </div>
+  <div id="keyword-search-wrapper" style="position:relative; margin-bottom:2rem;">
+    <input type="text" id="keyword-search" placeholder="— Type a keyword to filter items… —" autocomplete="off" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#0a0a0a; color:#e8e8e8; font-family:inherit;">
+    <div id="keyword-search-suggestions" style="position:absolute; top:100%; left:0; right:0; background:#0a0a0a; border:1px solid #505050; border-top:none; border-radius:0 0 5px 5px; max-height:250px; overflow-y:auto; z-index:1000; margin-top:0; display:none;"></div>
   </div>
   
   <!-- Crafting area for item listing form -->
@@ -40,11 +59,41 @@
     <!-- Crafting UI will be rendered here -->
   </div>
 
+<!-- ── Listing Type Selection Modal for Market Page ── -->
+<div class="modal-backdrop" id="listing-type-modal">
+  <div class="modal">
+    <button class="modal-close" data-action="close-listing-type">✕</button>
+    <h3>Create New Listing</h3>
+    <p style="color:#a8a8a8; font-size:0.9rem; margin-bottom:1.5rem;">Choose what you want to list:</p>
+    <div style="display:flex; flex-direction:column; gap:0.75rem;">
+      <button class="action-btn" onclick="window.selectListingType('item')" style="text-align:left; padding:1rem;">
+        <div style="font-weight:600;">Fence an Item</div>
+        <div style="font-size:0.8rem; color:#a8a8a8; margin-top:0.25rem;">List items you want to sell</div>
+      </button>
+      <button class="action-btn" onclick="window.selectListingType('fetcher')" style="text-align:left; padding:1rem;">
+        <div style="font-weight:600;">Hire a Fetcher</div>
+        <div style="font-size:0.8rem; color:#a8a8a8; margin-top:0.25rem;">Hire someone to find items for you</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Service Listing Modal ── -->
+<div class="modal-backdrop" id="service-listing-modal">
+  <div class="modal">
+    <button class="modal-close" data-action="close-service-listing">✕</button>
+    <h3>+ Sell a Service</h3>
+    <p style="color:#a8a8a8; font-size:0.9rem; margin-bottom:1rem;">Create a service listing to offer your expertise.</p>
+    <div id="service-form-container">
+      <!-- Form will be rendered here -->
+    </div>
+  </div>
+</div>
+
   <!-- Active listings -->
   <div class="section-header">
     <h2>Featured "Merchants"</h2>
-    <button class="action-btn" onclick="window.selectListingType('item')">+ Fence Your Items</button>
-    <button class="action-btn" onclick="window.selectListingType('fetcher')">+ Hire a Fetcher</button>
+    <button class="action-btn" onclick="document.getElementById('listing-type-modal').classList.add('open')">+ Create New Listing</button>
   </div>
   <div class="filter-bar">
     <label for="server-filter">Server</label>
