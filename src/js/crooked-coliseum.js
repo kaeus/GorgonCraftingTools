@@ -19,6 +19,7 @@ let tips = {
 let currentServer = ''
 let currentUser = null
 let unsubscribeTips = null
+let rolloverTimer = null
 
 // ── Date Logic ───────────────────────────────────────────────────────────────
 
@@ -213,7 +214,7 @@ function updateFightResult(selected) {
   result.innerHTML = `
     <div class="fight-result-display">
       <div class="result-slot ${isTie ? 'neutral' : 'winner'}">
-        <div class="result-fighter-img-slot"></div>
+        <img class="result-fighter-img" src="/images/fighters/${left}.png" alt="${left}">
         <span class="result-fighter-name">${left}</span>
         <span class="result-fighter-sub">${oddsLeft}%</span>
       </div>
@@ -226,7 +227,7 @@ function updateFightResult(selected) {
         }
       </div>
       <div class="result-slot ${isTie ? 'neutral' : 'loser'}">
-        <div class="result-fighter-img-slot"></div>
+        <img class="result-fighter-img" src="/images/fighters/${right}.png" alt="${right}">
         <span class="result-fighter-name">${right}</span>
         <span class="result-fighter-sub">${oddsRight}%</span>
       </div>
@@ -354,6 +355,22 @@ function handleTipsCheckboxChange(e) {
   updateTipsBadge()
 }
 
+// ── Date Rollover ─────────────────────────────────────────────────────────────
+
+function scheduleDateRollover() {
+  if (rolloverTimer) clearTimeout(rolloverTimer)
+  if (!currentServer) return
+
+  const now = new Date()
+  const next4am = new Date(now)
+  next4am.setUTCHours(4, 0, 0, 0)
+  if (now.getUTCHours() >= 4) next4am.setUTCDate(next4am.getUTCDate() + 1)
+
+  rolloverTimer = setTimeout(() => {
+    subscribeToTips(currentServer)
+  }, next4am - now)
+}
+
 // ── Firebase Subscription ────────────────────────────────────────────────────
 
 function subscribeToTips(server) {
@@ -368,6 +385,8 @@ function subscribeToTips(server) {
 
   const key = getDocumentKey(server)
   const statusEl = document.getElementById('coliseum-status')
+
+  scheduleDateRollover()
 
   unsubscribeTips = db.collection('coliseum').doc(key).onSnapshot(
     doc => {
@@ -426,6 +445,7 @@ function handleServerChange(server) {
     subscribeToTips(server)
   } else {
     if (unsubscribeTips) { unsubscribeTips(); unsubscribeTips = null }
+    if (rolloverTimer) { clearTimeout(rolloverTimer); rolloverTimer = null }
     tips = { globalAdvantages: {}, globalDisadvantages: {}, fightAdvantages: {} }
     setContentVisible(false)
     if (statusEl) statusEl.style.display = 'none'

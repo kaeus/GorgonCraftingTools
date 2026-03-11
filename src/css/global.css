@@ -1652,7 +1652,7 @@ input[type="number"]:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 3rem;
   width: 100%;
 }
 
@@ -1663,16 +1663,15 @@ input[type="number"]:focus {
   align-items: center;
   gap: 0.35rem;
   flex: 1;
-  max-width: 160px;
+  max-width: 220px;
 }
 
-/* Image placeholder — swap for <img> when artwork is ready */
-.result-fighter-img-slot {
-  width: 72px;
-  height: 72px;
+.result-fighter-img {
+  width: 200px;
+  height: 280px;
   border-radius: 6px;
-  background: #1e1e1e;
-  border: 1px dashed #333;
+  object-fit: cover;
+  border: 2px solid #333;
   flex-shrink: 0;
 }
 
@@ -1691,9 +1690,9 @@ input[type="number"]:focus {
 
 /* State-based coloring */
 .result-slot.winner .result-fighter-name { color: #6fcf6f; }
-.result-slot.winner .result-fighter-img-slot { border-color: #2e6b2e; background: #152015; }
+.result-slot.winner .result-fighter-img { border-color: #2e6b2e; }
 .result-slot.loser  .result-fighter-name { color: #cf6f6f; }
-.result-slot.loser  .result-fighter-img-slot { border-color: #5a2020; background: #1a1010; }
+.result-slot.loser  .result-fighter-img { border-color: #5a2020; opacity: 0.65; }
 .result-slot.neutral .result-fighter-name { color: #c0c0c0; }
 
 /* Center column */
