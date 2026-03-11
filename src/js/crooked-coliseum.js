@@ -214,7 +214,7 @@ function updateFightResult(selected) {
   result.innerHTML = `
     <div class="fight-result-display">
       <div class="result-slot ${isTie ? 'neutral' : 'winner'}">
-        <img class="result-fighter-img" src="/images/fighters/${left}.png" alt="${left}">
+        <img class="result-fighter-img" src="images/fighters/${left}.png" alt="${left}">
         <span class="result-fighter-name">${left}</span>
         <span class="result-fighter-sub">${oddsLeft}%</span>
       </div>
@@ -227,7 +227,7 @@ function updateFightResult(selected) {
         }
       </div>
       <div class="result-slot ${isTie ? 'neutral' : 'loser'}">
-        <img class="result-fighter-img" src="/images/fighters/${right}.png" alt="${right}">
+        <img class="result-fighter-img" src="images/fighters/${right}.png" alt="${right}">
         <span class="result-fighter-name">${right}</span>
         <span class="result-fighter-sub">${oddsRight}%</span>
       </div>
