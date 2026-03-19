@@ -28,18 +28,35 @@
     <div id="status" class="status-bar loading">Loading listings…</div>
 
     <div class="toolbar">
-      <label for="status-filter">Show</label>
-      <select id="status-filter">
-        <option value="">All</option>
-        <option value="active">Active only</option>
-        <option value="inactive">Inactive only</option>
-      </select>
+      <label for="fantasy-status-dropdown">Show</label>
+      <div id="fantasy-status-dropdown" style="width:220px;"></div>
       <div class="spacer"></div>
       <button class="refresh-btn" data-action="load-all-listings">↺ Refresh</button>
     </div>
 
     <div id="table-wrap">
       <div class="empty-state">Loading…</div>
+      <script type="module">
+        import { FantasyDropdown } from './components/FantasyDropdown.js';
+        const statusOptions = [
+          { value: '', label: 'All' },
+          { value: 'active', label: 'Active only' },
+          { value: 'inactive', label: 'Inactive only' }
+        ];
+        let selectedStatus = '';
+        new FantasyDropdown({
+          container: document.getElementById('fantasy-status-dropdown'),
+          options: statusOptions,
+          value: selectedStatus,
+          onChange: v => {
+            selectedStatus = v;
+            // TODO: trigger status filter logic here
+          },
+          placeholder: 'Select status',
+          dropdownClass: 'admin-select',
+          optionClass: 'admin-option',
+        });
+      </script>
     </div>
   </div>
 </div>

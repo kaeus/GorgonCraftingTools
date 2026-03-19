@@ -1,0 +1,222 @@
+/* Only apply gold color to non-placeholder selected value */
+#fantasy-metacategory-dropdown .fantasy-dropdown-selected .selected-text {
+  color: var(--color-accent-gold);
+  font-style: normal;
+  font-weight: 400;
+}
+#fantasy-metacategory-dropdown .fantasy-dropdown-selected.placeholder,
+#fantasy-metacategory-dropdown .fantasy-dropdown-selected .placeholder-text {
+  color: #a08c6a;
+  font-style: italic;
+  opacity: 0.7;
+  font-weight: 400;
+}
+/* Match dropdown placeholder style to .market-input */
+#fantasy-metacategory-dropdown .fantasy-dropdown-selected.placeholder,
+#fantasy-metacategory-dropdown .fantasy-dropdown-selected .placeholder-text {
+  color: #a08c6a;
+  font-style: italic;
+  opacity: 0.7;
+  font-weight: 400;
+}
+/* Match dropdown to .market-input styling for metacategory filter */
+#fantasy-metacategory-dropdown .fantasy-dropdown-selected {
+  background: rgba(15, 12, 8, 0.8);
+  border: 1px solid var(--color-parchment-border);
+  color: var(--color-text-primary);
+  font-family: 'Crimson Pro', 'Cormorant', Georgia, serif;
+  font-size: 0.95rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(100, 80, 50, 0.05);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 2.2rem 0.75rem 1rem;
+  height: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+}
+/* --- FINAL CONTEXT-SPECIFIC DROPDOWN FIXES --- */
+
+/* Sidebar (left) dropdown: match .topbar-title img width and style */
+.sidebar-dropdown-instance {
+  width: 95%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0 auto 0.5rem auto;
+}
+.sidebar-dropdown-instance .fantasy-dropdown {
+  width: 100%;
+  background: #2a1812;
+  border: 2px solid #1a1a1a;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.sidebar-dropdown-instance .fantasy-dropdown-selected {
+  border-radius: 6px;
+  padding: 0.75rem 2.2rem 0.75rem 1rem;
+  min-height: 2.2rem;
+  font-size: 1rem;
+}
+.sidebar-dropdown-instance .fantasy-dropdown-list {
+  background: #2a1812;
+  border: 2px solid #1a1a1a;
+  border-radius: 0 0 6px 6px;
+}
+
+/* Market filter (right) dropdown: match .market-input exactly */
+.market-dropdown-instance {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+.market-dropdown-instance .fantasy-dropdown {
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(100, 80, 50, 0.05);
+}
+.market-dropdown-instance .fantasy-dropdown-selected {
+  padding: 0.75rem 1rem;
+  min-height: unset;
+  font-size: 0.95rem;
+  border-radius: var(--radius-md);
+  height: 48px;
+  box-sizing: border-box;
+  background: rgba(15, 12, 8, 0.8);
+  background: rgba(15, 12, 8, 0.8);
+  border: 1px solid var(--color-parchment-border);
+  color: var(--color-text-primary);
+  font-family: 'Crimson Pro', 'Cormorant', Georgia, serif;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(100, 80, 50, 0.05);
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+}
+.market-dropdown-instance .fantasy-dropdown-list {
+  background: rgba(15, 12, 8, 0.98);
+  border: 1px solid var(--color-parchment-border);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+/* --- CONTEXT-SPECIFIC DROPDOWN SIZING --- */
+
+/* Sidebar (left) dropdown: match .topbar-title img width and button border radius */
+.sidebar-dropdown-instance {
+  width: 95%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0 auto 0.5rem auto;
+  border-radius: 6px;
+}
+.sidebar-dropdown-instance .fantasy-dropdown-selected {
+  border-radius: 6px;
+  padding: 0.55rem 2.2rem 0.55rem 1rem;
+  min-height: 2.2rem;
+}
+
+/* Market filter (right) dropdown: match .market-input width/height */
+.market-dropdown-instance {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+.market-dropdown-instance .fantasy-dropdown-selected {
+  padding: 0.75rem 2.2rem 0.75rem 1rem;
+  height: 48px;
+  min-height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  background: rgba(15, 12, 8, 0.8);
+  border: 1px solid var(--color-parchment-border);
+  color: var(--color-text-primary);
+  font-family: 'Crimson Pro', 'Cormorant', Georgia, serif;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(100, 80, 50, 0.05);
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+  position: relative;
+}
+
+/* Always show dropdown arrow for market filter */
+.market-dropdown-instance .fantasy-dropdown-selected .fantasy-dropdown-arrow {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 0.5rem;
+  height: 1.2rem;
+  width: 1.2rem;
+  pointer-events: none;
+}
+
+/* FantasyDropdown component styles */
+.fantasy-dropdown {
+  position: relative;
+}
+
+/* Sidebar (left) instance: full width of sidebar content */
+.topbar-server-filter .fantasy-dropdown {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+/* Market filter (right) instance: match input fields */
+#category-filter-wrapper .fantasy-dropdown {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+.fantasy-dropdown:focus {
+  border-color: #a08050;
+  box-shadow: 0 0 15px rgba(160,128,90,0.2);
+}
+.fantasy-dropdown-selected {
+  padding: 0.65rem 2.2rem 0.65rem 1rem;
+  min-height: 2.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  position: relative;
+}
+.fantasy-dropdown-arrow {
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+.fantasy-dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(15, 12, 8, 0.98);
+  border: 1px solid #6b5a3a;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  z-index: 1000;
+  max-height: 320px;
+  overflow-y: auto;
+  margin-top: 2px;
+}
+.fantasy-dropdown-option {
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  color: #e8e8e8;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  border-bottom: 1px solid rgba(90,74,58,0.08);
+  font-family: 'Crimson Pro', 'Cormorant', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.fantasy-dropdown-option:last-child {
+  border-bottom: none;
+}
+.fantasy-dropdown-option.selected,
+.fantasy-dropdown-option:hover {
+  background: linear-gradient(90deg, #3a2c1a 0%, #6b5a3a 100%);
+  color: #d6c3a3;
+}

@@ -5,11 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Black Wing Market - CraftingCorner</title>
   <link rel="stylesheet" href="./css/npc.css">
+  <link rel="stylesheet" href="./css/fantasy-dropdown.css">
   <style>
     body { visibility: hidden; background-color: #000; }
     #global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
   </style>
   <script type="module" src="./js/main.js"></script>
+  <script type="module">
+    import { FantasyDropdown } from './components/FantasyDropdown.js';
+    // Example metacategory options
+    const metacategories = [
+      { value: '', label: 'All Metacategories' },
+      { value: 'armor-location', label: 'Armor Pieces by Location' },
+      { value: 'armor-type', label: 'Armor Sets by Type' },
+      { value: 'books', label: 'Books, Scrolls & Documents' },
+      { value: 'crafting', label: 'Crafting Materials & Gems' },
+      { value: 'currency', label: 'Currency & Trade Items' },
+      { value: 'food', label: 'Food & Cooking Ingredients' },
+      { value: 'furniture', label: 'Furniture & Containers' },
+      { value: 'jewelry', label: 'Jewelry & Adornments' },
+      { value: 'melee', label: 'Melee Weapons' },
+      { value: 'potions', label: 'Potions, Drinks & Beverages' },
+      { value: 'racial', label: 'Racial & Cultural Items' },
+      { value: 'ranged', label: 'Ranged Weapons & Projectiles' },
+      { value: 'recipes', label: 'Recipes & Crafting Skills' },
+      { value: 'shields', label: 'Shields & Protective Gear' },
+      { value: 'system', label: 'System Tags & Metadata' },
+      { value: 'textbooks', label: 'Textbooks & Educational Materials' },
+      { value: 'tools', label: 'Tools & Specialized Equipment' },
+      { value: 'treasure', label: 'Treasure, Loot & Quest Items' },
+      { value: 'wearable', label: 'Wearable Gear & Accessories' },
+    ];
+    let selectedMetacategory = '';
+    new FantasyDropdown({
+      container: document.getElementById('fantasy-metacategory-dropdown'),
+      options: metacategories,
+      value: selectedMetacategory,
+      onChange: v => {
+        selectedMetacategory = v;
+        // TODO: trigger filtering logic here
+      },
+      placeholder: 'Select Metacategory',
+      optionClass: 'market-option',
+    });
+  </script>
 </head>
 <body>
 
@@ -32,28 +71,26 @@
   <div class="section-header">
     <h2>Search by Item Name</h2>
   </div>
-  <div id="item-search-wrapper" style="position:relative; margin-bottom:2rem;">
-    <input type="text" id="market-item-search" placeholder="— Type to search… —" autocomplete="off" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#0a0a0a; color:#e8e8e8; font-family:inherit;">
-    <div id="item-search-suggestions" style="position:absolute; top:100%; left:0; right:0; background:#0a0a0a; border:1px solid #505050; border-top:none; border-radius:0 0 5px 5px; max-height:250px; overflow-y:auto; z-index:1000; margin-top:0; display:none;"></div>
+  <div id="item-search-wrapper" class="market-search-wrapper">
+    <input type="text" id="market-item-search" class="market-input" placeholder="— Type to search… —" autocomplete="off">
+    <div id="item-search-suggestions" class="search-suggestions"></div>
   </div>
 
   <!-- Category Filter -->
   <div class="section-header">
     <h2>Filter by Metacategory</h2>
   </div>
-  <div id="category-filter-wrapper" style="margin-bottom:2rem;">
-    <select id="metacategory-filter" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#0a0a0a; color:#e8e8e8; font-family:inherit;">
-      <option value="">All Metacategories</option>
-    </select>
+  <div id="category-filter-wrapper" class="market-filter-wrapper">
+    <div id="fantasy-metacategory-dropdown" class="market-dropdown-instance"></div>
   </div>
 
   <!-- Keyword Search Filter -->
   <div class="section-header">
     <h2>Keyword Search</h2>
   </div>
-  <div id="keyword-search-wrapper" style="position:relative; margin-bottom:2rem;">
-    <input type="text" id="keyword-search" placeholder="— Type a keyword to filter items… —" autocomplete="off" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#0a0a0a; color:#e8e8e8; font-family:inherit;">
-    <div id="keyword-search-suggestions" style="position:absolute; top:100%; left:0; right:0; background:#0a0a0a; border:1px solid #505050; border-top:none; border-radius:0 0 5px 5px; max-height:250px; overflow-y:auto; z-index:1000; margin-top:0; display:none;"></div>
+  <div id="keyword-search-wrapper" class="market-search-wrapper">
+    <input type="text" id="keyword-search" class="market-input" placeholder="— Type a keyword to filter items… —" autocomplete="off">
+    <div id="keyword-search-suggestions" class="search-suggestions"></div>
   </div>
   
   <!-- Crafting area for item listing form -->
