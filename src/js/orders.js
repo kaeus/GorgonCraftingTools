@@ -220,7 +220,7 @@ export async function renderOrderDetails(order, currentUser = null) {
   
   // Load gem skill mapping
   try {
-    const response = await fetch('./public/gem_skill_mapping.json')
+    const response = await fetch('./gem_skill_mapping.json')
     if (response.ok) {
       gemMapping = await response.json()
     }

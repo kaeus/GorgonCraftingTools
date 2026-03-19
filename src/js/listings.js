@@ -459,8 +459,8 @@ export async function renderListings(docs) {
       if (nail) gsap.killTweensOf(nail)
 
       // Play card flip sound with slight pitch variation
-      const flipSound = new Audio('/sounds/card_flip.mp3')
-      flipSound.volume = 0.02
+      const flipSound = new Audio('sounds/card_flip.mp3')
+      flipSound.volume = 0.015
       flipSound.playbackRate = 0.9 + Math.random() * 0.25
       flipSound.play().catch(() => {})
 

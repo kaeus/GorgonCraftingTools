@@ -14,7 +14,7 @@ export class BellNPC {
     this.spriteElement = this.containerElement ? this.containerElement.querySelector('.npc-sprite') : null
     this.isRinging = false
 
-    this.imagePath = '/images/npcs/bell/'
+    this.imagePath = 'images/npcs/bell/'
     this.frames = {
       middle: this.imagePath + 'bell_middle.png',
       left: this.imagePath + 'bell_left.png',
@@ -51,7 +51,8 @@ export class BellNPC {
     setTimeout(() => this.containerElement.classList.remove('no-glow'), 3000)
 
     // Play cowbell sound
-    const sound = new Audio('/sounds/cowbell.mp3')
+    const sound = new Audio('sounds/cowbell.mp3')
+    sound.volume = 0.02
     sound.play()
 
     this.containerElement.dispatchEvent(new CustomEvent('bell_ring', { bubbles: true }))

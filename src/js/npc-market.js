@@ -15,7 +15,7 @@ export class MarketNPC {
     this.spriteElement = this.containerElement ? this.containerElement.querySelector('.npc-sprite') : null
     this.flyingFrames = ['max_flying_1.png', 'max_flying_2.png', 'max_flying_3.png']
     this.baseFrame = 'max_0.png'
-    this.imagePath = '/images/npcs/max/'
+    this.imagePath = 'images/npcs/max/'
     
     this.scrollTimeout = null
     this.currentFrameIndex = 0
@@ -234,10 +234,10 @@ export class MarketNPC {
   startFlySound() {
     if (!this._hasEntered) return
     if (!this.flySound) {
-      this.flySound = new Audio('/sounds/max_fly.mp3')
+      this.flySound = new Audio('sounds/max_fly.mp3')
       this.flySound.loop = true
     }
-    this.flySound.volume = 1
+    this.flySound.volume = .25
     this.flySound.play().catch(() => {})
   }
 

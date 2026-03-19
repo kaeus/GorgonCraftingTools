@@ -118,7 +118,7 @@ export function generateDenseClipPath() {
 export function getRandomNail() {
   const nails = ['nail_1.png', 'nail_2.png', 'nail_3.png', 'nail_4.png', 'nail_5.png', 'nail_6.png', 'nail_7.png', 'nail_8.png']
   const randomNail = nails[Math.floor(Math.random() * nails.length)]
-  return `/images/nails/${randomNail}`
+  return `images/nails/${randomNail}`
 }
 
 /**
