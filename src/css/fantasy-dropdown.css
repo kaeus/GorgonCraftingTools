@@ -1,3 +1,7 @@
+#fantasy-server-dropdown .fantasy-dropdown-selected.placeholder,
+#fantasy-server-dropdown .fantasy-dropdown-selected .placeholder-text {
+  font-family: 'Cinzel', serif;
+}
 /* Only apply gold color to non-placeholder selected value */
 #fantasy-metacategory-dropdown .fantasy-dropdown-selected .selected-text {
   color: var(--color-accent-gold);

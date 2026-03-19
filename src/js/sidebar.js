@@ -55,10 +55,7 @@ export function renderSidebar() {
           <img src="${getButtonImageSrc('crookedColiseum.html')}" alt="Crooked Coliseum">
         </a>
       </div>
-      <div class="topbar-server-filter">
-        <label for="fantasy-server-dropdown">Server</label>
-        <div id="fantasy-server-dropdown" class="sidebar-dropdown-instance"></div>
-      </div>
+      <div id="fantasy-server-dropdown" class="sidebar-dropdown-instance"></div>
       <div id="user-auth-slot">
         <button class="action-btn" data-action="open-auth">Sign In</button>
       </div>
@@ -93,7 +90,7 @@ export function renderSidebar() {
         selectedServer = v;
         // TODO: trigger server filter logic here
       },
-      placeholder: 'Select server',
+      placeholder: 'Server',
       dropdownClass: '',
       optionClass: '',
     });
