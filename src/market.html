@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Black Wing Market - CraftingCorner</title>
+  <link rel="stylesheet" href="./css/npc.css">
   <style>
     body { visibility: hidden; background-color: #000; }
     #global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
@@ -159,9 +160,11 @@
 <div class="footer"></div>
 
 <!-- ── NPC Message System ── -->
-<div id="npc-maxillae" class="npc-container npc-position-bottom-right">
-  <img data-npc-role="base" src="./images/black_wing_market_maxillae/max_0.png" alt="Maxillae">
-  <img data-npc-role="dialogue" src="" alt="Dialogue">
+<div id="npc-container" class="position-bottom-right">
+  <img id="npc-sprite" src="./images/black_wing_market_maxillae/max_0.png" alt="Maxillae">
+  <div id="npc-bubble">
+    <div id="npc-text"></div>
+  </div>
 </div>
 
 <!-- Firebase SDKs -->

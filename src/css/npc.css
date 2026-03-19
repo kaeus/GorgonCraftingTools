@@ -1,0 +1,160 @@
+/* ── NPC System Styles ── */
+
+#npc-container {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  bottom: 0;
+  right: -600px;
+}
+
+#npc-sprite {
+  width: 450px;
+  height: auto;
+  display: block;
+  image-rendering: pixelated;
+}
+
+/* Speech Bubble */
+#npc-bubble {
+  position: absolute;
+  bottom: 300px;
+  right: 120px;
+  max-width: 400px;
+  background: #1a1a1a;
+  border: 2px solid #505050;
+  border-radius: 8px;
+  padding: 16px 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8);
+  font-size: 1rem;
+}
+
+#npc-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  right: 40px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 0px solid transparent;
+  border-top: 8px solid #1a1a1a;
+}
+
+#npc-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -14px;
+  right: 36px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 0px solid transparent;
+  border-top: 12px solid #505050;
+}
+
+/* Wiggle animation */
+@keyframes npc-wiggle {
+  0% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(8px) rotate(1deg); }
+  50% { transform: translateX(0) rotate(0deg); }
+  75% { transform: translateX(-8px) rotate(-1deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+#npc-text {
+  font-family: inherit;
+  color: #e8e8e8;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+/* NPC Container Positions */
+#npc-container.position-bottom-right {
+  bottom: 0;
+}
+
+#npc-container.position-bottom-left {
+  bottom: 0;
+  left: 0;
+}
+
+#npc-container.position-bottom-left #npc-bubble {
+  right: auto;
+  left: -20px;
+}
+
+#npc-container.position-bottom-left #npc-bubble::after {
+  right: auto;
+  left: 30px;
+}
+
+#npc-container.position-bottom-left #npc-bubble::before {
+  right: auto;
+  left: 26px;
+}
+
+#npc-container.position-top-right {
+  top: 0;
+  right: 0;
+}
+
+#npc-container.position-top-right #npc-bubble {
+  bottom: auto;
+  top: 150px;
+}
+
+#npc-container.position-top-right #npc-bubble::after {
+  bottom: auto;
+  top: -8px;
+}
+
+#npc-container.position-top-right #npc-bubble::before {
+  bottom: auto;
+  top: -12px;
+}
+
+#npc-container.position-top-left {
+  top: 0;
+  left: 0;
+}
+
+#npc-container.position-top-left #npc-bubble {
+  bottom: auto;
+  top: 150px;
+  right: auto;
+  left: -20px;
+}
+
+#npc-container.position-top-left #npc-bubble::after {
+  bottom: auto;
+  top: -8px;
+  right: auto;
+  left: 30px;
+}
+
+#npc-container.position-top-left #npc-bubble::before {
+  bottom: auto;
+  top: -12px;
+  right: auto;
+  left: 26px;
+}
+
+/* Idle animation class (optional, for CSS-only idle effect) */
+@keyframes npc-idle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+#npc-sprite.idle {
+  animation: npc-idle 0.6s ease-in-out infinite;
+}

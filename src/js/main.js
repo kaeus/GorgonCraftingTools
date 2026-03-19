@@ -7,7 +7,8 @@ import * as UtilsModule from './utils.js'
 import * as OrderPageModule from './order-page.js'
 import * as ListingsManagerModule from './listings-manager.js'
 import * as SidebarModule from './sidebar.js'
-import { initNPCMessage } from './npc-message.js'
+import { NPCController } from './npc-controller.js'
+import { dialogue } from './npc-dialogue.js'
 import * as ColiseumModule from './crooked-coliseum.js'
 
 /**
@@ -193,14 +194,29 @@ async function initializeApp() {
     ListingsModule.initMarketItemSearch()
     ListingsModule.initKeywordSearch()
     ListingsModule.initCategoryFilters()
-    
-    // Initialize NPC message system for maxillae on market page
-    initNPCMessage('maxillae', {
-      position: 'bottom-right',
-      imagesPath: './images/black_wing_market_maxillae/',
-      imagePrefix: 'max_',
-      talkTime: 5000
-    })
+  }
+  
+  // Initialize NPC system on market page
+  const initNPC = () => {
+    if (document.querySelector('.listings-grid')) {
+      const npc = new NPCController('npc-container')
+      window.npc = npc
+
+      // Entrance animation: slide in from right while wobbling for entire 3.6 seconds
+      npc.enterFromRight(3.6)
+
+      // Speech bubble appears after entrance completes (3.6 seconds)
+      setTimeout(() => {
+        npc.speak(dialogue.welcome, 7000)
+      }, 3600)
+    }
+  }
+
+  // Wait for DOM to be fully loaded before initializing NPC
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNPC)
+  } else {
+    initNPC()
   }
   
   // Initialize order page if we're on craftorder.html or itemorder.html

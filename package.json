@@ -7,6 +7,9 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "gsap": "^3.12.2"
+  },
   "devDependencies": {
     "glob": "^13.0.6",
     "vite": "^5.0.0"
