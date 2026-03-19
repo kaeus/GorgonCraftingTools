@@ -5,102 +5,11 @@
 
 import { getFirestore } from './firebase.js'
 import { escapeHtml, PROFESSION_EMOJI, setStatus } from './utils.js'
+import { generateRandomClipPath, getRandomNail, getNailPositionStyle, getNailPositionData, getCardDishevelStyle } from './scroll-edge.js'
+import { gsap } from 'gsap'
 
 let allListingDocs = []
 let marketItemsDatabase = null // Cache for CDN items
-
-/**
- * Generate edge profile with calm and rough zones
- * Creates alternating smooth areas and heavily torn areas for realism
- * @param {number} i - Point index along edge
- * @param {number} pointsPerEdge - Total points on this edge
- * @returns {number} Edge variation amount
- */
-function edgeProfile(i, pointsPerEdge) {
-  const t = i / pointsPerEdge
-  // Create alternating zones: -1 → 1 around edge
-  const zone = Math.sin(t * Math.PI * 2)
-  
-  if (zone > 0.4) {
-    // Calm zone (almost straight) - subtle waviness only
-    return Math.sin(i * 0.1) * 0.2
-  } else {
-    // Rough zone (actual tearing) - heavy variation
-    return (
-      Math.sin(i * 0.08) * 1.2 +
-      Math.sin(i * 0.3) * 0.5 +
-      (Math.random() * 1.5 - 0.75)
-    )
-  }
-}
-
-/**
- * Generate rare deep tears for missing-material realism
- * 3% chance of creating bold inward chunks
- * @param {number} i - Point index (unused but kept for consistency)
- * @returns {number} Deep tear amount or 0
- */
-function deepTear(i) {
-  if (Math.random() < 0.03) {
-    return -3 - Math.random() * 2 // Big inward chunk: -3 to -5
-  }
-  return 0
-}
-
-/**
- * Generate a random tattered edge clip-path polygon with organic variation
- * Creates ~160 coordinate pairs with calm/rough zones, rare deep tears, and natural parchment look
- * Each edge has unique characteristics with quiet zones breaking the "hairy" appearance
- * @returns {string} CSS clip-path polygon string
- */
-function generateRandomClipPath() {
-  const points = []
-  const pointsPerEdge = 40 // Balanced detail level
-  
-  // TOP EDGE (Y = 0-2%) - DAMPENED for flatter appearance
-  for (let i = 0; i < pointsPerEdge; i++) {
-    const x = (i / pointsPerEdge) * 100
-    const profile = edgeProfile(i, pointsPerEdge)
-    const tear = deepTear(i)
-    // Top edges are typically flatter and less damaged
-    const variation = (profile + tear) * 0.6
-    const y = Math.max(0, Math.min(3, variation))
-    points.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`)
-  }
-  
-  // RIGHT EDGE (X = 100%)
-  for (let i = 0; i < pointsPerEdge; i++) {
-    const y = (i / pointsPerEdge) * 100
-    const profile = edgeProfile(i, pointsPerEdge)
-    const tear = deepTear(i)
-    const variation = Math.max(0, profile + tear)
-    const xOffset = Math.max(0, Math.min(5, variation))
-    const x = 100 - xOffset
-    points.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`)
-  }
-  
-  // BOTTOM EDGE (Y = 99-100%)
-  for (let i = 0; i < pointsPerEdge; i++) {
-    const x = 100 - ((i / pointsPerEdge) * 100)
-    const profile = edgeProfile(i, pointsPerEdge)
-    const tear = deepTear(i)
-    const variation = Math.max(0, profile + tear)
-    const y = Math.max(97, Math.min(101, 100 + variation))
-    points.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`)
-  }
-  
-  // LEFT EDGE (X = 0%)
-  for (let i = 0; i < pointsPerEdge; i++) {
-    const y = 100 - ((i / pointsPerEdge) * 100)
-    const profile = edgeProfile(i, pointsPerEdge)
-    const tear = deepTear(i)
-    const variation = Math.max(0, profile + tear)
-    const xOffset = Math.max(0, Math.min(5, variation))
-    points.push(`${xOffset.toFixed(2)}% ${y.toFixed(2)}%`)
-  }
-  
-  return `polygon(${points.join(', ')})`
-}
 
 function formatCommission(value) {
   if (!value) return '—'
@@ -108,52 +17,6 @@ function formatCommission(value) {
   if (isNaN(num)) return escapeHtml(value)
   return `${num}%`
 }
-
-/**
- * Randomly select a nail image for the card
- */
-function getRandomNail() {
-  const nails = ['nail_1.png', 'nail_2.png', 'nail_3.png', 'nail_4.png', 'nail_5.png', 'nail_6.png', 'nail_7.png', 'nail_8.png']
-  const randomNail = nails[Math.floor(Math.random() * nails.length)]
-  return `/images/nails/${randomNail}`
-}
-
-/**
- * Generate random horizontal position and rotation for nail
- */
-function getNailPositionStyle() {
-  const leftPosition = 45 + Math.random() * 10 // 45% to 55% from left (almost center)
-  const rotation = (Math.random() * 150) - 75 // -75 to +75 degrees
-  return `left: ${leftPosition}%; transform: translateX(-50%) rotate(${rotation}deg);`
-}
-
-/**
- * Generate random background-position for weathered parchment image
- */
-function getRandomParchmentPosition() {
-  const posX = Math.floor(Math.random() * 100)
-  const posY = Math.floor(Math.random() * 100)
-  return `${posX}% ${posY}%`
-}
-
-/**
- * Generate random offset and rotation for disheveled card appearance
- */
-function getCardDishevelStyle(isMarketPage = false) {
-  const offsetX = (Math.random() - 0.5) * 8 // -4px to 4px horizontal offset
-  const offsetY = (Math.random() - 0.5) * 12 // -6px to 6px vertical offset
-  const rotation = (Math.random() - 0.5) * 3 // -1.5deg to 1.5deg rotation
-  let transform = `transform: translate(${offsetX}px, ${offsetY}px) rotate(${rotation}deg);`
-  
-  // For market page item cards, add random background-position for parchment texture
-  if (isMarketPage) {
-    const bgPosition = getRandomParchmentPosition()
-    return `${transform} background-position: ${bgPosition};`
-  }
-  
-  return transform
-}
-
 
 /**
  * Load all listings from Firestore
@@ -514,19 +377,22 @@ export async function renderListings(docs) {
         ? `<img src="https://cdn.projectgorgon.com/v461/icons/icon_${iconId}.png" alt="${escapeHtml(d.itemName)}" style="width:40px; height:40px; border:1px solid #505050; border-radius:3px; object-fit:contain; cursor: help;" data-item-name="${escapeHtml(itemName)}" data-keywords="${keywordsJson}" class="item-icon-tags-trigger" onerror="this.style.opacity='0.3'">`
         : ''
       
+      const nailData = getNailPositionData()
       return `
-        <div class="listing-item-card card-edge" style="clip-path: ${generateRandomClipPath()}; ${getCardDishevelStyle(true)}">
-          <img src="${getRandomNail()}" alt="nail" class="card-nail" style="${getNailPositionStyle()}">
-          <div class="item-name">
-            ${iconWithHover || iconHtml}
-            <strong style="font-size: ${fontSize};">${escapeHtml(itemName)}</strong>
-          </div>
-          <div class="item-details">
-            <div>${d.amount} available</div>
-            <div>${d.pricePerUnit} councils per 1</div>
-          </div>
-          <div class="card-footer">
-            <a href="./itemorder.html?id=${encodeURIComponent(doc.id)}" class="order-link">Place Order</a>
+        <div class="card-hover-wrapper" style="transform-origin: ${nailData.leftPosition}% 0">
+          <div class="listing-item-card card-edge" style="clip-path: ${generateRandomClipPath()}; ${getCardDishevelStyle(true)}">
+            <img src="${getRandomNail()}" alt="nail" class="card-nail" data-base-rotation="${nailData.rotation}" style="${nailData.style}">
+            <div class="item-name">
+              ${iconWithHover || iconHtml}
+              <strong style="font-size: ${fontSize};">${escapeHtml(itemName)}</strong>
+            </div>
+            <div class="item-details">
+              <div>${d.amount} available</div>
+              <div>${d.pricePerUnit} councils per 1</div>
+            </div>
+            <div class="card-footer">
+              <a href="./itemorder.html?id=${encodeURIComponent(doc.id)}" class="order-link">Place Order</a>
+            </div>
           </div>
         </div>
       `
@@ -549,10 +415,12 @@ export async function renderListings(docs) {
         </div>
       </div>` : ''
 
+    const crafterNailData = getNailPositionData()
     return `
-      <div class="listing-crafting-card card-edge" style="clip-path: ${generateRandomClipPath()}; ${getCardDishevelStyle()}">
-        <img src="${getRandomNail()}" alt="nail" class="card-nail" style="${getNailPositionStyle()}">
-        <div class="card-header">
+      <div class="card-hover-wrapper" style="transform-origin: ${crafterNailData.leftPosition}% 0">
+        <div class="listing-crafting-card card-edge" style="clip-path: ${generateRandomClipPath()}; ${getCardDishevelStyle()}">
+          <img src="${getRandomNail()}" alt="nail" class="card-nail" data-base-rotation="${crafterNailData.rotation}" style="${crafterNailData.style}">
+          <div class="card-header">
           <div class="profession-icon">
             ${emoji}
             ${levelBadge}
@@ -568,9 +436,10 @@ export async function renderListings(docs) {
           ${hoursRow}
           ${noteBlock}
         </div>
-        <div class="card-footer">
-          ${d.server ? `<div class="server-tag">${escapeHtml(d.server)}</div>` : '<div></div>'}
-          <a href="./craftorder.html?id=${encodeURIComponent(doc.id)}" class="place-order-btn">Place Order</a>
+          <div class="card-footer">
+            ${d.server ? `<div class="server-tag">${escapeHtml(d.server)}</div>` : '<div></div>'}
+            <a href="./craftorder.html?id=${encodeURIComponent(doc.id)}" class="place-order-btn">Place Order</a>
+          </div>
         </div>
       </div>
     `
@@ -580,6 +449,48 @@ export async function renderListings(docs) {
   if (window.location.pathname.includes('market.html')) {
     attachKeywordHoverListeners()
   }
+
+  // Attach sway + glow listeners to card wrappers
+  grid.querySelectorAll('.card-hover-wrapper').forEach(wrapper => {
+    const nail = wrapper.querySelector('.card-nail')
+    wrapper.addEventListener('mouseenter', (e) => {
+      wrapper.classList.add('glow')
+      gsap.killTweensOf(wrapper)
+      if (nail) gsap.killTweensOf(nail)
+
+      // Play card flip sound with slight pitch variation
+      const flipSound = new Audio('/sounds/card_flip.mp3')
+      flipSound.volume = 0.02
+      flipSound.playbackRate = 0.9 + Math.random() * 0.25
+      flipSound.play().catch(() => {})
+
+      // Determine push direction: card swings away from where mouse entered
+      const rect = wrapper.getBoundingClientRect()
+      const mouseX = e.clientX - rect.left
+      const centerX = rect.width / 2
+      // Mouse from right → push left (positive rotation swings bottom-left), mouse from left → push right
+      const dir = mouseX > centerX ? 1 : -1
+
+      gsap.timeline()
+        .to(wrapper, { rotation: 1.2 * dir, duration: 0.35, ease: 'power2.out' })
+        .to(wrapper, { rotation: -0.8 * dir, duration: 0.45, ease: 'power2.inOut' })
+        .to(wrapper, { rotation: 0.5 * dir, duration: 0.4, ease: 'power2.inOut' })
+        .to(wrapper, { rotation: -0.25 * dir, duration: 0.35, ease: 'power2.inOut' })
+        .to(wrapper, { rotation: 0, duration: 0.3, ease: 'power2.inOut' })
+      if (nail) {
+        const baseRotation = parseFloat(nail.dataset.baseRotation || '0')
+        gsap.timeline()
+          .to(nail, { rotation: baseRotation - 8 * dir, duration: 0.3, ease: 'power2.out' })
+          .to(nail, { rotation: baseRotation + 5 * dir, duration: 0.4, ease: 'power2.inOut' })
+          .to(nail, { rotation: baseRotation - 3 * dir, duration: 0.35, ease: 'power2.inOut' })
+          .to(nail, { rotation: baseRotation + 1 * dir, duration: 0.3, ease: 'power2.inOut' })
+          .to(nail, { rotation: baseRotation, duration: 0.25, ease: 'power2.inOut' })
+      }
+    })
+    wrapper.addEventListener('mouseleave', () => {
+      wrapper.classList.remove('glow')
+    })
+  })
 }
 
 /**

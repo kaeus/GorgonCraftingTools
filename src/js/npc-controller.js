@@ -11,16 +11,16 @@
 import { gsap } from 'gsap'
 
 export class NPCController {
-  constructor(containerId = 'npc-container') {
+  constructor(containerId) {
     this.container = document.getElementById(containerId)
     if (!this.container) {
       console.error(`NPC container not found: #${containerId}`)
       return
     }
 
-    this.sprite = this.container.querySelector('#npc-sprite')
-    this.bubble = this.container.querySelector('#npc-bubble')
-    this.text = this.container.querySelector('#npc-text')
+    this.sprite = this.container.querySelector('.npc-sprite')
+    this.bubble = this.container.querySelector('.npc-bubble')
+    this.text = this.container.querySelector('.npc-text')
 
     if (!this.sprite || !this.bubble || !this.text) {
       console.error('NPC DOM elements not properly structured')
@@ -173,6 +173,48 @@ export class NPCController {
       },
       0
     )
+
+    // Smooth rotation back to zero
+    tl.to(this.container, { rotateZ: 0, duration: 0.4, ease: 'power2.out' })
+  }
+
+  /**
+   * Animate NPC entering from the top (slides down)
+   * @param {number} duration - Animation duration (default 3.0)
+   * @param {number} finalTop - Final top position in px (default 50)
+   */
+  enterFromTop(duration = 3.0, finalTop = 50) {
+    if (!this.isInitialized) return
+
+    const tl = gsap.timeline()
+
+    tl.to(
+      this.container,
+      {
+        top: finalTop,
+        duration: duration,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      },
+      0
+    )
+
+    const wobbleCycles = Math.floor(duration / 0.6)
+    tl.to(
+      this.container,
+      {
+        rotateZ: 3,
+        duration: 0.6,
+        repeat: wobbleCycles - 1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        transformOrigin: 'top center'
+      },
+      0
+    )
+
+    // Smooth rotation back to zero
+    tl.to(this.container, { rotateZ: 0, duration: 0.4, ease: 'power2.out' })
   }
 
   /**

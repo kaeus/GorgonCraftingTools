@@ -16,7 +16,7 @@ export class NPCMessage {
     this.npcName = npcName
     this.options = {
       position: options.position || 'bottom-right', // bottom-right, bottom-left, top-right, top-left, etc.
-      imagesPath: options.imagesPath || './images/npcs/',
+      imagesPath: options.imagesPath || './images/npcs/max/',
       imagePrefix: options.imagePrefix || 'max_',
       talkTime: options.talkTime || 5000,
       delayBeforeStart: options.delayBeforeStart || 1000,

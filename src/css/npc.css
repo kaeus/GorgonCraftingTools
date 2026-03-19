@@ -1,6 +1,6 @@
 /* ── NPC System Styles ── */
 
-#npc-container {
+.npc-container {
   position: fixed;
   z-index: 9999;
   pointer-events: none;
@@ -8,7 +8,7 @@
   right: -400px;
 }
 
-#npc-sprite {
+.npc-sprite {
   width: 258px;
   height: auto;
   display: block;
@@ -18,10 +18,11 @@
 }
 
 /* Speech Bubble */
-#npc-bubble {
+.npc-bubble {
   position: absolute;
   bottom: 280px;
-  right: 0px;
+  left: 50%;
+  transform: translateX(-50%);
   max-width: 300px;
   background: #1a1a1a;
   border: 2px solid #505050;
@@ -34,11 +35,11 @@
   font-size: 1rem;
 }
 
-#npc-bubble::after {
+.npc-bubble::after {
   display: none;
 }
 
-#npc-bubble::before {
+.npc-bubble::before {
   display: none;
 }
 
@@ -51,7 +52,7 @@
   100% { transform: translateX(0) rotate(0deg); }
 }
 
-#npc-text {
+.npc-text {
   font-family: 'Cinzel', serif;
   color: #e8e8e8;
   font-size: 0.85rem;
@@ -61,70 +62,72 @@
 }
 
 /* NPC Container Positions */
-#npc-container.position-bottom-right {
+.npc-container.position-bottom-right {
   bottom: 0;
 }
 
-#npc-container.position-bottom-left {
+.npc-container.position-bottom-left {
   bottom: 0;
-  left: 0;
-}
-
-#npc-container.position-bottom-left #npc-bubble {
+  left: 50px;
   right: auto;
-  left: -20px;
 }
 
-#npc-container.position-bottom-left #npc-bubble::after {
+.npc-container.position-bottom-left .npc-bubble {
+  right: auto;
+  left: 0px;
+}
+
+.npc-container.position-bottom-left .npc-bubble::after {
   right: auto;
   left: 30px;
 }
 
-#npc-container.position-bottom-left #npc-bubble::before {
+.npc-container.position-bottom-left .npc-bubble::before {
   right: auto;
   left: 26px;
 }
 
-#npc-container.position-top-right {
-  top: 0;
-  right: 0;
+.npc-container.position-top-right {
+  top: -400px;
+  bottom: auto;
+  right: -250px;
 }
 
-#npc-container.position-top-right #npc-bubble {
+.npc-container.position-top-right .npc-bubble {
   bottom: auto;
   top: 150px;
 }
 
-#npc-container.position-top-right #npc-bubble::after {
+.npc-container.position-top-right .npc-bubble::after {
   bottom: auto;
   top: -8px;
 }
 
-#npc-container.position-top-right #npc-bubble::before {
+.npc-container.position-top-right .npc-bubble::before {
   bottom: auto;
   top: -12px;
 }
 
-#npc-container.position-top-left {
+.npc-container.position-top-left {
   top: 0;
   left: 0;
 }
 
-#npc-container.position-top-left #npc-bubble {
+.npc-container.position-top-left .npc-bubble {
   bottom: auto;
   top: 150px;
   right: auto;
   left: -20px;
 }
 
-#npc-container.position-top-left #npc-bubble::after {
+.npc-container.position-top-left .npc-bubble::after {
   bottom: auto;
   top: -8px;
   right: auto;
   left: 30px;
 }
 
-#npc-container.position-top-left #npc-bubble::before {
+.npc-container.position-top-left .npc-bubble::before {
   bottom: auto;
   top: -12px;
   right: auto;
@@ -141,6 +144,42 @@
   }
 }
 
-#npc-sprite.idle {
+.npc-sprite.idle {
   animation: npc-idle 0.6s ease-in-out infinite;
 }
+
+/* Per-NPC size overrides */
+#npc-bell {
+  position: fixed !important;
+}
+
+#npc-bell .npc-sprite {
+  width: 181px;
+  height: auto;
+  position: relative;
+  transition: filter 0.2s ease;
+}
+
+#npc-bell:hover .npc-sprite {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.5));
+}
+
+#npc-bell.no-glow:hover .npc-sprite {
+  filter: none;
+}
+
+#npc-max {
+  pointer-events: none;
+}
+
+#npc-max .npc-sprite {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+#npc-max.glow .npc-sprite {
+  filter: drop-shadow(0 0 6px rgba(180, 60, 60, 0.9)) drop-shadow(0 0 12px rgba(180, 60, 60, 0.5));
+}
+
+

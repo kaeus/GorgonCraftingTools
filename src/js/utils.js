@@ -203,3 +203,6 @@ export function clearModalError(elementId) {
   el.textContent = ''
   el.style.display = 'none'
 }
+
+// Re-export scroll edge utilities from their dedicated module
+export { generateRandomClipPath, generateDenseClipPath, getRandomNail, getNailPositionStyle, getRandomParchmentPosition, getCardDishevelStyle } from './scroll-edge.js'

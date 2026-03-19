@@ -9,18 +9,20 @@ import { NPCController } from './npc-controller.js'
 import { getRandomDialogue } from './npc-dialogue.js'
 
 export class MarketNPC {
-  constructor(containerId = 'npc-container') {
+  constructor(containerId = 'npc-max') {
     this.controller = new NPCController(containerId)
     this.containerElement = document.getElementById(containerId)
-    this.spriteElement = document.getElementById('npc-sprite')
+    this.spriteElement = this.containerElement ? this.containerElement.querySelector('.npc-sprite') : null
     this.flyingFrames = ['max_flying_1.png', 'max_flying_2.png', 'max_flying_3.png']
     this.baseFrame = 'max_0.png'
-    this.imagePath = '/images/npcs/'
+    this.imagePath = '/images/npcs/max/'
     
     this.scrollTimeout = null
     this.currentFrameIndex = 0
     this.isFlying = false
     this.bobbingTimeline = null
+    this.flySound = null
+    this.isPresent = false
     
     // Ensure sprite is visible by default
     if (this.spriteElement) {
@@ -28,6 +30,76 @@ export class MarketNPC {
     }
     
     this.initScrollListener()
+    this.initClickListener()
+  }
+
+  /**
+   * Listen for click to dismiss Max with a goodbye.
+   * Uses canvas hit-testing to only respond on non-transparent pixels.
+   */
+  initClickListener() {
+    if (!this.containerElement || !this.spriteElement) return
+
+    // Build an offscreen canvas for pixel hit-testing
+    this._hitCanvas = document.createElement('canvas')
+    this._hitCtx = this._hitCanvas.getContext('2d', { willReadFrequently: true })
+
+    this.spriteElement.addEventListener('mousemove', (e) => {
+      if (this._isOverOpaque(e)) {
+        this.containerElement.classList.add('glow')
+      } else {
+        this.containerElement.classList.remove('glow')
+      }
+    })
+
+    this.spriteElement.addEventListener('mouseleave', () => {
+      this.containerElement.classList.remove('glow')
+    })
+
+    this.spriteElement.addEventListener('click', (e) => {
+      if (this._isOverOpaque(e)) {
+        this.dismiss()
+      }
+    })
+  }
+
+  /**
+   * Check if the mouse is over a non-transparent pixel of the sprite
+   */
+  _isOverOpaque(e) {
+    const img = this.spriteElement
+    if (!img.naturalWidth) return false
+
+    const rect = img.getBoundingClientRect()
+    const x = Math.round((e.clientX - rect.left) / rect.width * img.naturalWidth)
+    const y = Math.round((e.clientY - rect.top) / rect.height * img.naturalHeight)
+
+    this._hitCanvas.width = img.naturalWidth
+    this._hitCanvas.height = img.naturalHeight
+    this._hitCtx.drawImage(img, 0, 0)
+
+    const pixel = this._hitCtx.getImageData(x, y, 1, 1).data
+    return pixel[3] > 20 // alpha threshold
+  }
+
+  /**
+   * Dismiss Max — say goodbye then exit
+   */
+  dismiss() {
+    if (this._isDismissing || !this.isPresent) return
+    this._isDismissing = true
+
+    const dialogue = getRandomDialogue('marketGoodbye')
+    this.controller.speak(dialogue, 3000)
+
+    setTimeout(() => {
+      this.controller.exitToRight(2.0)
+      this._hasEntered = false
+      this.isPresent = false
+      setTimeout(() => {
+        this._isDismissing = false
+      }, 2000)
+    }, 3000)
   }
 
   /**
@@ -37,10 +109,13 @@ export class MarketNPC {
     let scrollTimeout
     
     window.addEventListener('scroll', () => {
+      if (!this.isPresent) return
+
       // Start flying animation
       if (!this.isFlying) {
         this.isFlying = true
         this.startFlyingAnimation()
+        this.startFlySound()
       }
 
       // Clear existing timeout
@@ -50,6 +125,7 @@ export class MarketNPC {
       scrollTimeout = setTimeout(() => {
         this.revertToBase()
         this.isFlying = false
+        this.stopFlySound()
       }, 500)
     }, { passive: true })
   }
@@ -155,11 +231,34 @@ export class MarketNPC {
     this.stopBobbing()
   }
 
+  startFlySound() {
+    if (!this._hasEntered) return
+    if (!this.flySound) {
+      this.flySound = new Audio('/sounds/max_fly.mp3')
+      this.flySound.loop = true
+    }
+    this.flySound.volume = 1
+    this.flySound.play().catch(() => {})
+  }
+
+  stopFlySound() {
+    if (!this.flySound) return
+    gsap.to(this.flySound, {
+      volume: 0,
+      duration: 0.5,
+      onComplete: () => {
+        this.flySound.pause()
+        this.flySound.currentTime = 0
+      }
+    })
+  }
+
   /**
    * Initialize entrance animation (called on page load)
    */
   enterScreen() {
-    this.controller.enterFromRight(3.6, 50)
+    this.isPresent = true
+    this.controller.enterFromRight(3.6, -30)
   }
 
   /**
@@ -167,6 +266,14 @@ export class MarketNPC {
    */
   speak(duration = 7000) {
     const dialogue = getRandomDialogue('market')
+    this.controller.speak(dialogue, duration)
+  }
+
+  /**
+   * Show random annoyed dialogue when bell is rung while Max is on screen
+   */
+  speakAnnoyed(duration = 5000) {
+    const dialogue = getRandomDialogue('marketAnnoyed')
     this.controller.speak(dialogue, duration)
   }
 

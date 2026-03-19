@@ -8,102 +8,195 @@
     body { visibility: hidden; background-color: #000; }
     #global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
     
-    /* Two-Column Layout */
+    /* Page Layout - fit to viewport */
     .page {
-      max-width: 1000px !important;
+      max-width: 960px !important;
       margin: 0 auto !important;
+      padding-top: 0.75rem !important;
+      padding-bottom: 0.5rem !important;
     }
     
-    .page > h1, .page > .subtitle {
+    .page > h1 {
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 0.15rem;
+      font-size: 1.5rem;
     }
     
+    .page > .subtitle {
+      text-align: center;
+      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+    }
+    
+    /* Main listing info container - parchment background */
     #listing-info {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 2rem;
+      gap: 1.25rem;
+      position: relative;
+      background: #f3efe6;
+      background-image: url(/images/cards/weathered_parchment.png);
+      background-size: 200%;
+      background-position: 0 0;
+      color: #1a1a1a;
+      padding: 28px 28px 24px;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15), inset 0 0 30px rgba(0,0,0,0.25), inset 0 0 8px rgba(0,0,0,0.15);
+      overflow: visible;
+      transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+      filter: drop-shadow(0 18px 36px rgba(0,0,0,0.5)) drop-shadow(0 9px 18px rgba(0,0,0,0.4)) drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+    }
+    
+    #listing-info::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        45deg,
+        rgba(0,0,0,0.025),
+        rgba(0,0,0,0.025) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: 1;
+      border-radius: 8px;
+    }
+    
+    #listing-info::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.05), rgba(0,0,0,0.08));
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 2;
+      border-radius: 8px;
+    }
+    
+    #listing-info > * {
+      position: relative;
+      z-index: 3;
+    }
+    
+    #listing-info:hover {
+      transform: translateY(-1px) scale(1.005);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    
+    /* Card nail styling */
+    #listing-info .card-nail {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      z-index: 10;
+      pointer-events: none;
     }
     
     /* Item Panel (Left Column) */
     .item-panel {
       grid-column: 1;
+      background: rgba(26, 26, 26, 0.6);
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
     }
     
     /* Purchase Panel (Right Column) */
     .purchase-panel {
       grid-column: 2;
+      background: rgba(26, 26, 26, 0.6);
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
     }
     
-    /* Card Styling */
+    /* Card Styling - transparent since within parchment container */
     .card {
-      background: #0a0a0a;
-      border: 1px solid #303030;
-      border-radius: 8px;
-      padding: 1.25rem;
-      margin-bottom: 1.5rem;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin-bottom: 0;
+      box-shadow: none;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
     
     .card h3 {
-      font-size: 1.1rem;
-      margin: 0 0 1rem 0;
-      color: #e8e8e8;
+      font-size: 1rem;
+      margin: 0 0 0.75rem 0;
+      color: #f3efe6;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-weight: 600;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+      font-family: 'Cinzel', serif;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     /* Item Header Card */
     .item-header {
       display: flex;
-      align-items: stretch;
+      align-items: flex-start;
       gap: 1rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0;
     }
     
     .item-icon-container {
       flex-shrink: 0;
-      width: 180px;
+      width: 100px;
+      height: 100px;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
     }
     
     .item-icon-container img {
-      width: 100%;
-      height: 100%;
-      border-radius: 6px;
-      background: #151515;
-      border: 1px solid #303030;
+      width: 85%;
+      height: 85%;
       object-fit: contain;
-      padding: 4px;
     }
     
     .item-header-text {
-      flex: 0 0 200px;
-      padding-top: 0.5rem;
-      min-width: 0;
-      overflow: hidden;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     
     .item-header-text .item-name {
-      font-size: 1.5rem;
+      font-size: 1.35rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
-      color: #fff;
+      color: #f3efe6;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.05em;
     }
     
     .item-header-text .item-meta {
-      font-size: 1rem;
-      color: #a8a8a8;
-      line-height: 1.5;
+      font-size: 0.85rem;
+      color: #b8a89a;
+      line-height: 1.6;
+    }
+    
+    .item-header-text .item-meta div {
+      margin-bottom: 0.2rem;
     }
     
     /* Stats Card - 3 Column Grid */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
+      gap: 1rem;
     }
     
     .stat-col {
@@ -113,162 +206,195 @@
     }
     
     .stat-label {
-      color: #a8a8a8;
-      font-size: 0.85rem;
-      margin-bottom: 0.5rem;
+      color: #b8a89a;
+      font-size: 0.7rem;
+      margin-bottom: 0.25rem;
       text-transform: uppercase;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.08em;
+      font-weight: 700;
     }
     
     .stat-value {
-      color: #fff;
+      color: #f3efe6;
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 1rem;
+      font-family: 'Cinzel', serif;
     }
     
     /* Quantity Stepper */
     .quantity-stepper {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
+      gap: 0.4rem;
+      margin-bottom: 0.5rem;
     }
     
     .stepper-btn {
-      width: 40px;
-      height: 40px;
-      border: 1px solid #505050;
-      background: #0a0a0a;
-      color: #e8e8e8;
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.3);
+      color: #f3efe6;
       border-radius: 4px;
-      font-size: 1.2rem;
+      font-size: 1rem;
       cursor: pointer;
       transition: border-color 0.2s, background-color 0.2s;
     }
     
     .stepper-btn:hover {
-      border-color: #707070;
-      background: #151515;
+      border-color: rgba(255, 255, 255, 0.4);
+      background: rgba(0, 0, 0, 0.5);
     }
     
     .stepper-input {
-      width: 60px;
-      height: 40px;
+      width: 50px;
+      height: 32px;
       text-align: center;
-      border: 1px solid #505050;
-      background: #0a0a0a;
-      color: #e8e8e8;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.3);
+      color: #f3efe6;
       border-radius: 4px;
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 600;
     }
     
     .helper-text {
-      font-size: 0.85rem;
-      color: #a8a8a8;
-      margin-bottom: 1rem;
+      font-size: 0.8rem;
+      color: #b8a89a;
+      margin-bottom: 0.75rem;
     }
     
     #quantity-error {
       color: #ff6b6b;
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
     }
     
     /* Summary Card */
+    .summary-box {
+      background: rgba(0, 0, 0, 0.15);
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-top: auto;
+    }
+    
+    .summary-box h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.75rem;
+      color: #b8a89a;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-family: 'Cinzel', serif;
+    }
+    
     .summary-row {
       display: flex;
       justify-content: space-between;
-      padding: 0.75rem 0;
-      font-size: 0.95rem;
+      padding: 0.35rem 0;
+      font-size: 0.85rem;
     }
     
     .summary-row .label {
-      color: #a8a8a8;
+      color: #9a8a7a;
     }
     
     .summary-row .value {
-      color: #e8e8e8;
+      color: #f3efe6;
       text-align: right;
+      font-weight: 600;
     }
     
     .summary-total {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 1rem;
-      border-top: 2px solid #303030;
-      margin-top: 0.75rem;
+      padding: 0.6rem 0 0;
+      margin-top: 0.4rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
     }
     
     .summary-total .label {
-      font-size: 1.1rem;
+      font-size: 0.85rem;
       font-weight: 700;
-      color: #fff;
+      color: #b8a89a;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
     
     .summary-total .value {
-      font-size: 1.3rem;
+      font-size: 1.15rem;
       font-weight: 700;
-      color: #fff;
+      color: #f3efe6;
+      font-family: 'Cinzel', serif;
     }
     
     /* Form Fields */
     .form-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 0.75rem;
     }
     
     .form-group label {
       display: block;
-      font-size: 0.95rem;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-      color: #e8e8e8;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      color: #f3efe6;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
     }
     
     .form-group input[type="text"],
     .form-group textarea {
       width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #505050;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 5px;
-      background: #0a0a0a;
-      color: #e8e8e8;
+      background: rgba(0, 0, 0, 0.35);
+      color: #f3efe6;
       font-family: inherit;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    
+    .form-group input[type="text"]::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(243, 239, 230, 0.4);
     }
     
     .form-group input[type="text"]:focus,
     .form-group textarea:focus {
       outline: none;
-      border-color: #707070;
-      background: #101010;
+      border-color: rgba(243, 239, 230, 0.35);
+      background: rgba(0, 0, 0, 0.45);
+      box-shadow: 0 0 8px rgba(243, 239, 230, 0.1);
     }
     
     .form-group textarea {
-      min-height: 80px;
+      min-height: 50px;
+      max-height: 80px;
       resize: vertical;
     }
     
     /* Purchase Button */
     .purchase-button {
       width: 100%;
-      height: 52px;
-      font-size: 1.05rem;
+      height: 44px;
+      font-size: 0.95rem;
       font-weight: 700;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #5a9fd4 0%, #3a7fa8 100%);
-      border: none;
+      margin-bottom: 0.6rem;
+      background: linear-gradient(135deg, var(--color-accent-brown) 0%, var(--color-accent-brown-dark) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s;
-      color: #fff;
+      color: #f3efe6;
+      letter-spacing: 0.04em;
     }
     
     .purchase-button:hover:not(:disabled) {
-      background: linear-gradient(135deg, #6aabdc 0%, #4a8bb0 100%);
+      background: linear-gradient(135deg, var(--color-accent-brown-hover) 0%, var(--color-accent-brown) 100%);
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(90, 159, 212, 0.3);
+      box-shadow: 0 4px 12px rgba(90, 44, 44, 0.4);
     }
     
     .purchase-button:disabled {
@@ -278,8 +404,9 @@
     
     .purchase-confirmation {
       text-align: center;
-      font-size: 0.9rem;
-      color: #a8a8a8;
+      font-size: 0.8rem;
+      color: #9a8a7a;
+      line-height: 1.4;
     }
     
     /* Section Headers */
@@ -287,11 +414,17 @@
       display: none;
     }
     
+    /* Divider - hide on this page */
+    #divider-container {
+      display: none;
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
       #listing-info {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 1rem;
+        padding: 20px;
       }
       
       .item-panel {
@@ -306,13 +439,13 @@
         grid-template-columns: repeat(2, 1fr);
       }
       
-      .item-icon-container img {
+      .item-icon-container {
         width: 80px;
         height: 80px;
       }
       
       .item-header-text .item-name {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
       }
     }
     
@@ -339,9 +472,11 @@
   <div id="status" class="status-bar loading">Loading listing…</div>
 
   <div id="listing-info" style="display:none;">
+    <!-- Card nail -->
+    <img src="" alt="nail" class="card-nail" id="listing-card-nail">
+    
     <!-- LEFT COLUMN: Item Panel -->
     <div class="item-panel">
-      <!-- Item Header & Stats Card -->
       <div class="card">
         <div class="item-header">
           <div class="item-icon-container">
@@ -354,38 +489,37 @@
               <div>Server: <span id="server-name">—</span></div>
               <div>Price: <span id="item-price">—</span> councils</div>
               <div>Available: <span id="item-quantity-available">—</span> units</div>
-              <div style="margin-top: 0.75rem;">
-                <span class="stat-label">Quantity</span>
-                <div class="quantity-stepper" style="margin-top: 0.25rem;">
-                  <button type="button" class="stepper-btn" id="qty-minus" data-action="qty-minus" style="width: 32px; height: 32px; font-size: 1rem;">−</button>
-                  <input type="number" id="purchase-quantity" class="stepper-input" value="1" min="1" style="width: 50px; height: 32px;">
-                  <button type="button" class="stepper-btn" id="qty-plus" data-action="qty-plus" style="width: 32px; height: 32px; font-size: 1rem;">+</button>
-                </div>
-              </div>
             </div>
           </div>
-          
-          <!-- Summary Column -->
-          <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start;">
-            <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 6px;">
-              <h4 style="margin: 0 0 1rem 0; font-size: 0.9rem; color: #e8e8e8; text-transform: uppercase; letter-spacing: 0.05em;">Summary</h4>
-              <div class="summary-row">
-                <span class="label">Unit Price</span>
-                <span class="value"><span id="unit-price">—</span> councils</span>
-              </div>
-              <div class="summary-row">
-                <span class="label">Quantity</span>
-                <span class="value"><span id="qty-display">1</span> units</span>
-              </div>
-              <div class="summary-total">
-                <span class="label">Total</span>
-                <span class="value"><span id="total-price">—</span> councils</span>
-              </div>
-            </div>
-            <div class="stat-col" id="min-order-size-display" style="display:none; margin-top: 1rem;">
-              <span class="stat-label">Minimum Order</span>
-              <span class="stat-value"><span id="min-order-size">—</span> units</span>
-            </div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <span class="stat-label">Quantity</span>
+          <div class="quantity-stepper" style="margin-top: 0.3rem;">
+            <button type="button" class="stepper-btn" id="qty-minus" data-action="qty-minus">−</button>
+            <input type="number" id="purchase-quantity" class="stepper-input" value="1" min="1">
+            <button type="button" class="stepper-btn" id="qty-plus" data-action="qty-plus">+</button>
+          </div>
+          <div class="stat-col" id="min-order-size-display" style="display:none; margin-top: 0.5rem;">
+            <span class="stat-label">Minimum Order</span>
+            <span class="stat-value"><span id="min-order-size">—</span> units</span>
+          </div>
+        </div>
+
+        <!-- Summary Box -->
+        <div class="summary-box">
+          <h4>Summary</h4>
+          <div class="summary-row">
+            <span class="label">Unit Price</span>
+            <span class="value"><span id="unit-price">—</span> councils</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Quantity</span>
+            <span class="value"><span id="qty-display">1</span> units</span>
+          </div>
+          <div class="summary-total">
+            <span class="label">Total</span>
+            <span class="value"><span id="total-price">—</span> councils</span>
           </div>
         </div>
       </div>
@@ -393,7 +527,6 @@
 
     <!-- RIGHT COLUMN: Purchase Panel -->
     <div class="purchase-panel">
-      <!-- Purchase Form Card -->
       <div class="card">
         <h3>Complete Purchase</h3>
         <div id="purchase-form">
@@ -460,6 +593,30 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js"></script>
+
+<script type="module">
+  import { generateDenseClipPath, getRandomNail, getNailPositionStyle, getCardDishevelStyle } from './js/scroll-edge.js'
+  
+  // Apply parchment styling to #listing-info when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    const listingInfo = document.getElementById('listing-info')
+    
+    if (listingInfo) {
+      // Apply dense clip-path (3× points for larger parchment surface)
+      listingInfo.style.clipPath = generateDenseClipPath()
+      
+      // Apply dishevel styling
+      listingInfo.style.cssText += getCardDishevelStyle()
+      
+      // Apply nail styling
+      const nailImg = document.getElementById('listing-card-nail')
+      if (nailImg) {
+        nailImg.src = getRandomNail()
+        nailImg.style.cssText = getNailPositionStyle()
+      }
+    }
+  })
+</script>
 
 </body>
 </html>

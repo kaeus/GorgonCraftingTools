@@ -1,4 +1,6 @@
 import '../css/global.css'
+import '../css/parchment-theme.css'
+import '../css/npc.css'
 import * as AuthModule from './auth.js'
 import * as FirebaseModule from './firebase.js'
 import * as ListingsModule from './listings.js'
@@ -8,6 +10,7 @@ import * as OrderPageModule from './order-page.js'
 import * as ListingsManagerModule from './listings-manager.js'
 import * as SidebarModule from './sidebar.js'
 import { MarketNPC } from './npc-market.js'
+import { BellNPC } from './npc-bell.js'
 import * as ColiseumModule from './crooked-coliseum.js'
 
 /**
@@ -198,18 +201,44 @@ async function initializeApp() {
   // Initialize NPC system on market page
   const initNPC = () => {
     if (document.querySelector('.listings-grid')) {
-      const marketNPC = new MarketNPC('npc-container')
+      const marketNPC = new MarketNPC('npc-max')
       window.marketNPC = marketNPC
-
-      // Entrance animation: slide in from right while wobbling for entire 3.6 seconds
-      marketNPC.enterScreen()
-
-      // Speech bubble appears after entrance completes (3.6 seconds)
-      // Select a random dialogue from the market NPC's dialogue pool
-      setTimeout(() => {
-        marketNPC.speak(7000)
-      }, 3600)
     }
+
+    // Bell NPC on every page - inject HTML then initialize
+    if (!document.getElementById('npc-bell')) {
+      const bellHtml = document.createElement('div')
+      bellHtml.id = 'npc-bell'
+      bellHtml.className = 'npc-container position-top-right'
+      bellHtml.innerHTML = `
+        <img class="npc-sprite" src="./images/npcs/bell/bell_middle.png" alt="Bell">
+        <div class="npc-bubble">
+          <div class="npc-text"></div>
+        </div>
+      `
+      document.body.appendChild(bellHtml)
+    }
+    const bellNPC = new BellNPC('npc-bell')
+    window.bellNPC = bellNPC
+    bellNPC.enterScreen()
+
+    // When bell rings, Max slides in after a 0.5s delay
+    document.addEventListener('bell_ring', () => {
+      if (window.marketNPC && !window.marketNPC._hasEntered) {
+        window.marketNPC._hasEntered = true
+        // Wait for bell animation to finish + 0.5s pause
+        const bellDuration = 7 * 0.26 + 0.3 // wobble frames + settle
+        setTimeout(() => {
+          window.marketNPC.enterScreen()
+          setTimeout(() => {
+            window.marketNPC.speak(7000)
+          }, 3600)
+        }, (bellDuration + 0.5) * 1000)
+      } else if (window.marketNPC && window.marketNPC._hasEntered) {
+        // Max is already on screen — annoyed response
+        window.marketNPC.speakAnnoyed(5000)
+      }
+    })
   }
 
   // Wait for DOM to be fully loaded before initializing NPC
