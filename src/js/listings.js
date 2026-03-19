@@ -9,11 +9,149 @@ import { escapeHtml, PROFESSION_EMOJI, setStatus } from './utils.js'
 let allListingDocs = []
 let marketItemsDatabase = null // Cache for CDN items
 
+/**
+ * Generate edge profile with calm and rough zones
+ * Creates alternating smooth areas and heavily torn areas for realism
+ * @param {number} i - Point index along edge
+ * @param {number} pointsPerEdge - Total points on this edge
+ * @returns {number} Edge variation amount
+ */
+function edgeProfile(i, pointsPerEdge) {
+  const t = i / pointsPerEdge
+  // Create alternating zones: -1 → 1 around edge
+  const zone = Math.sin(t * Math.PI * 2)
+  
+  if (zone > 0.4) {
+    // Calm zone (almost straight) - subtle waviness only
+    return Math.sin(i * 0.1) * 0.2
+  } else {
+    // Rough zone (actual tearing) - heavy variation
+    return (
+      Math.sin(i * 0.08) * 1.2 +
+      Math.sin(i * 0.3) * 0.5 +
+      (Math.random() * 1.5 - 0.75)
+    )
+  }
+}
+
+/**
+ * Generate rare deep tears for missing-material realism
+ * 3% chance of creating bold inward chunks
+ * @param {number} i - Point index (unused but kept for consistency)
+ * @returns {number} Deep tear amount or 0
+ */
+function deepTear(i) {
+  if (Math.random() < 0.03) {
+    return -3 - Math.random() * 2 // Big inward chunk: -3 to -5
+  }
+  return 0
+}
+
+/**
+ * Generate a random tattered edge clip-path polygon with organic variation
+ * Creates ~160 coordinate pairs with calm/rough zones, rare deep tears, and natural parchment look
+ * Each edge has unique characteristics with quiet zones breaking the "hairy" appearance
+ * @returns {string} CSS clip-path polygon string
+ */
+function generateRandomClipPath() {
+  const points = []
+  const pointsPerEdge = 40 // Balanced detail level
+  
+  // TOP EDGE (Y = 0-2%) - DAMPENED for flatter appearance
+  for (let i = 0; i < pointsPerEdge; i++) {
+    const x = (i / pointsPerEdge) * 100
+    const profile = edgeProfile(i, pointsPerEdge)
+    const tear = deepTear(i)
+    // Top edges are typically flatter and less damaged
+    const variation = (profile + tear) * 0.6
+    const y = Math.max(0, Math.min(3, variation))
+    points.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`)
+  }
+  
+  // RIGHT EDGE (X = 100%)
+  for (let i = 0; i < pointsPerEdge; i++) {
+    const y = (i / pointsPerEdge) * 100
+    const profile = edgeProfile(i, pointsPerEdge)
+    const tear = deepTear(i)
+    const variation = Math.max(0, profile + tear)
+    const xOffset = Math.max(0, Math.min(5, variation))
+    const x = 100 - xOffset
+    points.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`)
+  }
+  
+  // BOTTOM EDGE (Y = 99-100%)
+  for (let i = 0; i < pointsPerEdge; i++) {
+    const x = 100 - ((i / pointsPerEdge) * 100)
+    const profile = edgeProfile(i, pointsPerEdge)
+    const tear = deepTear(i)
+    const variation = Math.max(0, profile + tear)
+    const y = Math.max(97, Math.min(101, 100 + variation))
+    points.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`)
+  }
+  
+  // LEFT EDGE (X = 0%)
+  for (let i = 0; i < pointsPerEdge; i++) {
+    const y = 100 - ((i / pointsPerEdge) * 100)
+    const profile = edgeProfile(i, pointsPerEdge)
+    const tear = deepTear(i)
+    const variation = Math.max(0, profile + tear)
+    const xOffset = Math.max(0, Math.min(5, variation))
+    points.push(`${xOffset.toFixed(2)}% ${y.toFixed(2)}%`)
+  }
+  
+  return `polygon(${points.join(', ')})`
+}
+
 function formatCommission(value) {
   if (!value) return '—'
   const num = parseFloat(String(value).replace('%', ''))
   if (isNaN(num)) return escapeHtml(value)
   return `${num}%`
+}
+
+/**
+ * Randomly select a nail image for the card
+ */
+function getRandomNail() {
+  const nails = ['nail_1.png', 'nail_2.png', 'nail_3.png', 'nail_4.png', 'nail_5.png', 'nail_6.png', 'nail_7.png', 'nail_8.png']
+  const randomNail = nails[Math.floor(Math.random() * nails.length)]
+  return `/images/nails/${randomNail}`
+}
+
+/**
+ * Generate random horizontal position and rotation for nail
+ */
+function getNailPositionStyle() {
+  const leftPosition = 45 + Math.random() * 10 // 45% to 55% from left (almost center)
+  const rotation = (Math.random() * 150) - 75 // -75 to +75 degrees
+  return `left: ${leftPosition}%; transform: translateX(-50%) rotate(${rotation}deg);`
+}
+
+/**
+ * Generate random background-position for weathered parchment image
+ */
+function getRandomParchmentPosition() {
+  const posX = Math.floor(Math.random() * 100)
+  const posY = Math.floor(Math.random() * 100)
+  return `${posX}% ${posY}%`
+}
+
+/**
+ * Generate random offset and rotation for disheveled card appearance
+ */
+function getCardDishevelStyle(isMarketPage = false) {
+  const offsetX = (Math.random() - 0.5) * 8 // -4px to 4px horizontal offset
+  const offsetY = (Math.random() - 0.5) * 12 // -6px to 6px vertical offset
+  const rotation = (Math.random() - 0.5) * 3 // -1.5deg to 1.5deg rotation
+  let transform = `transform: translate(${offsetX}px, ${offsetY}px) rotate(${rotation}deg);`
+  
+  // For market page item cards, add random background-position for parchment texture
+  if (isMarketPage) {
+    const bgPosition = getRandomParchmentPosition()
+    return `${transform} background-position: ${bgPosition};`
+  }
+  
+  return transform
 }
 
 
@@ -59,7 +197,7 @@ export async function loadListings() {
       })
 
     restoreServerFilter()
-    applyFilter()
+    await applyFilter()
     setStatus('status', '', 'ok')
   } catch (error) {
     console.error('Error loading listings:', error)
@@ -70,7 +208,7 @@ export async function loadListings() {
 /**
  * Filter listings by server, keyword search, and/or metacategory
  */
-export function applyFilter() {
+export async function applyFilter() {
   const serverFilter = document.getElementById('server-filter')
   const keywordSearch = document.getElementById('keyword-search')
   const metaCategorySelect = document.getElementById('metacategory-filter')
@@ -120,7 +258,7 @@ export function applyFilter() {
     }
   }
 
-  renderListings(filtered)
+  await renderListings(filtered)
 }
 
 /**
@@ -243,23 +381,70 @@ function buildKeywordsCollapsible(itemName, searchKeyword, selectedMetacategory)
     const isMatched = kw === matchedKeyword
     return `<div style="padding: 0.25rem 0; ${isMatched ? 'font-weight: bold;' : ''}">${escapeHtml(kw)}</div>`
   }).join('')
+  
+  // Encode keywords as base64 JSON for data attribute
+  const keywordsJson = btoa(JSON.stringify(allKeywords))
 
   return `
-    <details class="item-keywords-collapsible" style="margin-top: 0.5rem;">
-      <summary style="color: #a8a8a8; font-size: 0.85rem; cursor: pointer; user-select: none;">
+    <div class="item-keywords-hover" style="margin-top: 0.5rem; position: relative; display: inline;">
+      <span class="keywords-tag-hover" data-item-name="${escapeHtml(itemName)}" data-keywords="${keywordsJson}" style="color: #a8a8a8; font-size: 0.85rem; cursor: help; user-select: none; border-bottom: 1px dotted #a8a8a8; white-space: nowrap;">
         tags (${keywordCount})
-      </summary>
-      <div style="padding: 0.5rem 0.5rem 0 0.5rem; font-size: 0.8rem; color: #a8a8a8; border-left: 2px solid #505050; margin-left: 0.25rem; padding-left: 0.5rem;">
-        ${keywordsList}
-      </div>
-    </details>
+      </span>
+    </div>
   `
+}
+
+/**
+ * Attach event listeners for tags hover on item images
+ */
+function attachKeywordHoverListeners() {
+  const iconElements = document.querySelectorAll('img.item-icon-tags-trigger')
+  
+  iconElements.forEach((element) => {
+    let hideTimeout = null
+    
+    element.addEventListener('mouseenter', () => {
+      if (window.marketNPC) {
+        // Clear any pending hide timers
+        if (hideTimeout) {
+          clearTimeout(hideTimeout)
+          hideTimeout = null
+        }
+        
+        const itemName = element.dataset.itemName
+        const keywordsBase64 = element.dataset.keywords
+        const keywordsList = JSON.parse(atob(keywordsBase64))
+        
+        // If no keywords, show a message saying the item has no tags
+        if (!keywordsList || keywordsList.length === 0) {
+          const message = `According to the Mantid Codex, ${itemName} has no special tags.`
+          window.marketNPC.controller.showText(message)
+        } else {
+          // Format the message: "According to the Mantid Codex, the __item name__ tags are: [bulleted list]"
+          const tagsList = keywordsList.map(tag => `• ${tag}`).join('\n')
+          const message = `According to the Mantid Codex, the ${itemName} tags are:\n\n${tagsList}`
+          
+          // Show the message without auto-hide
+          window.marketNPC.controller.showText(message)
+        }
+      }
+    })
+    
+    element.addEventListener('mouseleave', () => {
+      if (window.marketNPC) {
+        // Start fade out countdown only after they leave
+        hideTimeout = setTimeout(() => {
+          window.marketNPC.controller.hideSpeech()
+        }, 5000)
+      }
+    })
+  })
 }
 
 /**
  * Render listings to the grid
  */
-export function renderListings(docs) {
+export async function renderListings(docs) {
   const grid = document.getElementById('listings-grid')
   if (!grid) return
 
@@ -277,21 +462,71 @@ export function renderListings(docs) {
   const searchKeyword = keywordSearch ? keywordSearch.value : null
   const selectedMetacategory = metaCategorySelect ? metaCategorySelect.value : null
 
+  // Fetch items data to get icons for market page
+  let itemIconMap = {}
+  if (isMarketPage) {
+    try {
+      const response = await fetch('https://cdn.projectgorgon.com/v461/data/items.json')
+      if (response.ok) {
+        const itemsData = await response.json()
+        // Build a map of item names to IconIds
+        for (const [key, item] of Object.entries(itemsData)) {
+          if (item && item.Name && item.IconId) {
+            itemIconMap[item.Name.toLowerCase()] = item.IconId
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Could not fetch items data for icons:', err)
+    }
+  }
+
   grid.innerHTML = docs.map(doc => {
     const d = doc.data()
     const emoji = isMarketPage ? '📦' : (PROFESSION_EMOJI[d.profession] || '🔨')
 
     if (isMarketPage) {
       const keywordDisplay = buildKeywordsCollapsible(d.itemName, searchKeyword, selectedMetacategory)
+      // Use stored iconId first, fallback to fetched icon map
+      const iconId = d.iconId || itemIconMap[d.itemName?.toLowerCase()]
+      const iconHtml = iconId 
+        ? `<img src="https://cdn.projectgorgon.com/v461/icons/icon_${iconId}.png" alt="${escapeHtml(d.itemName)}" style="width:40px; height:40px; border:1px solid #505050; border-radius:3px; object-fit:contain;" onerror="this.style.opacity='0.3'">`
+        : ''
+      
+      // Dynamically adjust font size based on item name length
+      const itemName = d.itemName || 'Item'
+      let fontSize = '0.85rem'
+      if (itemName.length > 25) {
+        fontSize = '0.6rem'
+      } else if (itemName.length > 18) {
+        fontSize = '0.65rem'
+      } else if (itemName.length > 12) {
+        fontSize = '0.75rem'
+      }
+      
+      // Extract keywords for hover tooltip
+      const item = findItemInDatabase(itemName)
+      const itemKeywords = (item && item.Keywords) ? item.Keywords : []
+      const keywordsJson = btoa(JSON.stringify(itemKeywords))
+      
+      // Create icon HTML with hover functionality for tags
+      const iconWithHover = iconId 
+        ? `<img src="https://cdn.projectgorgon.com/v461/icons/icon_${iconId}.png" alt="${escapeHtml(d.itemName)}" style="width:40px; height:40px; border:1px solid #505050; border-radius:3px; object-fit:contain; cursor: help;" data-item-name="${escapeHtml(itemName)}" data-keywords="${keywordsJson}" class="item-icon-tags-trigger" onerror="this.style.opacity='0.3'">`
+        : ''
       
       return `
-        <div class="listing-item-card">
-          <div class="item-name"><strong>${escapeHtml(d.itemName || 'Item')}</strong></div>
-          ${keywordDisplay}
-          <div class="item-details">${d.amount} available @ ${d.pricePerUnit} council each</div>
-          ${d.server ? `<div class="server">🌐 <span class="card-label">Server</span>${escapeHtml(d.server)}</div>` : ''}
+        <div class="listing-item-card card-edge" style="clip-path: ${generateRandomClipPath()}; ${getCardDishevelStyle(true)}">
+          <img src="${getRandomNail()}" alt="nail" class="card-nail" style="${getNailPositionStyle()}">
+          <div class="item-name">
+            ${iconWithHover || iconHtml}
+            <strong style="font-size: ${fontSize};">${escapeHtml(itemName)}</strong>
+          </div>
+          <div class="item-details">
+            <div>${d.amount} available</div>
+            <div>${d.pricePerUnit} councils per 1</div>
+          </div>
           <div class="card-footer">
-            <a href="/itemorder.html?id=${encodeURIComponent(doc.id)}" class="order-link">Place Order</a>
+            <a href="./itemorder.html?id=${encodeURIComponent(doc.id)}" class="order-link">Place Order</a>
           </div>
         </div>
       `
@@ -315,7 +550,8 @@ export function renderListings(docs) {
       </div>` : ''
 
     return `
-      <div class="listing-crafting-card">
+      <div class="listing-crafting-card card-edge" style="clip-path: ${generateRandomClipPath()}; ${getCardDishevelStyle()}">
+        <img src="${getRandomNail()}" alt="nail" class="card-nail" style="${getNailPositionStyle()}">
         <div class="card-header">
           <div class="profession-icon">
             ${emoji}
@@ -334,17 +570,22 @@ export function renderListings(docs) {
         </div>
         <div class="card-footer">
           ${d.server ? `<div class="server-tag">${escapeHtml(d.server)}</div>` : '<div></div>'}
-          <a href="/craftorder.html?id=${encodeURIComponent(doc.id)}" class="place-order-btn">Place Order</a>
+          <a href="./craftorder.html?id=${encodeURIComponent(doc.id)}" class="place-order-btn">Place Order</a>
         </div>
       </div>
     `
   }).join('')
+
+  // Attach hover listeners for tags (only if on market page)
+  if (window.location.pathname.includes('market.html')) {
+    attachKeywordHoverListeners()
+  }
 }
 
 /**
  * Search listings (if needed)
  */
-export function searchListings(query) {
+export async function searchListings(query) {
   const lowerQuery = query.toLowerCase()
   const filtered = allListingDocs.filter(doc => {
     const d = doc.data()
@@ -352,7 +593,7 @@ export function searchListings(query) {
            d.profession.toLowerCase().includes(lowerQuery) ||
            (d.description && d.description.toLowerCase().includes(lowerQuery))
   })
-  renderListings(filtered)
+  await renderListings(filtered)
 }
 
 /**
@@ -474,7 +715,7 @@ function hideMarketItemSuggestions() {
 /**
  * Select a market item and filter listings
  */
-function selectMarketItem(itemName) {
+export async function selectMarketItem(itemName) {
   const searchInput = document.getElementById('market-item-search')
   if (searchInput) {
     searchInput.value = itemName
@@ -485,19 +726,19 @@ function selectMarketItem(itemName) {
   const filtered = allListingDocs.filter(doc =>
     doc.data().itemName === itemName
   )
-  renderListings(filtered)
+  await renderListings(filtered)
 }
 
 /**
  * Clear market item search and show all listings
  */
-export function clearMarketItemSearch() {
+export async function clearMarketItemSearch() {
   const searchInput = document.getElementById('market-item-search')
   if (searchInput) {
     searchInput.value = ''
   }
   hideMarketItemSuggestions()
-  renderListings(allListingDocs)
+  await renderListings(allListingDocs)
 }
 
 let metaCategoryMapping = null
@@ -509,7 +750,7 @@ async function loadMetaCategoryMapping() {
   if (metaCategoryMapping) return metaCategoryMapping
 
   try {
-    const response = await fetch('/keywords_meta_category_mapping.json')
+    const response = await fetch('./keywords_meta_category_mapping.json')
     if (!response.ok) {
       console.warn('Using fallback meta-category mapping')
       return getDefaultMetaCategoryMapping()
@@ -572,8 +813,8 @@ export async function initCategoryFilters() {
   })
 
   // Handle metacategory change - apply filter immediately
-  metaCategorySelect.addEventListener('change', () => {
-    applyFilter()
+  metaCategorySelect.addEventListener('change', async () => {
+    await applyFilter()
   })
 }
 
@@ -602,19 +843,19 @@ export async function initKeywordSearch() {
   const keywordsList = Array.from(allKeywords).sort()
 
   let searchTimeout
-  searchInput.addEventListener('input', (e) => {
+  searchInput.addEventListener('input', async (e) => {
     clearTimeout(searchTimeout)
     const query = e.target.value.toLowerCase().trim()
 
     if (query.length === 0) {
       suggestionsDiv.style.display = 'none'
-      applyFilter()
+      await applyFilter()
       return
     }
 
-    searchTimeout = setTimeout(() => {
+    searchTimeout = setTimeout(async () => {
       showKeywordSuggestions(query, keywordsList, suggestionsDiv)
-      applyFilter()
+      await applyFilter()
     }, 100)
   })
 
@@ -660,8 +901,8 @@ function showKeywordSuggestions(searchTerm, keywordsList, suggestionsDiv) {
 
     // Add click listeners to suggestions
     suggestionsDiv.querySelectorAll('.keyword-suggestion').forEach(el => {
-      el.addEventListener('click', () => {
-        selectKeyword(el.dataset.keyword)
+      el.addEventListener('click', async () => {
+        await selectKeyword(el.dataset.keyword)
       })
     })
   }
@@ -682,24 +923,24 @@ function hideKeywordSuggestions() {
 /**
  * Select a keyword and filter listings
  */
-function selectKeyword(keyword) {
+async function selectKeyword(keyword) {
   const searchInput = document.getElementById('keyword-search')
   if (searchInput) {
     searchInput.value = keyword
   }
   hideKeywordSuggestions()
-  applyFilter()
+  await applyFilter()
 }
 
 /**
  * Clear keyword search and show all listings
  */
-export function clearKeywordSearch() {
+export async function clearKeywordSearch() {
   const searchInput = document.getElementById('keyword-search')
   if (searchInput) {
     searchInput.value = ''
   }
   hideKeywordSuggestions()
-  applyFilter()
+  await applyFilter()
 }
 

@@ -25,6 +25,7 @@
   <p class="subtitle">A tangled bazaar where coin speaks louder than conscience. Rare goods, questionable wares, and items better left unasked about pass from shadowed hands to eager buyers. If you can pay the price, someone here can sell you almost anything.</p>
   <p class="subtitle">If what you seek isn't here, one of the bazaar's many acquisition specialists, known as "fetchers", can find it. Of course, the pay must be high enough to earn their attention.... and their silence.</p>
 
+  <div id="divider-container"></div>
   <div id="status" class="status-bar loading">Loading listings…</div>
 
   <!-- Item Search -->
@@ -96,17 +97,6 @@
     <h2>Featured "Merchants"</h2>
     <button class="action-btn" onclick="document.getElementById('listing-type-modal').classList.add('open')">+ Create New Listing</button>
   </div>
-  <div class="filter-bar">
-    <label for="server-filter">Server</label>
-    <select id="server-filter">
-      <option value="">All Servers</option>
-      <option>Arisetsu</option>
-      <option>Dreva</option>
-      <option>Laeth</option>
-      <option>Miraverre</option>
-      <option>Strekios</option>
-    </select>
-  </div>
   <div class="listings-grid" id="listings-grid">
     <div class="empty-state">Loading…</div>
   </div>
@@ -161,7 +151,7 @@
 
 <!-- ── NPC Message System ── -->
 <div id="npc-container" class="position-bottom-right">
-  <img id="npc-sprite" src="./images/black_wing_market_maxillae/max_0.png" alt="Maxillae">
+  <img id="npc-sprite" src="./images/npcs/max_0.png" alt="Maxillae">
   <div id="npc-bubble">
     <div id="npc-text"></div>
   </div>
@@ -171,7 +161,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="/firebase-config.js"></script>
+<script src="./firebase-config.js"></script>
 
 </body>
 </html>

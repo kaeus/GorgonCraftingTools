@@ -4,21 +4,23 @@
   position: fixed;
   z-index: 9999;
   pointer-events: none;
-  bottom: 20px;
+  bottom: 50px;
   right: -400px;
 }
 
 #npc-sprite {
-  width: 304px;
+  width: 258px;
   height: auto;
   display: block;
   image-rendering: pixelated;
+  filter: drop-shadow(0 12px 12px rgba(0, 0, 0, 0.9));
+  opacity: 1;
 }
 
 /* Speech Bubble */
 #npc-bubble {
   position: absolute;
-  bottom: 330px;
+  bottom: 280px;
   right: 0px;
   max-width: 300px;
   background: #1a1a1a;

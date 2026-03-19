@@ -82,10 +82,13 @@ export class NPCController {
   speak(text, duration = 3000) {
     if (!this.isInitialized) return
 
+    // Kill any existing animations and scheduled hide calls on the bubble
+    gsap.killTweensOf(this.bubble)
+
     // Set the text
     this.text.innerText = text
 
-    // Fade in bubble
+    // Ensure bubble is visible and fade in
     gsap.to(this.bubble, {
       opacity: 1,
       duration: 0.4,
@@ -95,6 +98,27 @@ export class NPCController {
     // Auto-hide after duration
     gsap.delayedCall(duration / 1000, () => {
       this.hideSpeech()
+    })
+  }
+
+  /**
+   * Show dialogue text without auto-hiding
+   * @param {string} text - The dialogue text to display
+   */
+  showText(text) {
+    if (!this.isInitialized) return
+
+    // Kill any existing animations and scheduled hide calls on the bubble
+    gsap.killTweensOf(this.bubble)
+
+    // Set the text
+    this.text.innerText = text
+
+    // Ensure bubble is visible and fade in
+    gsap.to(this.bubble, {
+      opacity: 1,
+      duration: 0.4,
+      ease: 'power2.out'
     })
   }
 
@@ -115,8 +139,9 @@ export class NPCController {
   /**
    * Animate NPC entering from the right
    * @param {number} duration - Animation duration (default 3.6)
+   * @param {number} finalRight - Final right position (default 50 for padding)
    */
-  enterFromRight(duration = 3.6) {
+  enterFromRight(duration = 3.6, finalRight = 50) {
     if (!this.isInitialized) return
 
     const tl = gsap.timeline()
@@ -125,7 +150,7 @@ export class NPCController {
     tl.to(
       this.container,
       {
-        right: 0,
+        right: finalRight,
         duration: duration,
         ease: 'power2.out',
         overwrite: 'auto'

@@ -19,10 +19,62 @@ export function setStatus(elementId, message, type = 'loading') {
   const el = document.getElementById(elementId)
   if (!el) return
 
-  el.textContent = message
-  el.className = `status-bar ${type}`
-  
-  if (type === 'error' || type === 'ok') {
+  if (type === 'ok') {
+    // Replace ok status with SVG divider in dedicated container
+    const dividerContainer = document.getElementById('divider-container')
+    if (!dividerContainer) return
+    
+    const currentPage = window.location.pathname
+    let svgHtml = ''
+    
+    if (currentPage.includes('market.html')) {
+      // Fantasy Curved Divider for market
+      svgHtml = `<div class="divider ornate">
+        <svg viewBox="0 0 400 40" preserveAspectRatio="none">
+          <path d="M10 20 
+                   H140 
+                   Q170 5 200 20 
+                   Q230 35 260 20 
+                   H390" />
+          <circle cx="200" cy="20" r="2.5" />
+        </svg>
+      </div>`
+    } else if (currentPage.includes('artisan_alley.html')) {
+      // Winged Divider for artisan alley
+      svgHtml = `<div class="divider winged">
+        <svg viewBox="0 0 500 40" preserveAspectRatio="none">
+          <path d="M20 20 
+                   Q60 5 100 20 
+                   T180 20 
+                   H320 
+                   Q360 5 400 20 
+                   T480 20" />
+          <circle cx="250" cy="20" r="3" />
+        </svg>
+      </div>`
+    } else if (currentPage.includes('yourListings.html')) {
+      // Layered Divider for your listings
+      svgHtml = `<div class="divider layered">
+        <svg viewBox="0 0 400 20" preserveAspectRatio="none">
+          <path class="back" d="M0 10 H400" />
+          <path class="front" d="M0 10 H400" />
+        </svg>
+      </div>`
+    } else {
+      // Minimal Elegant Divider for other pages
+      svgHtml = `<div class="divider">
+        <svg viewBox="0 0 400 20" preserveAspectRatio="none">
+          <path d="M0 10 H160 Q200 10 240 10 H400" />
+        </svg>
+      </div>`
+    }
+    
+    dividerContainer.innerHTML = svgHtml
+    dividerContainer.style.display = 'block'
+    el.style.display = 'none'
+  } else {
+    el.textContent = message
+    el.className = `status-bar ${type}`
     el.style.display = 'block'
   }
 }

@@ -5,7 +5,7 @@
  * Usage:
  * const npc = new NPCMessage('maxillae', {
  *   position: 'bottom-right',
- *   imagesPath: './images/black_wing_market_maxillae/',
+ *   imagesPath: './images/npcs/',
  *   talkTime: 5000
  * })
  * npc.init()
@@ -16,8 +16,8 @@ export class NPCMessage {
     this.npcName = npcName
     this.options = {
       position: options.position || 'bottom-right', // bottom-right, bottom-left, top-right, top-left, etc.
-      imagesPath: options.imagesPath || `./images/${npcName}/`,
-      imagePrefix: options.imagePrefix || 'max_', // prefix for max_0.png, max_1.png, etc.
+      imagesPath: options.imagesPath || './images/npcs/',
+      imagePrefix: options.imagePrefix || 'max_',
       talkTime: options.talkTime || 5000,
       delayBeforeStart: options.delayBeforeStart || 1000,
       slideInTime: options.slideInTime || 3000,

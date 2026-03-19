@@ -185,7 +185,7 @@ async function getGemSkillMapping() {
   if (gemSkillMapping) return gemSkillMapping
   
   try {
-    const response = await fetch('/gem_skill_mapping.json')
+    const response = await fetch('./gem_skill_mapping.json')
     if (!response.ok) throw new Error('Failed to fetch gem skill mapping')
     gemSkillMapping = await response.json()
     return gemSkillMapping

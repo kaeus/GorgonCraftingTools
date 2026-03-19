@@ -23,22 +23,12 @@
   <h1>Artisan Alley</h1>
   <p class="subtitle">Need something made rather than bought? Wander the lantern-lit stalls of Artisan Alley and find a craftsperson willing to take coin for their skill. From discreet repairs to bespoke creations, the right artisan can turn raw materials—and enough gold—into exactly what you need.</p>
 
+  <div id="divider-container"></div>
   <div id="status" class="status-bar loading">Loading listings…</div>
 
   <!-- Active listings -->
   <div class="section-header">
     <h2>Active Crafters</h2>
-  </div>
-  <div class="filter-bar">
-    <label for="server-filter">Server</label>
-    <select id="server-filter" onchange="applyFilter()">
-      <option value="">All Servers</option>
-      <option>Arisetsu</option>
-      <option>Dreva</option>
-      <option>Laeth</option>
-      <option>Miraverre</option>
-      <option>Strekios</option>
-    </select>
   </div>
   <div class="listings-grid" id="listings-grid">
     <div class="empty-state">Loading…</div>
@@ -101,7 +91,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="/firebase-config.js"></script>
+<script src="./firebase-config.js"></script>
 
 </body>
 </html>

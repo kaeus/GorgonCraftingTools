@@ -472,7 +472,7 @@ export function setCurrentUser(user) {
 export function initColiseum() {
   // Restore server preference
   const saved = localStorage.getItem('preferred-server')
-  const serverSelect = document.getElementById('coliseum-server-filter')
+  const serverSelect = document.getElementById('server-filter')
   if (serverSelect) {
     if (saved) {
       serverSelect.value = saved

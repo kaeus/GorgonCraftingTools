@@ -15,12 +15,17 @@ export class MarketNPC {
     this.spriteElement = document.getElementById('npc-sprite')
     this.flyingFrames = ['max_flying_1.png', 'max_flying_2.png', 'max_flying_3.png']
     this.baseFrame = 'max_0.png'
-    this.imagePath = './images/black_wing_market_maxillae/'
+    this.imagePath = '/images/npcs/'
     
     this.scrollTimeout = null
     this.currentFrameIndex = 0
     this.isFlying = false
     this.bobbingTimeline = null
+    
+    // Ensure sprite is visible by default
+    if (this.spriteElement) {
+      gsap.set(this.spriteElement, { opacity: 1 })
+    }
     
     this.initScrollListener()
   }
@@ -53,6 +58,13 @@ export class MarketNPC {
    * Cycle through flying frames continuously
    */
   startFlyingAnimation() {
+    // Ensure sprite is fully visible during flight
+    gsap.to(this.spriteElement, {
+      opacity: 1,
+      duration: 0.1,
+      overwrite: 'auto'
+    })
+
     // Start bobbing animation
     this.startBobbing()
 
@@ -132,6 +144,14 @@ export class MarketNPC {
     const basePath = this.imagePath + this.baseFrame
     this.spriteElement.src = basePath
     this.currentFrameIndex = 0
+    
+    // Ensure sprite maintains opacity while reverting
+    gsap.to(this.spriteElement, {
+      opacity: 1,
+      duration: 0.2,
+      overwrite: 'auto'
+    })
+    
     this.stopBobbing()
   }
 
@@ -139,7 +159,7 @@ export class MarketNPC {
    * Initialize entrance animation (called on page load)
    */
   enterScreen() {
-    this.controller.enterFromRight(3.6)
+    this.controller.enterFromRight(3.6, 50)
   }
 
   /**

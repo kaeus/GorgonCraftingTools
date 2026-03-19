@@ -1241,33 +1241,24 @@ export async function saveItemListing() {
   try {
     setStatus('status', 'Creating item listing…', 'loading')
     
-    // Look up item data to get icon URL/ID
+    // Look up item data to get icon ID
     let iconId = null
     try {
       const response = await fetch('https://cdn.projectgorgon.com/v461/data/items.json')
       if (response.ok) {
-        const data = await response.json()
-        let items = []
+        const itemsData = await response.json()
         
-        // Handle various response structures
-        if (Array.isArray(data)) {
-          items = data
-        } else if (data.items && Array.isArray(data.items)) {
-          items = data.items
-        } else if (data.data && Array.isArray(data.data)) {
-          items = data.data
-        } else {
-          const entries = Object.entries(data)
-          if (entries.length > 0) {
-            items = entries.map(([key, value]) => ({ key, ...value }))
+        // itemsData is an object with keys like "item_123", find the matching item by Name
+        for (const [key, item] of Object.entries(itemsData)) {
+          if (item && item.Name === itemName && item.IconId) {
+            iconId = item.IconId
+            console.log('Found icon ID for item:', itemName, 'iconId:', iconId)
+            break
           }
         }
         
-        // Find the matching item
-        const itemData = items.find(item => item.Name === itemName)
-        if (itemData && itemData.IconId) {
-          iconId = itemData.IconId
-          console.log('Found icon ID for item:', itemName, 'iconId:', iconId)
+        if (!iconId) {
+          console.warn('Could not find icon ID for item:', itemName)
         }
       }
     } catch (err) {
