@@ -7,8 +7,7 @@ import * as UtilsModule from './utils.js'
 import * as OrderPageModule from './order-page.js'
 import * as ListingsManagerModule from './listings-manager.js'
 import * as SidebarModule from './sidebar.js'
-import { NPCController } from './npc-controller.js'
-import { dialogue } from './npc-dialogue.js'
+import { MarketNPC } from './npc-market.js'
 import * as ColiseumModule from './crooked-coliseum.js'
 
 /**
@@ -199,15 +198,16 @@ async function initializeApp() {
   // Initialize NPC system on market page
   const initNPC = () => {
     if (document.querySelector('.listings-grid')) {
-      const npc = new NPCController('npc-container')
-      window.npc = npc
+      const marketNPC = new MarketNPC('npc-container')
+      window.marketNPC = marketNPC
 
       // Entrance animation: slide in from right while wobbling for entire 3.6 seconds
-      npc.enterFromRight(3.6)
+      marketNPC.enterScreen()
 
       // Speech bubble appears after entrance completes (3.6 seconds)
+      // Select a random dialogue from the market NPC's dialogue pool
       setTimeout(() => {
-        npc.speak(dialogue.welcome, 7000)
+        marketNPC.speak(7000)
       }, 3600)
     }
   }

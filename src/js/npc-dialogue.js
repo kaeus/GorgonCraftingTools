@@ -1,52 +1,67 @@
 /**
  * NPC Dialogue System
- * Centralized dialogue data for NPC interactions
+ * Centralized dialogue data for NPC interactions, organized by NPC/location
  */
 
-export const dialogue = {
-  // Welcome and greeting
-  welcome: "Welcome to the Black Wing Market.",
-  greetReturn: "Back for more... interesting wares?",
-  
-  // Search-related
-  searchPrompt: "Looking for something rare?",
-  noResults: "Hmm... I don't see that item listed.",
-  itemFound: "Ah, a fine choice.",
-  rareItem: "Ah... a rare find indeed.",
-  
-  // Marketplace actions
-  listingCreated: "A new offering appears in the shadows.",
-  purchaseComplete: "A wise acquisition.",
-  saleMade: "The deal is sealed.",
-  
-  // NPC Maxillae specific
-  networkTip: "The networks whisper... everything has a price.",
-  secrecy: "Discretion is our greatest commodity here.",
-  
-  // Fetcher-related
-  fetcherAvailable: "Need something found? We have... specialists.",
-  fetcherHired: "Excellent choice. Our people are quite resourceful.",
-  
-  // Flavor text
-  busy: "Give me a moment... I'm counting coin.",
-  watching: "I'm watching... always watching.",
-  mysterious: "Some secrets are better left in shadow.",
+/**
+ * Dialogue options for each NPC/location
+ * Each NPC has an array of dialogue lines that can be randomly selected
+ */
+export const npcDialogues = {
+  market: [
+    "Welcome to the Black Wing Market.",
+    "What Market?",
+    "Rare Goods, Questionable Prices",
+    "You Ask Too Many Questions",
+    "Please Mind Your Fingers While Counting Coins. *Snick*",
+    "Well... Time to Fetch Dr. Mantis Toboggan",
+    "Complain Loudly and Become the Meat Stall",
+    "You Didn't See Us.",
+    "One Meatman's Treasure is Another Meatman's Treasure",
+    "Shhhhhhhhhhhhhh.",
+    "If You Feel Fleeced, You Were.",
+    "Steal Once, Limp Forever.",
+    "Barter Hard. We Respect Courage.",
+    "Mind Your Coins. Mind Your Limbs.",
+    "Back for More... Interesting Wares?",
+    "Looking for Something Rare?",
+    "Hmm... I Don't See That Item Listed.",
+    "Ah, A Fine Choice.",
+    "Ah... A Rare Find Indeed.",
+    "A New Offering Appears in the Shadows.",
+    "A Wise Acquisition.",
+    "The Deal is Sealed.",
+    "The Networks Whisper... Everything Has a Price.",
+    "Discretion is Our Greatest Commodity Here.",
+    "Need Something Found? We Have... Specialists.",
+    "Excellent Choice. Our People Are Quite Resourceful.",
+    "Give Me a Moment... I'm Counting Coin.",
+    "I'm Watching... Always Watching.",
+    "Some Secrets Are Better Left in Shadow.",
+  ],
+  // Additional NPCs can be added here in the future
+  // artisanAlley: [...],
+  // crookedColiseum: [...],
 }
 
 /**
- * Get a random dialogue piece
- * @param {string} category - The dialogue category
- * @returns {string} - The dialogue text
+ * Get a random dialogue from a specific NPC's dialogue pool
+ * @param {string} npcLocation - The location/NPC identifier (e.g., 'market')
+ * @returns {string} - A random dialogue line from that NPC's pool
  */
-export function getDialogue(category) {
-  return dialogue[category] || dialogue.welcome
+export function getRandomDialogue(npcLocation = 'market') {
+  const dialogues = npcDialogues[npcLocation]
+  if (!dialogues || dialogues.length === 0) {
+    return npcDialogues.market[0] // Fallback to first market dialogue
+  }
+  return dialogues[Math.floor(Math.random() * dialogues.length)]
 }
 
 /**
- * Create custom dialogue event
- * @param {string} text - The dialogue text
- * @param {number} duration - Duration in ms to display (default 3000)
+ * Get all dialogues for a specific NPC
+ * @param {string} npcLocation - The location/NPC identifier
+ * @returns {array} - Array of all dialogue lines for that NPC
  */
-export function createCustomDialogue(text, duration = 3000) {
-  return { text, duration }
+export function getAllDialogues(npcLocation = 'market') {
+  return npcDialogues[npcLocation] || npcDialogues.market
 }
