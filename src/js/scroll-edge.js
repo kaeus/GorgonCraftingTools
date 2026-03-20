@@ -104,12 +104,12 @@ export function generateRandomClipPath() {
 
 /**
  * Generate a high-detail tattered edge clip-path polygon.
- * Uses 120 points per edge (~480 total) — 3× the standard density
+ * Uses 240 points per edge (~960 total) — 6× the standard density
  * for larger surfaces like full-page parchment containers.
  * @returns {string} CSS clip-path polygon string
  */
 export function generateDenseClipPath() {
-  return buildClipPath(120)
+  return buildClipPath(240)
 }
 
 /**

@@ -8,85 +8,95 @@
     body { visibility: hidden; background-color: #000; }
     #global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
     
-    /* Page Layout - fit to viewport */
-    .page {
-      max-width: 960px !important;
-      margin: 0 auto !important;
-      padding-top: 0.75rem !important;
-      padding-bottom: 0.5rem !important;
+    /* ═══════════════════════════════════════════════════════════
+       ORDERFORM PAGE STYLES - Namespaced with .orderform- prefix
+       ═══════════════════════════════════════════════════════════ */
+    
+    /* Page Layout */
+    .orderform-page {
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+      padding-top: 1rem;
+      padding-bottom: 2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
     
-    .page > h1 {
+    .orderform-title {
       text-align: center;
-      margin-bottom: 0.15rem;
-      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      font-size: 2rem;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #d6c8a8;
+      text-transform: uppercase;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
     
-    .page > .subtitle {
+    .orderform-subtitle {
       text-align: center;
-      margin-bottom: 0.75rem;
-      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+      color: #b8a680;
+      font-style: italic;
+      font-family: 'Crimson Text', Georgia, serif;
+      line-height: 1.6;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     }
     
-    /* Main listing info container - parchment background */
-    #listing-info {
+    /* Main Container */
+    .orderform-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.25rem;
+      gap: 3rem;
       position: relative;
-      background: #f3efe6;
-      background-image: url(/images/cards/weathered_parchment.png);
-      background-size: 200%;
-      background-position: 0 0;
-      color: #1a1a1a;
-      padding: 28px 28px 24px;
-      border-radius: 8px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.15), inset 0 0 30px rgba(0,0,0,0.25), inset 0 0 8px rgba(0,0,0,0.15);
+      background-image: url(./assets/textures/seemless%20parchment.png);
+      background-size: cover;
+      background-position: center;
+      background-attachment: scroll;
+      color: #2a2118;
+      padding: 50px 60px 45px;
+      border-radius: 2px;
+      border: none;
+      box-shadow: none;
       overflow: visible;
-      transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
-      filter: drop-shadow(0 18px 36px rgba(0,0,0,0.5)) drop-shadow(0 9px 18px rgba(0,0,0,0.4)) drop-shadow(0 3px 6px rgba(0,0,0,0.3));
     }
     
-    #listing-info::before {
+    .orderform-container::before {
       content: "";
       position: absolute;
       inset: 0;
-      background-image: repeating-linear-gradient(
-        45deg,
-        rgba(0,0,0,0.025),
-        rgba(0,0,0,0.025) 1px,
-        transparent 1px,
-        transparent 3px
-      );
-      opacity: 0.2;
+      background-image: url(./assets/textures/dusty_glass.png);
+      background-size: 400%;
+      background-position: var(--glass-pos-x, 50%) var(--glass-pos-y, 50%);
+      background-repeat: no-repeat;
+      opacity: 1;
       pointer-events: none;
       z-index: 1;
-      border-radius: 8px;
+      border-radius: 0;
+      mix-blend-mode: overlay;
     }
     
-    #listing-info::after {
+    .orderform-container::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.05), rgba(0,0,0,0.08));
-      mix-blend-mode: multiply;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%);
+      mix-blend-mode: overlay;
       pointer-events: none;
       z-index: 2;
-      border-radius: 8px;
+      border-radius: 0;
     }
     
-    #listing-info > * {
+    .orderform-container > * {
       position: relative;
       z-index: 3;
     }
     
-    #listing-info:hover {
-      transform: translateY(-1px) scale(1.005);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    }
-    
-    /* Card nail styling */
-    #listing-info .card-nail {
+    .orderform-nail {
       position: absolute;
       width: 60px;
       height: 60px;
@@ -94,319 +104,394 @@
       pointer-events: none;
     }
     
-    /* Item Panel (Left Column) */
-    .item-panel {
+    /* Columns */
+    .orderform-panel {
+      background: transparent;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      display: flex;
+      flex-direction: column;
+      box-shadow: none;
+    }
+    
+    .orderform-panel-left {
       grid-column: 1;
-      background: rgba(26, 26, 26, 0.6);
-      padding: 18px;
-      border-radius: 8px;
-      border: 1px solid rgba(0, 0, 0, 0.3);
-      display: flex;
-      flex-direction: column;
+      padding-right: 2rem;
+      border-right: 1px solid #8b5a2b;
     }
     
-    /* Purchase Panel (Right Column) */
-    .purchase-panel {
+    .orderform-panel-right {
       grid-column: 2;
-      background: rgba(26, 26, 26, 0.6);
-      padding: 18px;
-      border-radius: 8px;
-      border: 1px solid rgba(0, 0, 0, 0.3);
-      display: flex;
-      flex-direction: column;
+      padding-left: 2rem;
     }
     
-    /* Card Styling - transparent since within parchment container */
-    .card {
+    /* Card Section */
+    .orderform-card {
       background: transparent;
       border: none;
       padding: 0;
-      margin-bottom: 0;
+      margin-bottom: 2rem;
       box-shadow: none;
       flex: 1;
       display: flex;
       flex-direction: column;
+      border-radius: 0;
     }
     
-    .card h3 {
-      font-size: 1rem;
-      margin: 0 0 0.75rem 0;
-      color: #f3efe6;
+    .orderform-card:hover {
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .orderform-card-title {
+      font-size: 0.9rem;
+      margin: 0 0 1.2rem 0;
+      color: #3a2817;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.18em;
       font-weight: 700;
       font-family: 'Cinzel', serif;
-      padding-bottom: 0.6rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid #8b5a2b;
+      text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.3);
+      font-size: 0.88rem;
     }
     
-    /* Item Header Card */
-    .item-header {
+    /* Item Header */
+    .orderform-item-header {
       display: flex;
       align-items: flex-start;
       gap: 1rem;
       margin-bottom: 0;
     }
     
-    .item-icon-container {
+    .orderform-item-icon {
       flex-shrink: 0;
-      width: 100px;
-      height: 100px;
+      width: 110px;
+      height: 110px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0, 0, 0, 0.3);
-      border: 2px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
+      background: transparent;
+      border: 2px solid #8b5a2b;
+      border-radius: 0;
+      box-shadow: none;
+      position: relative;
     }
     
-    .item-icon-container img {
+    .orderform-item-icon img {
       width: 85%;
       height: 85%;
       object-fit: contain;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
     }
     
-    .item-header-text {
+    .orderform-item-text {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
     
-    .item-header-text .item-name {
-      font-size: 1.35rem;
+    .orderform-item-name {
+      font-size: 1.5rem;
       font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: #f3efe6;
+      margin-bottom: 0.6rem;
+      color: #2a2118;
       font-family: 'Cinzel', serif;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.2);
     }
     
-    .item-header-text .item-meta {
-      font-size: 0.85rem;
-      color: #b8a89a;
-      line-height: 1.6;
+    .orderform-item-meta {
+      font-size: 0.9rem;
+      color: #5a4a38;
+      line-height: 1.8;
+      font-family: 'Crimson Text', Georgia, serif;
     }
     
-    .item-header-text .item-meta div {
-      margin-bottom: 0.2rem;
+    .orderform-item-meta div {
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
     }
     
-    /* Stats Card - 3 Column Grid */
-    .stats-grid {
+    /* Stats */
+    .orderform-stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
     }
     
-    .stat-col {
+    .orderform-stat {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
     }
     
-    .stat-label {
-      color: #b8a89a;
-      font-size: 0.7rem;
-      margin-bottom: 0.25rem;
+    .orderform-stat-label {
+      color: #6b5a47;
+      font-size: 0.72rem;
+      margin-bottom: 0.3rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       font-weight: 700;
-    }
-    
-    .stat-value {
-      color: #f3efe6;
-      font-weight: 700;
-      font-size: 1rem;
       font-family: 'Cinzel', serif;
     }
     
-    /* Quantity Stepper */
-    .quantity-stepper {
+    .orderform-stat-value {
+      color: #2a2118;
+      font-weight: 700;
+      font-size: 1.05rem;
+      font-family: 'Cinzel', serif;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Quantity Control */
+    .orderform-quantity {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
-      margin-bottom: 0.5rem;
+      gap: 0.5rem;
+      margin-bottom: 0.8rem;
     }
     
-    .stepper-btn {
-      width: 32px;
-      height: 32px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: rgba(0, 0, 0, 0.3);
-      color: #f3efe6;
-      border-radius: 4px;
-      font-size: 1rem;
+    .orderform-quantity-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid #8b5a2b;
+      background: transparent;
+      color: #3a2817;
+      border-radius: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
       cursor: pointer;
-      transition: border-color 0.2s, background-color 0.2s;
+      transition: all 0.2s ease;
+      box-shadow: none;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
     }
     
-    .stepper-btn:hover {
-      border-color: rgba(255, 255, 255, 0.4);
-      background: rgba(0, 0, 0, 0.5);
+    .orderform-quantity-btn:hover {
+      border-color: #6b4423;
+      background: rgba(139, 90, 43, 0.12);
     }
     
-    .stepper-input {
-      width: 50px;
-      height: 32px;
+    .orderform-quantity-btn:active {
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+      transform: scale(0.95);
+    }
+    
+    .orderform-quantity-input {
+      width: 56px;
+      height: 36px;
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: rgba(0, 0, 0, 0.3);
-      color: #f3efe6;
-      border-radius: 4px;
-      font-size: 0.9rem;
-      font-weight: 600;
+      border: 1px solid #8b5a2b;
+      background: transparent;
+      color: #2a2118;
+      border-radius: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: 'Cinzel', serif;
+      transition: all 0.2s ease;
+      box-shadow: none;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
     }
     
-    .helper-text {
-      font-size: 0.8rem;
-      color: #b8a89a;
-      margin-bottom: 0.75rem;
+    .orderform-quantity-input:focus {
+      outline: none;
+      border-color: #6b4423;
+      background: rgba(139, 90, 43, 0.08);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .orderform-helper-text {
+      font-size: 0.82rem;
+      color: #6b5a47;
+      margin-bottom: 1rem;
+      font-style: italic;
     }
     
     #quantity-error {
-      color: #ff6b6b;
-      font-size: 0.8rem;
-      margin-top: 0.3rem;
+      color: #8a4a3a;
+      font-size: 0.82rem;
+      margin-top: 0.35rem;
+      font-weight: 500;
     }
     
-    /* Summary Card */
-    .summary-box {
-      background: rgba(0, 0, 0, 0.15);
-      padding: 0.75rem;
-      border-radius: 6px;
+    /* Summary */
+    .orderform-summary {
+      background: transparent;
+      padding: 1.5rem 0;
+      border-radius: 0;
       margin-top: auto;
+      border-top: 2px solid #8b5a2b;
+      border-bottom: 2px solid #8b5a2b;
+      box-shadow: none;
+      position: relative;
     }
     
-    .summary-box h4 {
-      margin: 0 0 0.5rem 0;
+    .orderform-summary-title {
+      margin: 0 0 0.9rem 0;
       font-size: 0.75rem;
-      color: #b8a89a;
+      color: #3a2817;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.12em;
       font-family: 'Cinzel', serif;
+      font-weight: 700;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
     }
     
-    .summary-row {
+    .orderform-summary-row {
       display: flex;
       justify-content: space-between;
-      padding: 0.35rem 0;
-      font-size: 0.85rem;
+      padding: 1rem 0;
+      font-size: 0.88rem;
+      border-bottom: 1px dotted #8b5a2b;
     }
     
-    .summary-row .label {
-      color: #9a8a7a;
+    .orderform-summary-row .label {
+      color: #6b5a47;
+      font-weight: 500;
     }
     
-    .summary-row .value {
-      color: #f3efe6;
+    .orderform-summary-row .value {
+      color: #3a2817;
       text-align: right;
-      font-weight: 600;
+      font-weight: 700;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
     }
     
-    .summary-total {
+    .orderform-summary-total {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.6rem 0 0;
-      margin-top: 0.4rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 1rem 0 0;
+      margin-top: 0.2rem;
+      border-top: 2px solid #8b5a2b;
     }
     
-    .summary-total .label {
+    .orderform-summary-total .label {
       font-size: 0.85rem;
       font-weight: 700;
-      color: #b8a89a;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    
-    .summary-total .value {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #f3efe6;
-      font-family: 'Cinzel', serif;
-    }
-    
-    /* Form Fields */
-    .form-group {
-      margin-bottom: 0.75rem;
-    }
-    
-    .form-group label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 700;
-      margin-bottom: 0.35rem;
-      color: #f3efe6;
+      color: #3a2817;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
     }
     
-    .form-group input[type="text"],
-    .form-group textarea {
+    .orderform-summary-total .value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #2a2118;
+      font-family: 'Cinzel', serif;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Form */
+    .orderform-form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .orderform-form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #6b5a47;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-family: 'Cinzel', serif;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+    
+    .orderform-form-group input[type="text"],
+    .orderform-form-group textarea {
       width: 100%;
-      padding: 0.55rem 0.65rem;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 5px;
-      background: rgba(0, 0, 0, 0.35);
-      color: #f3efe6;
-      font-family: inherit;
-      font-size: 0.85rem;
-      transition: all 0.2s;
+      padding: 0.7rem 0.85rem;
+      border: 1px solid #8b5a2b;
+      border-radius: 0;
+      background: transparent;
+      color: #3a2817;
+      font-family: 'Crimson Pro', 'Cormorant', Georgia, serif;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      box-shadow: none;
     }
     
-    .form-group input[type="text"]::placeholder,
-    .form-group textarea::placeholder {
-      color: rgba(243, 239, 230, 0.4);
+    .orderform-form-group input[type="text"]::placeholder,
+    .orderform-form-group textarea::placeholder {
+      color: rgba(58, 40, 23, 0.35);
     }
     
-    .form-group input[type="text"]:focus,
-    .form-group textarea:focus {
+    .orderform-form-group input[type="text"]:focus,
+    .orderform-form-group textarea:focus {
       outline: none;
-      border-color: rgba(243, 239, 230, 0.35);
-      background: rgba(0, 0, 0, 0.45);
-      box-shadow: 0 0 8px rgba(243, 239, 230, 0.1);
+      border-color: #6b4423;
+      background: rgba(248, 245, 240, 0.3);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
     }
     
-    .form-group textarea {
-      min-height: 50px;
-      max-height: 80px;
+    .orderform-form-group textarea {
+      min-height: 55px;
+      max-height: 85px;
       resize: vertical;
+      font-family: 'Crimson Text', Georgia, serif;
+      font-size: 0.9rem;
     }
     
     /* Purchase Button */
-    .purchase-button {
+    .orderform-purchase-button {
       width: 100%;
-      height: 44px;
+      height: 48px;
       font-size: 0.95rem;
       font-weight: 700;
-      margin-bottom: 0.6rem;
-      background: linear-gradient(135deg, var(--color-accent-brown) 0%, var(--color-accent-brown-dark) 100%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 6px;
+      margin-bottom: 0.8rem;
+      background: linear-gradient(135deg, #6b4423 0%, #5a3a1a 100%);
+      border: 1px solid #3a2817;
+      border-radius: 0;
       cursor: pointer;
-      transition: all 0.2s;
-      color: #f3efe6;
-      letter-spacing: 0.04em;
+      transition: all 0.25s ease;
+      color: #e8dcc8;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-family: 'Cinzel', serif;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      position: relative;
     }
     
-    .purchase-button:hover:not(:disabled) {
-      background: linear-gradient(135deg, var(--color-accent-brown-hover) 0%, var(--color-accent-brown) 100%);
+    .orderform-purchase-button:hover:not(:disabled) {
+      background: linear-gradient(135deg, #7e5433 0%, #6b4423 100%);
+      border-color: #2a1810;
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(90, 44, 44, 0.4);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
     
-    .purchase-button:disabled {
-      opacity: 0.5;
+    .orderform-purchase-button:active:not(:disabled) {
+      transform: translateY(0px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+    
+    .orderform-purchase-button:disabled {
+      opacity: 0.6;
       cursor: not-allowed;
     }
     
-    .purchase-confirmation {
+    .orderform-purchase-confirmation {
       text-align: center;
-      font-size: 0.8rem;
-      color: #9a8a7a;
-      line-height: 1.4;
+      font-size: 0.85rem;
+      color: #6b5a47;
+      line-height: 1.5;
+      background: transparent;
+      padding: 0.8rem 0;
+      border-radius: 0;
+      border-top: 1px dotted #8b5a2b;
+      font-style: italic;
+      box-shadow: none;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
     }
     
     /* Section Headers */
@@ -421,37 +506,82 @@
     
     /* Responsive */
     @media (max-width: 768px) {
-      #listing-info {
+      .orderform-container {
         grid-template-columns: 1fr;
-        gap: 1rem;
-        padding: 20px;
+        gap: 1.25rem;
+        padding: 24px;
       }
       
-      .item-panel {
+      .orderform-panel-left {
         grid-column: 1;
+        padding-right: 0;
+        border-right: none;
+        border-bottom: 1px solid #8b5a2b;
+        padding-bottom: 1.5rem;
       }
       
-      .purchase-panel {
+      .orderform-panel-right {
         grid-column: 1;
+        padding-left: 0;
+        padding-top: 1.5rem;
       }
       
-      .stats-grid {
+      .orderform-stats {
         grid-template-columns: repeat(2, 1fr);
       }
       
-      .item-icon-container {
-        width: 80px;
-        height: 80px;
+      .orderform-item-icon {
+        width: 90px;
+        height: 90px;
       }
       
-      .item-header-text .item-name {
-        font-size: 1.2rem;
+      .orderform-item-name {
+        font-size: 1.3rem;
+      }
+
+      .orderform-title {
+        font-size: 1.75rem;
       }
     }
     
     @media (max-width: 480px) {
-      .stats-grid {
+      .orderform-title {
+        font-size: 1.5rem;
+      }
+
+      .orderform-subtitle {
+        font-size: 0.85rem;
+      }
+
+      .orderform-container {
+        padding: 20px;
+      }
+      
+      .orderform-stats {
         grid-template-columns: 1fr;
+        gap: 0.8rem;
+      }
+
+      .orderform-item-icon {
+        width: 80px;
+        height: 80px;
+      }
+
+      .orderform-item-header {
+        gap: 0.8rem;
+      }
+
+      .orderform-item-name {
+        font-size: 1.15rem;
+      }
+
+      .orderform-card-title {
+        font-size: 1rem;
+      }
+
+      .orderform-purchase-button {
+        height: 44px;
+        font-size: 0.9rem;
       }
     }
   </style>
@@ -464,27 +594,27 @@
 
 <div class="topbar"></div>
 
-<div class="page">
-  <h1>Purchase Item</h1>
-  <p class="subtitle">Buy from a seller in Project Gorgon</p>
+<div class="orderform-page">
+  <h1 class="orderform-title">Purchase Item</h1>
+  <p class="orderform-subtitle">Buy from a seller in Project Gorgon</p>
 
   <div id="divider-container"></div>
   <div id="status" class="status-bar loading">Loading listing…</div>
 
-  <div id="listing-info" style="display:none;">
+  <div class="orderform-container" id="listing-info" style="display:none;">
     <!-- Card nail -->
-    <img src="" alt="nail" class="card-nail" id="listing-card-nail">
+    <img src="" alt="nail" class="orderform-nail" id="listing-card-nail">
     
     <!-- LEFT COLUMN: Item Panel -->
-    <div class="item-panel">
-      <div class="card">
-        <div class="item-header">
-          <div class="item-icon-container">
+    <div class="orderform-panel orderform-panel-left">
+      <div class="orderform-card">
+        <div class="orderform-item-header">
+          <div class="orderform-item-icon">
             <img id="item-icon" src="" alt="Item Icon">
           </div>
-          <div class="item-header-text">
-            <div class="item-name" id="item-name">—</div>
-            <div class="item-meta">
+          <div class="orderform-item-text">
+            <div class="orderform-item-name" id="item-name">—</div>
+            <div class="orderform-item-meta">
               <div>Seller: <span id="seller-name">—</span></div>
               <div>Server: <span id="server-name">—</span></div>
               <div>Price: <span id="item-price">—</span> councils</div>
@@ -494,30 +624,30 @@
         </div>
 
         <div style="margin-top: 1rem;">
-          <span class="stat-label">Quantity</span>
-          <div class="quantity-stepper" style="margin-top: 0.3rem;">
-            <button type="button" class="stepper-btn" id="qty-minus" data-action="qty-minus">−</button>
-            <input type="number" id="purchase-quantity" class="stepper-input" value="1" min="1">
-            <button type="button" class="stepper-btn" id="qty-plus" data-action="qty-plus">+</button>
+          <span class="orderform-stat-label">Quantity</span>
+          <div class="orderform-quantity" style="margin-top: 0.3rem;">
+            <button type="button" class="orderform-quantity-btn" id="qty-minus" data-action="qty-minus">−</button>
+            <input type="number" id="purchase-quantity" class="orderform-quantity-input" value="1" min="1">
+            <button type="button" class="orderform-quantity-btn" id="qty-plus" data-action="qty-plus">+</button>
           </div>
-          <div class="stat-col" id="min-order-size-display" style="display:none; margin-top: 0.5rem;">
-            <span class="stat-label">Minimum Order</span>
-            <span class="stat-value"><span id="min-order-size">—</span> units</span>
+          <div class="orderform-stat" id="min-order-size-display" style="display:none; margin-top: 0.5rem;">
+            <span class="orderform-stat-label">Minimum Order</span>
+            <span class="orderform-stat-value"><span id="min-order-size">—</span> units</span>
           </div>
         </div>
 
         <!-- Summary Box -->
-        <div class="summary-box">
-          <h4>Summary</h4>
-          <div class="summary-row">
+        <div class="orderform-summary">
+          <h4 class="orderform-summary-title">Summary</h4>
+          <div class="orderform-summary-row">
             <span class="label">Unit Price</span>
             <span class="value"><span id="unit-price">—</span> councils</span>
           </div>
-          <div class="summary-row">
+          <div class="orderform-summary-row">
             <span class="label">Quantity</span>
             <span class="value"><span id="qty-display">1</span> units</span>
           </div>
-          <div class="summary-total">
+          <div class="orderform-summary-total">
             <span class="label">Total</span>
             <span class="value"><span id="total-price">—</span> councils</span>
           </div>
@@ -526,23 +656,23 @@
     </div>
 
     <!-- RIGHT COLUMN: Purchase Panel -->
-    <div class="purchase-panel">
-      <div class="card">
-        <h3>Complete Purchase</h3>
+    <div class="orderform-panel orderform-panel-right">
+      <div class="orderform-card">
+        <h3 class="orderform-card-title">Complete Purchase</h3>
         <div id="purchase-form">
-          <div class="form-group">
+          <div class="orderform-form-group">
             <label for="character-name">Character Name <span style="color:#ff6b6b;">*</span></label>
             <input type="text" id="character-name" placeholder="e.g. Kilwind">
           </div>
 
-          <div class="form-group">
+          <div class="orderform-form-group">
             <label for="purchase-notes">Message to Seller <span style="color:#a8a8a8;">(optional)</span></label>
             <textarea id="purchase-notes" placeholder="Any special requests…"></textarea>
           </div>
 
-          <button class="action-btn purchase-button" data-action="submit-purchase" id="submit-purchase-btn">Complete Purchase</button>
+          <button class="action-btn orderform-purchase-button" data-action="submit-purchase" id="submit-purchase-btn">Complete Purchase</button>
 
-          <div class="purchase-confirmation">
+          <div class="orderform-purchase-confirmation">
             You will pay <span id="confirmation-total">—</span> councils for <span id="confirmation-quantity">1</span> <span id="confirmation-item">item</span>
           </div>
         </div>
@@ -607,6 +737,14 @@
       
       // Apply dishevel styling
       listingInfo.style.cssText += getCardDishevelStyle()
+      
+      // Apply random background position for dusty glass overlay
+      const randomX = Math.random() * 100
+      const randomY = Math.random() * 100
+      const before = listingInfo.parentElement.style.setProperty ? listingInfo : null
+      // Use CSS custom property to set position on ::before
+      listingInfo.style.setProperty('--glass-pos-x', `${randomX}%`)
+      listingInfo.style.setProperty('--glass-pos-y', `${randomY}%`)
       
       // Apply nail styling
       const nailImg = document.getElementById('listing-card-nail')
