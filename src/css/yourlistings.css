@@ -7,7 +7,14 @@
 @import url('./parchment-theme.css');
 @import url('./fantasy-dropdown.css');
 
-body { visibility: hidden; background-color: #000; }
+/* Override background for Your Listings page - swap wood for cluttered desk */
+body { 
+  visibility: hidden; 
+  background-color: #000;
+  background-image: linear-gradient(rgba(10, 10, 10, 0.50), rgba(10, 10, 10, 0.50)), url('../assets/textures/cluttered_desk.jpg') !important;
+  background-size: cover;
+  background-attachment: fixed;
+}
 #global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
 
 /* Parchment Container */
@@ -84,7 +91,7 @@ body { visibility: hidden; background-color: #000; }
 }
 
 .listings-parchment-wrapper tbody tr:hover {
-  background-color: rgba(139, 90, 43, 0.08);
+  background-color: rgba(139, 69, 69, 0.12);
 }
 
 .listings-parchment-wrapper th,
@@ -101,16 +108,16 @@ body { visibility: hidden; background-color: #000; }
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: #3a2817;
-  border-bottom: 2px solid #8b5a2b;
+  border-bottom: 2px solid #8b4545;
   background-color: rgba(255, 255, 255, 0.35);
 }
 
 /* Action Buttons */
 .listings-parchment-wrapper .action-btn,
 .listings-parchment-wrapper button:not(#create-listing-btn) {
-  background-color: #8b6b5a;
+  background-color: #8b4545;
   color: #f5f1e8;
-  border: 1px solid #6b5a4a;
+  border: 1px solid #6b3535;
   padding: 0.5rem 1rem;
   font-family: 'Cinzel', serif;
   font-weight: 600;
@@ -124,20 +131,22 @@ body { visibility: hidden; background-color: #000; }
 
 .listings-parchment-wrapper .action-btn:hover,
 .listings-parchment-wrapper button:not(#create-listing-btn):hover {
-  background-color: #8b7a6b;
+  background-color: #a05555;
   color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+  border-color: #d4af37;
 }
 
 .listings-parchment-wrapper .delete-btn {
-  background-color: #8b6a6a;
+  background-color: #a84545;
   color: #f5e6e0;
-  border-color: #7b5a5a;
+  border-color: #8b3535;
 }
 
 .listings-parchment-wrapper .delete-btn:hover {
-  background-color: #7b5a5a;
+  background-color: #c55555;
   color: #fff;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
 }
 
 .listings-parchment-wrapper .edit-btn {
@@ -147,8 +156,10 @@ body { visibility: hidden; background-color: #000; }
 }
 
 .listings-parchment-wrapper .edit-btn:hover {
-  background-color: #5a7a5a;
+  background-color: #7b9b7b;
   color: #fff;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+  border-color: #d4af37;
 }
 
 /* Status Badges */
@@ -167,6 +178,7 @@ body { visibility: hidden; background-color: #000; }
   background-color: #6b8b6b;
   color: #fff;
   border: 1px solid #5a7a5a;
+  box-shadow: 0 0 6px rgba(107, 139, 107, 0.5);
 }
 
 .listings-parchment-wrapper .status-inactive {
@@ -180,6 +192,7 @@ body { visibility: hidden; background-color: #000; }
   background-color: #6b8b6b;
   color: #fff;
   border-color: #5a7a5a;
+  box-shadow: 0 0 6px rgba(107, 139, 107, 0.5);
 }
 
 .listings-parchment-wrapper table .badge.inactive {
