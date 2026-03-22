@@ -84,8 +84,7 @@
   <div id="status" class="status-bar loading">Loading…</div>
 
   <div class="form-container" id="form-wrapper">
-    <img src="" alt="nail" class="form-nail" id="form-nail">
-    
+    <!-- Nail image created by JavaScript once page is loaded -->
     <h3 class="form-title">Account Settings</h3>
     <p class="form-subtitle">Update your profile information.</p>
 
@@ -226,7 +225,7 @@
 </script>
 
 <script type="module">
-  import { generateDenseClipPath, getRandomNail, getNailPositionStyle, getCardDishevelStyle } from './js/scroll-edge.js'
+  import { generateDenseClipPath, getCardDishevelStyle } from './js/scroll-edge.js'
   import * as AccountSettingsModule from './js/page-account-settings.js'
   import * as AccountSetupModule from './js/account-setup.js'
   import * as FirebaseModule from './js/firebase.js'
@@ -253,12 +252,6 @@
       formWrapper.style.setProperty('--glass-pos-y', `${randomY}%`)
       formWrapper.style.setProperty('--parchment-pos-x', `${Math.random() * 100}%`)
       formWrapper.style.setProperty('--parchment-pos-y', `${Math.random() * 100}%`)
-      
-      const nailImg = document.getElementById('form-nail')
-      if (nailImg) {
-        nailImg.src = getRandomNail()
-        nailImg.style.cssText = getNailPositionStyle()
-      }
     }
     
     // Initialize account settings

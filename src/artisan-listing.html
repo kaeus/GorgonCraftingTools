@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Artisan Listing - CraftingCorner</title>
+  <link rel="stylesheet" href="./css/itemform.css">
+  <link rel="stylesheet" href="./css/fantasy-dropdown.css">
+  <style>
+    body { visibility: hidden; background-color: #000; }
+    #global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
+  </style>
+  <script type="module" src="./js/main.js"></script>
+</head>
+<body>
+
+<!-- ── Global Loading Overlay ── -->
+<div id="global-loading-overlay"></div>
+
+<div class="topbar"></div>
+
+<div class="form-page">
+  <h1 class="form-page-title">Create New Listing</h1>
+  <p class="form-page-subtitle">Offer your crafting services in Artisan Alley</p>
+
+  <div id="divider-container"></div>
+  <div id="status" class="status-bar loading">Loading…</div>
+
+  <div class="form-container" id="form-wrapper">
+    <!-- Nail image created by JavaScript once page is loaded -->
+    
+    <h3 class="form-title">Create New Listing</h3>
+    <p class="form-subtitle">Offer your crafting services.</p>
+
+    <form id="artisan-listing-form">
+      <div class="form-group">
+        <label for="artisan-crafter-name">Crafter Name *</label>
+        <input type="text" id="artisan-crafter-name" placeholder="Your character name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="artisan-profession">Profession *</label>
+        <select id="artisan-profession" required>
+          <option value="">Select a profession</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="artisan-server">Server</label>
+        <select id="artisan-server">
+          <option value="">Select a server</option>
+          <option value="Arisetsu">Arisetsu</option>
+          <option value="Dreva">Dreva</option>
+          <option value="Laeth">Laeth</option>
+          <option value="Miraverre">Miraverre</option>
+          <option value="Strekios">Strekios</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="artisan-crafter-level">Crafter Level</label>
+        <input type="number" id="artisan-crafter-level" placeholder="e.g. 45" min="1">
+      </div>
+      
+      <div class="form-group">
+        <label for="artisan-availability">Availability</label>
+        <input type="text" id="artisan-availability" placeholder="e.g. 6 PM - 10 PM">
+      </div>
+      
+      <div class="form-group">
+        <label for="artisan-commission">Commission Rate % *</label>
+        <input type="number" id="artisan-commission" min="0" max="100" step="1" value="50" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="artisan-description">Description</label>
+        <textarea id="artisan-description" placeholder="Details about your crafting services..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="artisan-ingredient-filter">Ingredient Prices *</label>
+        <input type="text" id="artisan-ingredient-filter" placeholder="Filter ingredients...">
+        <div id="artisan-ingredient-pricing" style="border:1px solid #8b5a2b; border-radius:4px; padding:1rem; background:#0a0a0a; max-height:400px; overflow-y:auto; margin-top:0.5rem;">
+          <div style="color:#a8a8a8; text-align:center; padding:2rem;">Select a profession above to load ingredients</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="artisan-variable-ingredient-filter">Variable Ingredient Prices *</label>
+        <input type="text" id="artisan-variable-ingredient-filter" placeholder="Filter ingredients...">
+        <div id="artisan-variable-ingredient-pricing" style="border:1px solid #8b5a2b; border-radius:4px; padding:1rem; background:#0a0a0a; max-height:400px; overflow-y:auto; margin-top:0.5rem;">
+          <div style="color:#a8a8a8; text-align:center; padding:2rem;">Select a profession above to load ingredients</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label style="display:flex; align-items:center; gap:0.5rem;">
+          <input type="checkbox" id="artisan-active" checked>
+          <span>Active (visible to customers)</span>
+        </label>
+      </div>
+
+      <div class="form-error" id="artisan-form-error"></div>
+      
+      <div class="form-buttons">
+        <button type="submit" id="artisan-submit-btn" disabled>Create Listing</button>
+        <button type="button" onclick="window.location.href='yourListings.html'">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js"></script>
+
+<script>
+  // Auto-populate server dropdown from sidebar selection
+  document.addEventListener('DOMContentLoaded', () => {
+    const selectedServer = localStorage.getItem('selectedServer');
+    if (selectedServer) {
+      const serverSelect = document.getElementById('artisan-server');
+      if (serverSelect) {
+        serverSelect.value = selectedServer;
+      }
+    }
+  });
+</script>
+
+<script type="module">
+  import { generateDenseClipPath, getCardDishevelStyle } from './js/scroll-edge.js'
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const formWrapper = document.getElementById('form-wrapper')
+    
+    if (formWrapper) {
+      formWrapper.style.clipPath = generateDenseClipPath()
+      formWrapper.style.cssText += getCardDishevelStyle()
+      
+      const randomX = Math.random() * 100
+      const randomY = Math.random() * 100
+      formWrapper.style.setProperty('--glass-pos-x', `${randomX}%`)
+      formWrapper.style.setProperty('--glass-pos-y', `${randomY}%`)
+      formWrapper.style.setProperty('--parchment-pos-x', `${Math.random() * 100}%`)
+      formWrapper.style.setProperty('--parchment-pos-y', `${Math.random() * 100}%`)
+    }
+  })
+</script>
+
+<script type="module">
+  import * as FirebaseModule from './js/firebase.js'
+  import * as AuthModule from './js/auth.js'
+  
+  // Initialize Firebase FIRST
+  if (typeof FIREBASE_CONFIG !== 'undefined') {
+    FirebaseModule.initializeFirebase(FIREBASE_CONFIG)
+  }
+  
+  // Initialize auth module
+  AuthModule.initAuthModal()
+</script>
+
+<script type="module" src="./js/page-artisan-listing.js"></script>
+
+</body>
+</html>

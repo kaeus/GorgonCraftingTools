@@ -70,13 +70,14 @@ function buildClipPath(pointsPerEdge) {
     points.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`)
   }
 
-  // BOTTOM EDGE (Y = 99-100%)
+  // BOTTOM EDGE (Y = 95-100%) - Bites UPWARD with same roughness as sides
   for (let i = 0; i < pointsPerEdge; i++) {
     const x = 100 - ((i / pointsPerEdge) * 100)
     const profile = edgeProfile(i, pointsPerEdge)
     const tear = deepTear(i)
     const variation = Math.max(0, profile + tear)
-    const y = Math.max(97, Math.min(101, 100 + variation))
+    const yOffset = Math.max(0, Math.min(5, variation))
+    const y = Math.max(95, 100 - yOffset)
     points.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`)
   }
 

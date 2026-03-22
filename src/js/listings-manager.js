@@ -309,7 +309,7 @@ export function selectListingType(type) {
   }
 
   if (type === 'crafted') {
-    showListingForm(null)
+    window.location.href = 'artisan-listing.html'
   } else if (type === 'item') {
     window.location.href = 'itemfence.html'
   } else if (type === 'fetcher') {

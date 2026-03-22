@@ -6,6 +6,7 @@
 import * as Firebase from './firebase.js'
 import * as Auth from './auth.js'
 import { escapeHtml, setStatus } from './utils.js'
+import { getRandomNail, getNailPositionStyle } from './scroll-edge.js'
 
 let itemsWithIcons = null
 let selectedItemId = null
@@ -16,16 +17,35 @@ let selectedItemId = null
 export function initItemFencePage() {
   console.log('[ItemFence] Initializing item fence page...')
   
+  // Wait a tick for Firebase to be initialized
+  setTimeout(() => {
+    setupPageInitialization()
+  }, 50)
+}
+
+function setupPageInitialization() {
   // Set up auth state listener
   Firebase.onAuthStateChanged(user => {
     console.log('[ItemFence] Auth state changed, user:', user ? user.email : 'none')
     Auth.renderUserAuth(user)
     
+    // Auto-populate form fields from account settings
+    if (user) {
+      populateFromAccountSettings()
+    }
+    
     // Hide loading overlay when done
     setTimeout(() => {
       const overlay = document.getElementById('global-loading-overlay')
       if (overlay) overlay.style.display = 'none'
+      
+      const statusBar = document.getElementById('status')
+      if (statusBar) statusBar.style.display = 'none'
+      
       document.body.style.visibility = 'visible'
+      
+      // Create nail image only when page is ready to display
+      createNail()
     }, 200)
   })
 
@@ -198,6 +218,41 @@ function validateForm() {
 }
 
 /**
+ * Load and populate form fields from account settings
+ */
+async function populateFromAccountSettings() {
+  try {
+    const user = Firebase.getAuth()?.currentUser
+    if (!user) return
+
+    const db = Firebase.getFirestore()
+    if (!db) return
+
+    const userDoc = await db.collection('users').doc(user.uid).get()
+    if (!userDoc.exists) return
+
+    const data = userDoc.data()
+    
+    // Populate Character Name if not already filled
+    const charNameInput = document.getElementById('item-character-name')
+    if (charNameInput && !charNameInput.value && data.primaryCharacterName) {
+      charNameInput.value = data.primaryCharacterName
+    }
+    
+    // Populate Availability if not already filled
+    const availabilityInput = document.getElementById('item-pst')
+    if (availabilityInput && !availabilityInput.value && data.primaryAvailability) {
+      availabilityInput.value = data.primaryAvailability
+    }
+    
+    // Revalidate form after population
+    validateForm()
+  } catch (error) {
+    console.warn('[ItemFence] Error loading account settings:', error)
+  }
+}
+
+/**
  * Save item listing to Firestore
  */
 async function saveItemListing() {
@@ -291,6 +346,22 @@ async function saveItemListing() {
     errorEl.style.display = 'block'
     setStatus('status', 'Error creating listing', 'error')
   }
+}
+
+/**
+ * Create nail image element
+ */
+function createNail() {
+  const formWrapper = document.getElementById('form-wrapper')
+  if (!formWrapper) return
+  
+  const nailImg = document.createElement('img')
+  nailImg.src = getRandomNail()
+  nailImg.alt = 'nail'
+  nailImg.id = 'form-nail'
+  nailImg.className = 'form-nail'
+  nailImg.style.cssText = 'width: 5vw; height: 5vw; ' + getNailPositionStyle()
+  formWrapper.insertBefore(nailImg, formWrapper.firstChild)
 }
 
 // Initialize when page loads

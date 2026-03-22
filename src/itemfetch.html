@@ -27,7 +27,7 @@
   <div id="status" class="status-bar loading">Loading…</div>
 
   <div class="form-container" id="form-wrapper">
-    <img src="" alt="nail" class="form-nail" id="form-nail">
+    <!-- Nail image created by JavaScript once page is loaded -->
     
     <h3 class="form-title">Hire a Fetcher</h3>
     <p class="form-subtitle">Find someone to acquire rare and hard-to-find items for you.</p>
@@ -96,7 +96,7 @@
 </script>
 
 <script type="module">
-  import { generateDenseClipPath, getRandomNail, getNailPositionStyle, getCardDishevelStyle } from './js/scroll-edge.js'
+  import { generateDenseClipPath, getCardDishevelStyle } from './js/scroll-edge.js'
   
   document.addEventListener('DOMContentLoaded', () => {
     const formWrapper = document.getElementById('form-wrapper')
@@ -111,14 +111,21 @@
       formWrapper.style.setProperty('--glass-pos-y', `${randomY}%`)
       formWrapper.style.setProperty('--parchment-pos-x', `${Math.random() * 100}%`)
       formWrapper.style.setProperty('--parchment-pos-y', `${Math.random() * 100}%`)
-      
-      const nailImg = document.getElementById('form-nail')
-      if (nailImg) {
-        nailImg.src = getRandomNail()
-        nailImg.style.cssText = getNailPositionStyle()
-      }
     }
   })
+</script>
+
+<script type="module">
+  import * as FirebaseModule from './js/firebase.js'
+  import * as AuthModule from './js/auth.js'
+  
+  // Initialize Firebase FIRST
+  if (typeof FIREBASE_CONFIG !== 'undefined') {
+    FirebaseModule.initializeFirebase(FIREBASE_CONFIG)
+  }
+  
+  // Initialize auth module
+  AuthModule.initAuthModal()
 </script>
 
 <script type="module" src="./js/page-item-fetch.js"></script>

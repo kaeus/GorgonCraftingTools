@@ -95,19 +95,17 @@
   overflow: visible;
 }
 
-.form-container::before {
+.form-container::after {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url(./assets/textures/dusty_glass_brown.png);
-  background-size: 400%;
-  background-position: var(--glass-pos-x, 50%) var(--glass-pos-y, 50%);
-  background-repeat: no-repeat;
-  opacity: 0.6;
+  background-image: url(../assets/textures/white-grungy-wall-textured-background.jpg);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.35;
   pointer-events: none;
-  z-index: 1;
-  border-radius: 0;
-  mix-blend-mode: overlay;
+  z-index: 2;
+  mix-blend-mode: multiply;
 }
 
 .form-container > * {
@@ -155,6 +153,19 @@
   mix-blend-mode: overlay;
 }
 
+.orderform-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url(../assets/textures/white-grungy-wall-textured-background.jpg);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: multiply;
+}
+
 .orderform-container > * {
   position: relative;
   z-index: 3;
@@ -186,8 +197,6 @@
   aspect-ratio: 1 / 1;
   object-fit: contain;
   display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
   filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
   outline: 0.5% solid #8b5a2b;
   outline-offset: 1%;

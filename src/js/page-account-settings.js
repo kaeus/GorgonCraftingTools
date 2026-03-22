@@ -5,6 +5,7 @@
 
 import { getFirestore, getCurrentUser } from './firebase.js'
 import { setStatus } from './utils.js'
+import { getRandomNail, getNailPositionStyle } from './scroll-edge.js'
 
 export async function initAccountSettings() {
   const form = document.getElementById('account-settings-form')
@@ -15,6 +16,17 @@ export async function initAccountSettings() {
 
   // Load existing settings
   await loadAccountSettings()
+
+  // Hide loading overlay and status bar
+  setTimeout(() => {
+    const overlay = document.getElementById('global-loading-overlay')
+    if (overlay) overlay.style.display = 'none'
+    
+    const statusBar = document.getElementById('status')
+    if (statusBar) statusBar.style.display = 'none'
+    
+    document.body.style.visibility = 'visible'
+  }, 200)
 
   // Enable submit button when form changes
   form.addEventListener('change', () => {
@@ -62,6 +74,9 @@ export async function initAccountSettings() {
       }
     })
   }
+
+  // Create nail image only when page is ready
+  createNail()
 }
 
 export async function loadAccountSettings() {
@@ -295,4 +310,20 @@ function showCancelConfirmation() {
       popup.remove()
     }
   })
+}
+
+/**
+ * Create nail image element
+ */
+function createNail() {
+  const formWrapper = document.getElementById('form-wrapper')
+  if (!formWrapper) return
+  
+  const nailImg = document.createElement('img')
+  nailImg.src = getRandomNail()
+  nailImg.alt = 'nail'
+  nailImg.id = 'form-nail'
+  nailImg.className = 'form-nail'
+  nailImg.style.cssText = getNailPositionStyle()
+  formWrapper.insertBefore(nailImg, formWrapper.firstChild)
 }

@@ -343,6 +343,10 @@ async function hideGlobalLoadingOverlay() {
   if (document.getElementById('account-setup-blocker')) {
     document.body.style.visibility = 'visible'
     overlay.style.display = 'none'
+    
+    // Also hide the status bar
+    const statusBar = document.getElementById('status')
+    if (statusBar) statusBar.style.display = 'none'
     return
   }
   
@@ -363,6 +367,10 @@ async function hideGlobalLoadingOverlay() {
   
   // Make body visible
   document.body.style.visibility = 'visible'
+  
+  // Hide the status bar
+  const statusBar = document.getElementById('status')
+  if (statusBar) statusBar.style.display = 'none'
   
   // Add the hidden class to fade out the overlay
   overlay.classList.add('hidden')

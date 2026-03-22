@@ -100,18 +100,84 @@
 <script type="module">
   import { generateDenseClipPath } from './js/scroll-edge.js'
   
+  function generateHatchingSVG(width = 1200, height = 900, lines = 200) {
+    const rand = (min, max) => Math.random() * (max - min) + min;
+
+    // Create cluster centers for natural clustering
+    const clusterCenters = Array.from({ length: 6 }, () => ({
+      x: rand(0, width),
+      y: rand(0, height)
+    }));
+
+    let paths = "";
+
+    for (let i = 0; i < lines; i++) {
+      // Biased point toward cluster centers
+      const cluster = clusterCenters[Math.floor(Math.random() * clusterCenters.length)];
+      let x = cluster.x + rand(-150, 150);
+      let y = cluster.y + rand(-150, 150);
+
+      // Clamp to bounds
+      x = Math.max(0, Math.min(width, x));
+      y = Math.max(0, Math.min(height, y));
+
+      const length = rand(15, 80);
+      
+      // Angle grouping - base angle + small variation for natural hand motion
+      const baseAngle = rand(-35, 35);
+      const angle = (baseAngle + rand(-8, 8)) * (Math.PI / 180);
+
+      let x2 = x + Math.cos(angle) * length;
+      let y2 = y + Math.sin(angle) * length;
+
+      // Broken strokes for realism
+      if (Math.random() < 0.4) {
+        const factor = rand(0.4, 0.85);
+        x2 = x + (x2 - x) * factor;
+        y2 = y + (y2 - y) * factor;
+      }
+
+      // Edge bias - darker on edges, lighter in center (matches parchment wear)
+      const edgeFade = Math.min(
+        x / width,
+        y / height,
+        (width - x) / width,
+        (height - y) / height
+      );
+      
+      const baseOpacity = rand(0.008, 0.06);
+      const opacity = baseOpacity * (0.4 + edgeFade * 0.6); // 40-100% based on edge proximity
+      const strokeWidth = rand(0.4, 1.5);
+
+      // Skip some strokes for more organic feel
+      if (Math.random() < 0.15) continue;
+
+      paths += `<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" stroke="black" stroke-opacity="${opacity}" stroke-width="${strokeWidth}" stroke-linecap="round"/>`;
+    }
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${paths}</svg>`;
+  }
+  
   document.addEventListener('DOMContentLoaded', () => {
     const parchmentContainer = document.querySelector('.listings-parchment-wrapper')
     
     if (parchmentContainer) {
+      // Generate procedural hatching SVG
+      const hatchingSVG = generateHatchingSVG();
+      
+      // Create a blob URL for the SVG
+      const blob = new Blob([hatchingSVG], { type: 'image/svg+xml' });
+      const svgUrl = URL.createObjectURL(blob);
+      
+      // Inject style to set background-image on ::before
+      const style = document.createElement('style');
+      style.textContent = `.listings-parchment-wrapper::before { background-image: url(${svgUrl}); }`;
+      document.head.appendChild(style);
+      
       // Apply dense clip-path for torn edges
       parchmentContainer.style.clipPath = generateDenseClipPath()
       
-      // Apply random background position for dusty glass overlay and parchment
-      const randomX = Math.random() * 100
-      const randomY = Math.random() * 100
-      parchmentContainer.style.setProperty('--glass-pos-x', `${randomX}%`)
-      parchmentContainer.style.setProperty('--glass-pos-y', `${randomY}%`)
+      // Apply random background position for parchment texture
       parchmentContainer.style.setProperty('--parchment-pos-x', `${Math.random() * 100}%`)
       parchmentContainer.style.setProperty('--parchment-pos-y', `${Math.random() * 100}%`)
     }
