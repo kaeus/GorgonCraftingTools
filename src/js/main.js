@@ -9,6 +9,7 @@ import * as UtilsModule from './utils.js'
 import * as OrderPageModule from './order-page.js'
 import * as ListingsManagerModule from './listings-manager.js'
 import * as SidebarModule from './sidebar.js'
+import * as AccountSetupModule from './account-setup.js'
 import { MarketNPC } from './npc-market.js'
 import { BellNPC } from './npc-bell.js'
 import * as ColiseumModule from './crooked-coliseum.js'
@@ -167,6 +168,14 @@ function setupEventListeners() {
 async function initializeApp() {
   console.log('CraftingCorner app initialized')
   
+  // Initialize Firebase FIRST if FIREBASE_CONFIG is available
+  if (typeof FIREBASE_CONFIG !== 'undefined') {
+    FirebaseModule.initializeFirebase(FIREBASE_CONFIG)
+  }
+  
+  // Check account setup after Firebase is initialized
+  await AccountSetupModule.ensureAccountSetup()
+  
   // Render sidebar on all pages
   if (document.querySelector('#admin-panel')) {
     // Admin page
@@ -184,11 +193,6 @@ async function initializeApp() {
   
   // Set up event listeners
   setupEventListeners()
-  
-  // Initialize Firebase if FIREBASE_CONFIG is available
-  if (typeof FIREBASE_CONFIG !== 'undefined') {
-    FirebaseModule.initializeFirebase(FIREBASE_CONFIG)
-  }
   
   // Load initial listings if we're on the market page
   if (document.querySelector('.listings-grid')) {
@@ -334,6 +338,13 @@ async function initializeApp() {
 async function hideGlobalLoadingOverlay() {
   const overlay = document.getElementById('global-loading-overlay')
   if (!overlay) return
+  
+  // If account setup blocker is showing, keep the overlay hidden but don't remove it
+  if (document.getElementById('account-setup-blocker')) {
+    document.body.style.visibility = 'visible'
+    overlay.style.display = 'none'
+    return
+  }
   
   // Wait for fonts to load if available
   if (document.fonts && document.fonts.ready) {

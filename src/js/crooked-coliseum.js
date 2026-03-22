@@ -431,7 +431,6 @@ function setContentVisible(visible) {
 
 function handleServerChange(server) {
   currentServer = server
-  localStorage.setItem('preferred-server', server)
 
   const statusEl = document.getElementById('coliseum-status')
 
@@ -470,16 +469,20 @@ export function setCurrentUser(user) {
 // ── Initialization ────────────────────────────────────────────────────────────
 
 export function initColiseum() {
-  // Restore server preference
-  const saved = localStorage.getItem('preferred-server')
-  const serverSelect = document.getElementById('server-filter')
-  if (serverSelect) {
-    if (saved) {
-      serverSelect.value = saved
-      currentServer = saved
+  // Get server selection from sidebar
+  const selectedServer = localStorage.getItem('selectedServer')
+  
+  // Listen for server changes from the sidebar
+  window.addEventListener('serverChange', (e) => {
+    handleServerChange(e.detail.server)
+  })
+  
+  // Also listen to storage events for cross-tab changes
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'selectedServer') {
+      handleServerChange(e.newValue)
     }
-    serverSelect.addEventListener('change', e => handleServerChange(e.target.value))
-  }
+  })
 
   // Configure Tips button
   document.getElementById('configure-tips-btn')?.addEventListener('click', openTipsModal)
@@ -495,8 +498,9 @@ export function initColiseum() {
   // Checkbox changes (delegated to modal body)
   document.getElementById('tips-modal-body')?.addEventListener('change', handleTipsCheckboxChange)
 
-  if (currentServer) {
-    // Server already saved — pre-render grid then load live data
+  if (selectedServer) {
+    // Server selected in sidebar — pre-render grid then load live data
+    currentServer = selectedServer
     renderAll()
     setContentVisible(false) // hide until snapshot arrives
     const statusEl = document.getElementById('coliseum-status')
@@ -505,9 +509,9 @@ export function initColiseum() {
       statusEl.className = 'status-bar loading'
       statusEl.style.display = ''
     }
-    subscribeToTips(currentServer)
+    subscribeToTips(selectedServer)
   } else {
-    // No server selected yet — show placeholder
+    // No server selected — show placeholder
     setContentVisible(false)
   }
 }

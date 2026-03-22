@@ -82,6 +82,19 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js"></script>
 
+<script>
+  // Auto-populate server dropdown from sidebar selection
+  document.addEventListener('DOMContentLoaded', () => {
+    const selectedServer = localStorage.getItem('selectedServer');
+    if (selectedServer) {
+      const serverSelect = document.getElementById('fetcher-server');
+      if (serverSelect) {
+        serverSelect.value = selectedServer;
+      }
+    }
+  });
+</script>
+
 <script type="module">
   import { generateDenseClipPath, getRandomNail, getNailPositionStyle, getCardDishevelStyle } from './js/scroll-edge.js'
   

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Settings - CraftingCorner</title>
+  <link rel="stylesheet" href="./css/itemform.css">
+  <link rel="stylesheet" href="./css/fantasy-dropdown.css">
+  <style>
+    body { visibility: hidden; background-color: #000; }
+    #global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
+    
+    .profile-picture-section {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #505050;
+    }
+    
+    .profile-picture-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 8px;
+      border: 2px solid #8B7355;
+      background-color: #2a2a2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    
+    .profile-picture-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .profile-picture-placeholder {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .profile-picture-controls {
+      flex: 1;
+    }
+    
+    .form-group input[type="file"] {
+      padding: 0.5rem;
+      cursor: pointer;
+    }
+    
+    .form-group input[type="file"]::file-selector-button {
+      background-color: #5c4a3d;
+      color: #d6c3a3;
+      border: 1px solid #8B7355;
+      padding: 0.5rem 1rem;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    
+    .form-group input[type="file"]::file-selector-button:hover {
+      background-color: #6d5a4d;
+    }
+  </style>
+  <script type="module" src="./js/main.js"></script>
+</head>
+<body>
+
+<!-- ── Global Loading Overlay ── -->
+<div id="global-loading-overlay"></div>
+
+<div class="topbar"></div>
+
+<div class="form-page">
+  <h1 class="form-page-title">Account Settings</h1>
+  <p class="form-page-subtitle">Manage your account information and preferences</p>
+
+  <div id="divider-container"></div>
+  <div id="status" class="status-bar loading">Loading…</div>
+
+  <div class="form-container" id="form-wrapper">
+    <img src="" alt="nail" class="form-nail" id="form-nail">
+    
+    <h3 class="form-title">Account Settings</h3>
+    <p class="form-subtitle">Update your profile information.</p>
+
+    <form id="account-settings-form">
+      <!-- Profile Picture Section -->
+      <div class="profile-picture-section">
+        <div class="profile-picture-preview" id="profile-picture-preview">
+          <div class="profile-picture-placeholder">No image</div>
+        </div>
+        <div class="profile-picture-controls">
+          <div class="form-group">
+            <label for="primary-profile-picture">Primary Profile Picture</label>
+            <input type="file" id="primary-profile-picture" accept="image/*">
+          </div>
+          <small style="color: #888;">Recommended: 200x200px or larger • Max 500 KB</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="primary-character-name">Primary Character Name *</label>
+        <input type="text" id="primary-character-name" placeholder="Your character name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="primary-server">Primary Server *</label>
+        <select id="primary-server" required>
+          <option value="">Select a server</option>
+          <option value="Arisetsu">Arisetsu</option>
+          <option value="Dreva">Dreva</option>
+          <option value="Laeth">Laeth</option>
+          <option value="Miraverre">Miraverre</option>
+          <option value="Strekios">Strekios</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="primary-availability">Primary Availability (PST)</label>
+        <input type="text" id="primary-availability" placeholder="e.g. 6 PM - 10 PM PST">
+      </div>
+      
+      <div class="form-error" id="settings-form-error"></div>
+      
+      <div class="form-buttons">
+        <button type="submit" id="settings-submit-btn" disabled>Save Settings</button>
+        <button type="button" id="cancel-btn">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── Auth modal ── -->
+<div class="modal-backdrop" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" data-action="close-auth">✕</button>
+    <h3>Sign In</h3>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-google" data-tab="google">Google</button>
+      <button class="modal-tab" id="tab-email" data-tab="email">Email</button>
+    </div>
+
+    <!-- Google tab -->
+    <div id="pane-google">
+      <button class="google-btn" data-action="sign-in-google">
+        <svg class="google-icon" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </button>
+      <div id="google-error" class="modal-error" style="display:none;"></div>
+    </div>
+
+    <!-- Email tab -->
+    <div id="pane-email" style="display:none;">
+      <div id="email-error" class="modal-error" style="display:none;"></div>
+      <div id="email-name-wrap" style="display:none;">
+        <label for="auth-name">Display Name</label>
+        <input type="text" id="auth-name" placeholder="Your in-game name">
+      </div>
+      <label for="auth-email">Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email">
+      <label for="auth-password">Password</label>
+      <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password">
+      <button class="modal-submit" id="email-submit" data-action="sign-in-email">Sign In</button>
+      <div class="modal-toggle">
+        <span id="toggle-text">Don't have an account?</span>
+        <a data-action="toggle-email-mode"> Register</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js"></script>
+
+<script>
+  // Auto-populate server dropdown from sidebar selection
+  document.addEventListener('DOMContentLoaded', () => {
+    const selectedServer = localStorage.getItem('selectedServer');
+    if (selectedServer) {
+      const serverSelect = document.getElementById('primary-server');
+      if (serverSelect) {
+        serverSelect.value = selectedServer;
+      }
+    }
+
+    // Handle profile picture preview
+    const fileInput = document.getElementById('primary-profile-picture');
+    const preview = document.getElementById('profile-picture-preview');
+
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const maxSize = 500 * 1024; // 500 KB
+          if (file.size > maxSize) {
+            alert(`File too large (${(file.size / 1024).toFixed(0)} KB). Maximum size is 500 KB.`);
+            fileInput.value = ''; // Clear the input
+            preview.innerHTML = '';
+            return;
+          }
+          
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            preview.innerHTML = `<img src="${event.target.result}" alt="Profile Picture">`;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  });
+</script>
+
+<script type="module">
+  import { generateDenseClipPath, getRandomNail, getNailPositionStyle, getCardDishevelStyle } from './js/scroll-edge.js'
+  import * as AccountSettingsModule from './js/page-account-settings.js'
+  import * as AccountSetupModule from './js/account-setup.js'
+  import * as FirebaseModule from './js/firebase.js'
+  import * as AuthModule from './js/auth.js'
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Firebase FIRST
+    if (typeof FIREBASE_CONFIG !== 'undefined') {
+      FirebaseModule.initializeFirebase(FIREBASE_CONFIG)
+    }
+    
+    // Initialize auth module
+    AuthModule.initAuthModal()
+    
+    const formWrapper = document.getElementById('form-wrapper')
+    
+    if (formWrapper) {
+      formWrapper.style.clipPath = generateDenseClipPath()
+      formWrapper.style.cssText += getCardDishevelStyle()
+      
+      const randomX = Math.random() * 100
+      const randomY = Math.random() * 100
+      formWrapper.style.setProperty('--glass-pos-x', `${randomX}%`)
+      formWrapper.style.setProperty('--glass-pos-y', `${randomY}%`)
+      formWrapper.style.setProperty('--parchment-pos-x', `${Math.random() * 100}%`)
+      formWrapper.style.setProperty('--parchment-pos-y', `${Math.random() * 100}%`)
+      
+      const nailImg = document.getElementById('form-nail')
+      if (nailImg) {
+        nailImg.src = getRandomNail()
+        nailImg.style.cssText = getNailPositionStyle()
+      }
+    }
+    
+    // Initialize account settings
+    AccountSettingsModule.initAccountSettings()
+    
+    // Set up navigation guard to prevent leaving without saving
+    AccountSetupModule.setupNavigationGuard()
+  })
+</script>
+
+<script type="module" src="./js/page-account-settings.js"></script>
+
+</body>
+</html>

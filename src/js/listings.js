@@ -59,7 +59,19 @@ export async function loadListings() {
         return timeB - timeA
       })
 
-    restoreServerFilter()
+    // Set up multiple listeners for server selection changes
+    // Listen for custom event from sidebar when server is selected on same page
+    window.addEventListener('serverChange', (e) => {
+      applyFilter()
+    })
+    
+    // Also listen for storage events for cross-tab communication
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'selectedServer') {
+        applyFilter()
+      }
+    })
+    
     await applyFilter()
     setStatus('status', '', 'ok')
   } catch (error) {
@@ -72,17 +84,15 @@ export async function loadListings() {
  * Filter listings by server, keyword search, and/or metacategory
  */
 export async function applyFilter() {
-  const serverFilter = document.getElementById('server-filter')
   const keywordSearch = document.getElementById('keyword-search')
   const metaCategorySelect = document.getElementById('metacategory-filter')
   
   let filtered = [...allListingDocs]
 
-  // Apply server filter
-  if (serverFilter && serverFilter.value) {
-    const server = serverFilter.value
-    localStorage.setItem('preferred-server', server)
-    filtered = filtered.filter(doc => doc.data().server === server)
+  // Apply server filter from sidebar selection stored in localStorage
+  const selectedServer = localStorage.getItem('selectedServer')
+  if (selectedServer) {
+    filtered = filtered.filter(doc => doc.data().server === selectedServer)
   }
 
   // Apply keyword search filter if set
@@ -124,16 +134,7 @@ export async function applyFilter() {
   await renderListings(filtered)
 }
 
-/**
- * Restore saved server filter preference
- */
-function restoreServerFilter() {
-  const saved = localStorage.getItem('preferred-server')
-  if (!saved) return
-  const serverFilter = document.getElementById('server-filter')
-  if (!serverFilter) return
-  serverFilter.value = saved
-}
+
 
 /**
  * Load items database from CDN

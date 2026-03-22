@@ -9,7 +9,8 @@ const pageButtonMap = {
   'market.html': 'market',
   'artisan_alley.html': 'artisan_alley',
   'legs_list.html': 'legs_list',
-  'crookedColiseum.html': 'crookedColiseum'
+  'crookedColiseum.html': 'crookedColiseum',
+  'account-settings.html': 'account_settings'
 }
 
 // Helper function to get the appropriate image source
@@ -55,6 +56,11 @@ export function renderSidebar() {
           <img src="${getButtonImageSrc('crookedColiseum.html')}" alt="Crooked Coliseum">
         </a>
       </div>
+      <div class="topbar-title">
+        <a href="account-settings.html" class="topbar-image-link">
+          <img src="${getButtonImageSrc('account-settings.html')}" alt="Account Settings">
+        </a>
+      </div>
       <div id="fantasy-server-dropdown" class="sidebar-dropdown-instance"></div>
       <div id="user-auth-slot">
         <button class="action-btn" data-action="open-auth">Sign In</button>
@@ -81,14 +87,18 @@ export function renderSidebar() {
         serverOptions.splice(i, 1);
       }
     }
-    let selectedServer = '';
+    // Load persisted server selection from localStorage
+    let selectedServer = localStorage.getItem('selectedServer') || '';
     new FantasyDropdown({
       container: document.getElementById('fantasy-server-dropdown'),
       options: serverOptions,
       value: selectedServer,
       onChange: v => {
         selectedServer = v;
-        // TODO: trigger server filter logic here
+        // Persist the server selection to localStorage
+        localStorage.setItem('selectedServer', v);
+        // Dispatch event so listings.js can respond to server changes
+        window.dispatchEvent(new CustomEvent('serverChange', { detail: { server: v } }));
       },
       placeholder: 'Server',
       dropdownClass: '',
@@ -125,6 +135,11 @@ export function renderAdminSidebar() {
           <img src="${getButtonImageSrc('crookedColiseum.html')}" alt="Crooked Coliseum">
         </a>
       </div>
+      <div class="topbar-title">
+        <a href="account-settings.html" class="topbar-image-link">
+          <img src="${getButtonImageSrc('account-settings.html')}" alt="Account Settings">
+        </a>
+      </div>
       <div id="fantasy-server-dropdown" class="sidebar-dropdown-instance"></div>
       <div id="user-auth-slot">
         <button class="action-btn" data-action="open-auth">Sign In</button>
@@ -151,14 +166,18 @@ export function renderAdminSidebar() {
         serverOptions.splice(i, 1);
       }
     }
-    let selectedServer = '';
+    // Load persisted server selection from localStorage
+    let selectedServer = localStorage.getItem('selectedServer') || '';
     new FantasyDropdown({
       container: document.getElementById('fantasy-server-dropdown'),
       options: serverOptions,
       value: selectedServer,
       onChange: v => {
         selectedServer = v;
-        // TODO: trigger server filter logic here
+        // Persist the server selection to localStorage
+        localStorage.setItem('selectedServer', v);
+        // Dispatch event so listings.js can respond to server changes
+        window.dispatchEvent(new CustomEvent('serverChange', { detail: { server: v } }));
       },
       placeholder: 'Server',
       dropdownClass: '',
@@ -204,6 +223,11 @@ export function renderOrderSidebar() {
           <img src="${getButtonImageSrc('crookedColiseum.html')}" alt="Crooked Coliseum">
         </a>
       </div>
+      <div class="topbar-title">
+        <a href="account-settings.html" class="topbar-image-link">
+          <img src="${getButtonImageSrc('account-settings.html')}" alt="Account Settings">
+        </a>
+      </div>
       <div id="fantasy-server-dropdown" class="sidebar-dropdown-instance"></div>
       <div id="user-auth-slot">
         <button class="action-btn" data-action="open-auth">Sign In</button>
@@ -231,14 +255,18 @@ export function renderOrderSidebar() {
         serverOptions.splice(i, 1);
       }
     }
-    let selectedServer = '';
+    // Load persisted server selection from localStorage
+    let selectedServer = localStorage.getItem('selectedServer') || '';
     new FantasyDropdown({
       container: document.getElementById('fantasy-server-dropdown'),
       options: serverOptions,
       value: selectedServer,
       onChange: v => {
         selectedServer = v;
-        // TODO: trigger server filter logic here
+        // Persist the server selection to localStorage
+        localStorage.setItem('selectedServer', v);
+        // Dispatch event so listings.js can respond to server changes
+        window.dispatchEvent(new CustomEvent('serverChange', { detail: { server: v } }));
       },
       placeholder: 'Server',
       dropdownClass: '',

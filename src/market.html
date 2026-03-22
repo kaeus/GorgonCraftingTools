@@ -43,11 +43,23 @@
       value: selectedMetacategory,
       onChange: v => {
         selectedMetacategory = v;
-        // TODO: trigger filtering logic here
+        // Update the hidden input so listings.js can detect the change
+        const filterInput = document.getElementById('metacategory-filter');
+        if (filterInput) {
+          filterInput.value = v;
+          filterInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
       },
       placeholder: 'Select Metacategory',
       optionClass: 'market-option',
     });
+    
+    // Create a hidden input for metacategory filter so listings.js can track it
+    const filterInput = document.createElement('input');
+    filterInput.type = 'hidden';
+    filterInput.id = 'metacategory-filter';
+    filterInput.value = selectedMetacategory;
+    document.body.appendChild(filterInput);
   </script>
 </head>
 <body>

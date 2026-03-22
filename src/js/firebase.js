@@ -57,5 +57,24 @@ export function signInWithGoogle() {
 }
 
 export async function getCurrentUser() {
-  return auth.currentUser
+  // Wait for auth state to be determined
+  return new Promise((resolve) => {
+    if (!auth) {
+      console.error('Firebase not initialized')
+      resolve(null)
+      return
+    }
+    
+    // If user is already loaded, return immediately
+    if (auth.currentUser) {
+      resolve(auth.currentUser)
+      return
+    }
+    
+    // Otherwise wait for auth state to change
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      unsubscribe()
+      resolve(user)
+    })
+  })
 }
