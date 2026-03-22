@@ -125,17 +125,7 @@ export function renderAdminSidebar() {
           <img src="${getButtonImageSrc('crookedColiseum.html')}" alt="Crooked Coliseum">
         </a>
       </div>
-      <div class="topbar-server-filter">
-        <label for="server-filter">Server</label>
-        <select id="server-filter">
-          <option value="">All Servers</option>
-          <option>Arisetsu</option>
-          <option>Dreva</option>
-          <option>Laeth</option>
-          <option>Miraverre</option>
-          <option>Strekios</option>
-        </select>
-      </div>
+      <div id="fantasy-server-dropdown" class="sidebar-dropdown-instance"></div>
       <div id="user-auth-slot">
         <button class="action-btn" data-action="open-auth">Sign In</button>
       </div>
@@ -144,6 +134,37 @@ export function renderAdminSidebar() {
   `
 
   topbar.innerHTML = sidebarHTML
+  
+  // Initialize fantasy dropdown
+  import('../components/FantasyDropdown.js').then(({ FantasyDropdown }) => {
+    const serverOptions = [
+      { value: '', label: 'All Servers' },
+      { value: 'Arisetsu', label: 'Arisetsu' },
+      { value: 'Dreva', label: 'Dreva' },
+      { value: 'Laeth', label: 'Laeth' },
+      { value: 'Miraverre', label: 'Miraverre' },
+      { value: 'Strekios', label: 'Strekios' }
+    ];
+    // Remove duplicate blank/All Servers entries if present (should only be first)
+    for (let i = serverOptions.length - 1; i > 0; i--) {
+      if (serverOptions[i].value === '' && serverOptions[i].label === 'All Servers') {
+        serverOptions.splice(i, 1);
+      }
+    }
+    let selectedServer = '';
+    new FantasyDropdown({
+      container: document.getElementById('fantasy-server-dropdown'),
+      options: serverOptions,
+      value: selectedServer,
+      onChange: v => {
+        selectedServer = v;
+        // TODO: trigger server filter logic here
+      },
+      placeholder: 'Server',
+      dropdownClass: '',
+      optionClass: '',
+    });
+  });
 }
 
 export function renderOrderSidebar() {
@@ -183,17 +204,7 @@ export function renderOrderSidebar() {
           <img src="${getButtonImageSrc('crookedColiseum.html')}" alt="Crooked Coliseum">
         </a>
       </div>
-      <div class="topbar-server-filter">
-        <label for="server-filter">Server</label>
-        <select id="server-filter">
-          <option value="">All Servers</option>
-          <option>Arisetsu</option>
-          <option>Dreva</option>
-          <option>Laeth</option>
-          <option>Miraverre</option>
-          <option>Strekios</option>
-        </select>
-      </div>
+      <div id="fantasy-server-dropdown" class="sidebar-dropdown-instance"></div>
       <div id="user-auth-slot">
         <button class="action-btn" data-action="open-auth">Sign In</button>
       </div>
@@ -201,5 +212,37 @@ export function renderOrderSidebar() {
     <img class="sidebar-banner-cap" src="./images/ui/sidebar/banner_bottom.png" alt="">
   `
   
+  // Clear and populate the topbar
   topbar.innerHTML = sidebarHTML
+  
+  // Initialize fantasy dropdown
+  import('../components/FantasyDropdown.js').then(({ FantasyDropdown }) => {
+    const serverOptions = [
+      { value: '', label: 'All Servers' },
+      { value: 'Arisetsu', label: 'Arisetsu' },
+      { value: 'Dreva', label: 'Dreva' },
+      { value: 'Laeth', label: 'Laeth' },
+      { value: 'Miraverre', label: 'Miraverre' },
+      { value: 'Strekios', label: 'Strekios' }
+    ];
+    // Remove duplicate blank/All Servers entries if present (should only be first)
+    for (let i = serverOptions.length - 1; i > 0; i--) {
+      if (serverOptions[i].value === '' && serverOptions[i].label === 'All Servers') {
+        serverOptions.splice(i, 1);
+      }
+    }
+    let selectedServer = '';
+    new FantasyDropdown({
+      container: document.getElementById('fantasy-server-dropdown'),
+      options: serverOptions,
+      value: selectedServer,
+      onChange: v => {
+        selectedServer = v;
+        // TODO: trigger server filter logic here
+      },
+      placeholder: 'Server',
+      dropdownClass: '',
+      optionClass: '',
+    });
+  });
 }

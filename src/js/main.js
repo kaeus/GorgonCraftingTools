@@ -172,9 +172,9 @@ async function initializeApp() {
     // Admin page
     console.log('[Main] Detected admin page')
     SidebarModule.renderAdminSidebar()
-  } else if (document.querySelector('#order-form') || document.querySelector('#purchase-form')) {
-    // Order page (craft or item)
-    console.log('[Main] Detected order/purchase page')
+  } else if (document.querySelector('#order-form') || document.querySelector('#purchase-form') || document.querySelector('.form-page') || document.querySelector('.orderform-page')) {
+    // Order page (craft or item) - includes itemfence, itemfetch, itemorder
+    console.log('[Main] Detected order/form page')
     SidebarModule.renderOrderSidebar()
   } else {
     // All other pages (market/listings, etc.)

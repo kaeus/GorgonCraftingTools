@@ -1,0 +1,990 @@
+/* ═══════════════════════════════════════════════════════════
+   UNIFIED ITEM FORM STYLES
+   Supports both form pages and order form pages
+   ═══════════════════════════════════════════════════════════ */
+
+/* PAGE LAYOUT - Form Pages */
+.form-page {
+  width: 100%;
+  margin: 0 auto;
+  padding-top: 1.2%;
+  padding-bottom: 2%;
+  padding-left: 5%;
+  padding-right: 5%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.form-page-title {
+  text-align: center;
+  margin-bottom: 0.3%;
+  font-size: 1.5rem;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #d6c8a8;
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.form-page-subtitle {
+  text-align: center;
+  margin-bottom: 1.8%;
+  font-size: 0.75rem;
+  color: #b8a680;
+  font-style: italic;
+  font-family: 'Crimson Text', Georgia, serif;
+  line-height: 1.6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* PAGE LAYOUT - Order Form Pages */
+.orderform-page {
+  width: 100%;
+  margin: 0 auto;
+  padding-top: 1.2%;
+  padding-bottom: 2%;
+  padding-left: 5%;
+  padding-right: 5%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.orderform-title {
+  text-align: center;
+  margin-bottom: 0.3%;
+  font-size: 1.5rem;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #d6c8a8;
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.orderform-subtitle {
+  text-align: center;
+  margin-bottom: 1.8%;
+  font-size: 0.75rem;
+  color: #b8a680;
+  font-style: italic;
+  font-family: 'Crimson Text', Georgia, serif;
+  line-height: 1.6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* FORM CONTAINERS */
+.form-container {
+  position: relative;
+  background-color: #e8dcc8;
+  background-image: url(./assets/textures/seemless%20parchment.png);
+  background-size: cover;
+  background-position: var(--parchment-pos-x, 0%) var(--parchment-pos-y, 0%);
+  background-attachment: scroll;
+  color: #2a2118;
+  padding: 6% 3.2% 2.8%;
+  border-radius: 2px;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.form-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url(./assets/textures/dusty_glass_brown.png);
+  background-size: 400%;
+  background-position: var(--glass-pos-x, 50%) var(--glass-pos-y, 50%);
+  background-repeat: no-repeat;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 0;
+  mix-blend-mode: overlay;
+}
+
+.form-container > * {
+  position: relative;
+  z-index: 3;
+}
+
+.orderform-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 600px;
+  display: block;
+}
+
+.orderform-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.8rem;
+  position: relative;
+  background-color: #e8dcc8;
+  background-image: url(./assets/textures/seemless%20parchment.png);
+  background-size: cover;
+  background-position: var(--parchment-pos-x, 0%) var(--parchment-pos-y, 0%);
+  background-attachment: scroll;
+  color: #2a2118;
+  padding: 2.8% 3.2% 2.8%;
+  border-radius: 2px;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.orderform-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url(./assets/textures/dusty_glass_brown.png);
+  background-size: 400%;
+  background-position: var(--glass-pos-x, 50%) var(--glass-pos-y, 50%);
+  background-repeat: no-repeat;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 0;
+  mix-blend-mode: overlay;
+}
+
+.orderform-container > * {
+  position: relative;
+  z-index: 3;
+}
+
+/* NAILS */
+.form-nail {
+  position: absolute;
+  width: 8%;
+  height: 8%;
+  z-index: 10;
+  pointer-events: none;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  outline: 0.5% solid #8b5a2b;
+  outline-offset: 1%;
+  left: 50%;
+  top: 1%;
+  transform: translateX(-50%);
+}
+
+.orderform-nail {
+  position: absolute;
+  width: 8%;
+  height: 8%;
+  z-index: 20;
+  pointer-events: none;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  outline: 0.5% solid #8b5a2b;
+  outline-offset: 1%;
+  top: 1%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* TITLES & SUBTITLES */
+.form-title,
+.orderform-card-title {
+  margin-bottom: 0.8rem;
+  font-size: 1.1rem;
+  color: #3a2817;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #8b5a2b;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.form-subtitle {
+  color: #6b5a47;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-style: italic;
+}
+
+/* FORM GROUPS & LABELS */
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.7rem;
+  color: #6b5a47;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+}
+
+.form-container .form-group input,
+.form-container .form-group select,
+.form-container .form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #8b5a2b;
+  border-radius: 0;
+  background: rgba(255, 250, 240, 0.8);
+  color: #2a2118;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  box-shadow: none;
+}
+
+.form-container .form-group input:focus,
+.form-container .form-group select:focus,
+.form-container .form-group textarea:focus {
+  background: rgba(255, 250, 240, 0.95);
+  border-color: #a08050;
+  box-shadow: none;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ORDER FORM GROUPS */
+.orderform-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.orderform-form-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #6b5a47;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: 'Cinzel', serif;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.orderform-form-group input[type="text"],
+.orderform-form-group textarea {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid #8b5a2b;
+  border-radius: 0;
+  background: transparent;
+  color: #3a2817;
+  font-family: 'Crimson Pro', 'Cormorant', Georgia, serif;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  box-shadow: none;
+}
+
+.orderform-form-group input[type="text"]::placeholder,
+.orderform-form-group textarea::placeholder {
+  color: rgba(58, 40, 23, 0.35);
+}
+
+.orderform-form-group input[type="text"]:focus,
+.orderform-form-group textarea:focus {
+  outline: none;
+  border-color: #6b4423;
+  background: rgba(248, 245, 240, 0.3);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.orderform-form-group textarea {
+  min-height: 4.2%;
+  max-height: 6.5%;
+  resize: vertical;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.9rem;
+}
+
+/* ERROR MESSAGES */
+.form-error {
+  color: #8b3a3a;
+  background: rgba(255, 240, 230, 0.6);
+  border: 1px solid #8b5a2b;
+  border-radius: 2px;
+  padding: 0.75rem;
+  display: none;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* FORM BUTTONS */
+.form-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.form-buttons button {
+  padding: 0.75rem;
+  border: 1px solid #8b5a2b;
+  border-radius: 0;
+  color: #2a2118;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.form-buttons button[type="submit"] {
+  background: rgba(139, 90, 43, 0.3);
+}
+
+.form-buttons button[type="submit"]:hover:not(:disabled) {
+  background: rgba(139, 90, 43, 0.5);
+}
+
+.form-buttons button[type="submit"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-buttons button[type="button"] {
+  background: transparent;
+  color: #6b5a47;
+}
+
+.form-buttons button[type="button"]:hover {
+  background: rgba(139, 90, 43, 0.1);
+}
+
+/* SEARCH RESULTS DROPDOWN */
+#item-search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(255, 250, 240, 0.95);
+  border: 1px solid #8b5a2b;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+  z-index: 100;
+}
+
+#item-search-results div {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid #d4c5b0;
+}
+
+#item-search-results div:hover {
+  background: rgba(139, 90, 43, 0.1);
+}
+
+.form-status {
+  color: #6b8e23;
+  font-size: 0.85rem;
+  margin-top: 0.35rem;
+  font-family: 'Cinzel', serif;
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ORDER FORM SPECIFIC STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+/* COLUMNS */
+.orderform-panel {
+  background: transparent;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none;
+}
+
+.orderform-panel-left {
+  grid-column: 1;
+  padding-right: 1.5%;
+  border-right: 1px solid #8b5a2b;
+}
+
+.orderform-panel-right {
+  grid-column: 2;
+  padding-left: 1.5%;
+}
+
+/* CARD SECTION */
+.orderform-card {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 1rem;
+  box-shadow: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+}
+
+.orderform-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* ITEM HEADER */
+.orderform-item-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.orderform-item-icon {
+  flex-shrink: 0;
+  width: 8.5%;
+  height: 8.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0.15% solid #8b5a2b;
+  border-radius: 0;
+  box-shadow: none;
+  position: relative;
+}
+
+.orderform-item-icon img {
+  width: 85%;
+  height: 85%;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.orderform-item-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.orderform-item-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  color: #2a2118;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.orderform-item-meta {
+  font-size: 0.9rem;
+  color: #5a4a38;
+  line-height: 1.8;
+  font-family: 'Crimson Text', Georgia, serif;
+}
+
+.orderform-item-meta div {
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+}
+
+/* STATS */
+.orderform-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.orderform-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.orderform-stat-label {
+  color: #6b5a47;
+  font-size: 0.72rem;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+}
+
+.orderform-stat-value {
+  color: #2a2118;
+  font-weight: 700;
+  font-size: 1.05rem;
+  font-family: 'Cinzel', serif;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+/* QUANTITY CONTROL */
+.orderform-quantity {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.orderform-quantity-btn {
+  width: 2.85%;
+  height: 2.85%;
+  border: 1px solid #8b5a2b;
+  background: transparent;
+  color: #3a2817;
+  border-radius: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: none;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.orderform-quantity-btn:hover {
+  border-color: #6b4423;
+  background: rgba(139, 90, 43, 0.12);
+}
+
+.orderform-quantity-btn:active {
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  transform: scale(0.95);
+}
+
+.orderform-quantity-input {
+  width: 4.3%;
+  height: 2.85%;
+  text-align: center;
+  border: 1px solid #8b5a2b;
+  background: transparent;
+  color: #2a2118;
+  border-radius: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  transition: all 0.2s ease;
+  box-shadow: none;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.orderform-quantity-input:focus {
+  outline: none;
+  border-color: #6b4423;
+  background: rgba(139, 90, 43, 0.08);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.orderform-helper-text {
+  font-size: 0.82rem;
+  color: #6b5a47;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+#quantity-error {
+  color: #8a4a3a;
+  font-size: 0.82rem;
+  margin-top: 0.35rem;
+  font-weight: 500;
+}
+
+/* SUMMARY */
+.orderform-summary {
+  background: transparent;
+  padding: 1.5rem 0;
+  border-radius: 0;
+  margin-top: auto;
+  border-top: 2px solid #8b5a2b;
+  border-bottom: 2px solid #8b5a2b;
+  box-shadow: none;
+  position: relative;
+}
+
+.orderform-summary-title {
+  margin: 0 0 0.9rem 0;
+  font-size: 0.75rem;
+  color: #3a2817;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.orderform-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  font-size: 0.88rem;
+  border-bottom: 1px dotted #8b5a2b;
+}
+
+.orderform-summary-row .label {
+  color: #6b5a47;
+  font-weight: 500;
+}
+
+.orderform-summary-row .value {
+  color: #3a2817;
+  text-align: right;
+  font-weight: 700;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.orderform-summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0 0;
+  margin-top: 0.2rem;
+  border-top: 2px solid #8b5a2b;
+}
+
+.orderform-summary-total .label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #3a2817;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.orderform-summary-total .value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2a2118;
+  font-family: 'Cinzel', serif;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+/* PURCHASE BUTTON */
+.orderform-purchase-button {
+  width: 100%;
+  height: 3.8%;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  background: linear-gradient(135deg, #6b4423 0%, #5a3a1a 100%);
+  border: 1px solid #3a2817;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: #e8dcc8;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: 'Cinzel', serif;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.orderform-purchase-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7e5433 0%, #6b4423 100%);
+  border-color: #2a1810;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.orderform-purchase-button:active:not(:disabled) {
+  transform: translateY(0px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.orderform-purchase-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.orderform-purchase-confirmation {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #6b5a47;
+  line-height: 1.5;
+  background: transparent;
+  padding: 0.8rem 0;
+  border-radius: 0;
+  border-top: 1px dotted #8b5a2b;
+  font-style: italic;
+  box-shadow: none;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+/* SECTION HEADERS */
+.section-header {
+  display: none;
+}
+
+/* Divider - hide on order pages */
+#divider-container {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .orderform-container {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding: 24px;
+  }
+  
+  .orderform-panel-left {
+    grid-column: 1;
+    padding-right: 0;
+    border-right: none;
+    border-bottom: 1px solid #8b5a2b;
+    padding-bottom: 1.5rem;
+  }
+  
+  .orderform-panel-right {
+    grid-column: 1;
+    padding-left: 0;
+    padding-top: 1.5rem;
+  }
+  
+  .orderform-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .orderform-item-icon {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .orderform-item-name {
+    font-size: 1.3rem;
+  }
+
+  .orderform-title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .orderform-title {
+    font-size: 1.5rem;
+  }
+
+  .orderform-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .orderform-container {
+    padding: 20px;
+  }
+  
+  .orderform-stats {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .orderform-item-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .orderform-item-header {
+    gap: 0.8rem;
+  }
+
+  .orderform-item-name {
+    font-size: 1.15rem;
+  }
+
+  .orderform-card-title {
+    font-size: 1rem;
+  }
+
+  .orderform-purchase-button {
+    height: 44px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAIL TEAR EFFECT - Creates transparency holes beneath nails
+   Simulates tears/damage in parchment where nail penetrates
+   ═══════════════════════════════════════════════════════════ */
+
+/* Nail tear mask container - positioned behind and under nail */
+.nail-tear-effect {
+  position: absolute;
+  width: 10%;
+  height: 10%;
+  aspect-ratio: 1 / 1;
+  top: 0.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 9;
+  background: transparent;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+  mix-blend-mode: multiply;
+}
+
+/* Tear detail variability - creates organic tear patterns */
+.nail-tear-speckle {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+  background: radial-gradient(circle at var(--speckle-x, 50%) var(--speckle-y, 50%), 
+                             rgba(0, 0, 0, 0.25) 0%, 
+                             transparent 60%);
+  border-radius: 50%;
+  mix-blend-mode: overlay;
+}
+
+/* Heavy tear variant - deeper shadow for more dramatic holes */
+.nail-tear-effect.heavy {
+  background: transparent;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+/* Light tear variant - subtle wear marks */
+.nail-tear-effect.light {
+  background: transparent;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Animated shimmer for tear depth perception */
+@keyframes tear-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.92;
+  }
+}
+
+.nail-tear-effect.animated {
+  animation: tear-pulse 5s ease-in-out infinite;
+}
+
+/* Tear edge degradation - adds worn/weathered appearance */
+.nail-tear-edge {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle at 0% 0%, 
+                                       transparent 0px, 
+                                       transparent 8px, 
+                                       rgba(0, 0, 0, 0.1) 8px, 
+                                       rgba(0, 0, 0, 0.1) 12px);
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* MASKS */
+/* Parchment hole mask - removed per user request */
+.orderform-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.8rem;
+  position: relative;
+  background-color: #e8dcc8;
+  background-image: url(./assets/textures/seemless%20parchment.png);
+  background-size: cover;
+  background-position: var(--parchment-pos-x, 0%) var(--parchment-pos-y, 0%);
+  background-attachment: scroll;
+  color: #2a2118;
+  padding: 2.8% 3.2% 2.8%;
+  border-radius: 2px;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+/* Order form nail tear - removed, using mask on container instead */
+.orderform-nail-tear {
+  display: none;
+}
+
+/* Order form nail tear - removed, using mask on container instead */
+.orderform-nail-tear {
+  display: none;
+}
+
+/* Multiple tears for damaged appearance */
+.nail-tear-effect ~ .nail-tear-effect {
+  opacity: 0.4;
+  transform: translateX(-50%) translate(8%, 12%);
+  z-index: 8;
+}
+
+.nail-tear-effect ~ .nail-tear-effect ~ .nail-tear-effect {
+  opacity: 0.3;
+  transform: translateX(-50%) translate(-5%, 15%);
+  z-index: 7;
+}
+
+/* Mobile responsive tear sizing */
+@media (max-width: 768px) {
+  .nail-tear-effect,
+  .orderform-nail-tear {
+    width: 12%;
+    height: 12%;
+  }
+  
+  .nail-tear-effect ~ .nail-tear-effect {
+    transform: translateX(-50%) translate(10%, 14%);
+  }
+  
+  .nail-tear-effect ~ .nail-tear-effect ~ .nail-tear-effect {
+    transform: translateX(-50%) translate(-6%, 16%);
+  }
+}
+
+@media (max-width: 480px) {
+  .nail-tear-effect,
+  .orderform-nail-tear {
+    width: 14%;
+    height: 14%;
+    top: 1%;
+  }
+  
+  .nail-tear-effect ~ .nail-tear-effect {
+    transform: translateX(-50%) translate(12%, 16%);
+  }
+  
+  .nail-tear-effect ~ .nail-tear-effect ~ .nail-tear-effect {
+    transform: translateX(-50%) translate(-7%, 18%);
+  }
+}
+
+/* Print media - hide tear effects */
+@media print {
+  .nail-tear-effect,
+  .orderform-nail-tear,
+  .nail-tear-speckle,
+  .nail-tear-edge {
+    display: none;
+  }
+}
+

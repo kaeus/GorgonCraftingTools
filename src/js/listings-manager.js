@@ -5,8 +5,37 @@
 
 import { getFirestore, getAuth } from './firebase.js'
 import { escapeHtml, PROFESSION_EMOJI, getProfessions, setStatus } from './utils.js'
+import { generateDenseClipPath, getRandomNail, getNailPositionStyle, getCardDishevelStyle, generateNailTearClipPath } from './scroll-edge.js'
 
 let userListings = []
+
+/**
+ * Helper function: Create a parchment-styled form container
+ * Consolidates all parchment styling to avoid duplication
+ * @param {string} title - Form title (e.g., "Fence an Item")
+ * @param {string} subtitle - Form subtitle (e.g., "List items you want to sell...")
+ * @param {string} formContent - Inner form HTML
+ * @returns {string} Complete parchment-wrapped form HTML
+ */
+function createParchmentFormContainer(title, subtitle, formContent) {
+  const parchmentX = Math.random() * 100;
+  const parchmentY = Math.random() * 100;
+  const tearVariant = Math.random() > 0.7 ? ' heavy' : Math.random() > 0.5 ? ' light' : '';
+  const animateTear = Math.random() > 0.6 ? ' animated' : '';
+  
+  return `
+    <div style="position:relative; margin-bottom:2rem; padding:6% 3.2% 2.8%; background-color:#e8dcc8; background-image:url(./assets/textures/seemless%20parchment.png); background-size:cover; background-position:${parchmentX}% ${parchmentY}%; background-attachment:scroll; color:#2a2118; border-radius:2px; border:none; box-shadow:none; overflow:visible;">
+      <div style="position:absolute; inset:0; background-image:url(./assets/textures/dusty_glass_brown.png); background-size:400%; background-position:50% 50%; background-repeat:no-repeat; opacity:0.6; pointer-events:none; z-index:1; border-radius:0; mix-blend-mode:overlay;"></div>
+      <div class="nail-tear-effect${tearVariant}${animateTear}"></div>
+      <img src="" alt="nail" style="position:absolute; width:8%; height:8%; z-index:10; pointer-events:none; aspect-ratio:1/1; object-fit:contain; filter:drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)); outline:0.5% solid #8b5a2b; outline-offset:1%; left:50%; top:1%; transform:translateX(-50%);"/>
+      <div style="position:relative; z-index:3;">
+        <h3 style="margin-bottom:0.8rem; font-size:1.1rem; color:#3a2817; text-transform:uppercase; letter-spacing:0.18em; font-weight:700; font-family:'Cinzel', serif; padding-bottom:0.8rem; border-bottom:1px solid #8b5a2b; text-shadow:1px 1px 1px rgba(255, 255, 255, 0.3);">${title}</h3>
+        <p style="color:#6b5a47; font-size:0.9rem; margin-bottom:1.5rem; font-family:'Crimson Text', Georgia, serif; font-style:italic;">${subtitle}</p>
+        ${formContent}
+      </div>
+    </div>
+  `
+}
 
 /**
  * Fetch all unique ingredients for a profession
@@ -282,9 +311,9 @@ export function selectListingType(type) {
   if (type === 'crafted') {
     showListingForm(null)
   } else if (type === 'item') {
-    showItemListingForm()
+    window.location.href = 'itemfence.html'
   } else if (type === 'fetcher') {
-    showFetcherListingForm()
+    window.location.href = 'itemfetch.html'
   } else if (type === 'service') {
     showServiceListingModal()
   }
@@ -297,84 +326,103 @@ async function showItemListingForm() {
   const craftingArea = document.getElementById('crafting-area')
   if (!craftingArea) return
 
-  // Show the crafting area
   craftingArea.style.display = 'block'
 
-  const formHtml = `
-    <div style="margin-bottom:2rem; padding:1.5rem; background:#0a0a0a; border:1px solid #505050; border-radius:5px;">
-      <h3 style="margin-bottom:1.5rem; font-size:1.1rem;">Fence an Item</h3>
-      <p style="color:#a8a8a8; font-size:0.9rem; margin-bottom:1rem;">List items you want to sell on the Black Wing Market.</p>
-      <div id="item-form-container">
-        <div style="display:grid; gap:1rem;">
-          <!-- Character Name -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Character Name *</label>
-            <input type="text" id="item-character-name" placeholder="Your character name" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
+  const formContent = `
+    <div id="item-form-container">
+      <div style="display:grid; gap:1.2rem;">
+        <!-- Character Name -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Character Name *</label>
+          <input type="text" id="item-character-name" placeholder="Your character name" style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem;">
+        </div>
+        
+        <!-- Server -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Server *</label>
+          <select id="item-server" style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem;">
+            <option value="">Select a server</option>
+            <option value="Arisetsu">Arisetsu</option>
+            <option value="Dreva">Dreva</option>
+            <option value="Laeth">Laeth</option>
+            <option value="Miraverre">Miraverre</option>
+            <option value="Strekios">Strekios</option>
+          </select>
+        </div>
+        
+        <!-- PST Availability -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Availability</label>
+          <input type="text" id="item-pst" placeholder="e.g. 6 PM - 10 PM" style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem;">
+        </div>
+        
+        <!-- Item Search -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Item *</label>
+          <div style="position:relative;">
+            <input type="text" id="item-search" placeholder="Search items..." style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem;" autocomplete="off">
+            <div id="item-search-results" style="position:absolute; top:100%; left:0; right:0; background:rgba(255,250,240,0.95); border:1px solid #8b5a2b; border-top:none; max-height:200px; overflow-y:auto; display:none; z-index:100;"></div>
           </div>
-          
-          <!-- Server -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Server *</label>
-            <select id="item-server" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
-              <option value="">Select a server</option>
-              <option value="Arisetsu">Arisetsu</option>
-              <option value="Dreva">Dreva</option>
-              <option value="Laeth">Laeth</option>
-              <option value="Miraverre">Miraverre</option>
-              <option value="Strekios">Strekios</option>
-            </select>
-          </div>
-          
-          <!-- PST Availability -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Availability</label>
-            <input type="text" id="item-pst" placeholder="e.g. 6 PM - 10 PM" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
-          </div>
-          
-          <!-- Item Search -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Item *</label>
-            <div style="position:relative;">
-              <input type="text" id="item-search" placeholder="Search items..." style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;" autocomplete="off">
-              <div id="item-search-results" style="position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #505050; border-top:none; border-radius:0 0 5px 5px; max-height:200px; overflow-y:auto; display:none; z-index:100;"></div>
-            </div>
-            <input type="hidden" id="item-id">
-            <div id="item-selected" style="margin-top:0.35rem; color:#7cb342; font-size:0.85rem; display:none;"></div>
-            <div id="item-search-status" style="margin-top:0.35rem; font-size:0.75rem; color:#a8a8a8; display:none;"></div>
-          </div>
-          
-          <!-- Amount -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Amount *</label>
-            <input type="number" id="item-amount" placeholder="Quantity available" min="1" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
-          </div>
-          
-          <!-- Price Per Unit -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Council per Unit *</label>
-            <input type="number" id="item-price" placeholder="Price per unit" min="1" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
-          </div>
-          
-          <!-- Notes -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Notes (Optional)</label>
-            <textarea id="item-notes" placeholder="Add any notes about this listing..." style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8; min-height:80px; font-family:inherit; resize:vertical;"></textarea>
-          </div>
-          
-          <!-- Error Message -->
-          <div id="item-form-error" style="color:#ff6b6b; background:#2a1a1a; border:1px solid #4a3030; border-radius:4px; padding:0.6rem; display:none;"></div>
-          
-          <!-- Buttons -->
-          <div style="display:flex; gap:1rem;">
-            <button class="action-btn" id="item-submit-btn" onclick="window.saveItemListing()" disabled style="opacity:0.5; cursor:not-allowed;">Create Listing</button>
-            <button class="action-btn ghost" onclick="window.cancelItemListingForm()">Cancel</button>
-          </div>
+          <input type="hidden" id="item-id">
+          <div id="item-selected" style="margin-top:0.35rem; color:#6b8e23; font-size:0.85rem; display:none; font-family:'Cinzel', serif;"></div>
+          <div id="item-search-status" style="margin-top:0.35rem; font-size:0.75rem; color:#8b7355; display:none;"></div>
+        </div>
+        
+        <!-- Amount -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Amount *</label>
+          <input type="number" id="item-amount" placeholder="Quantity available" min="1" style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem;">
+        </div>
+        
+        <!-- Price Per Unit -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Council per Unit *</label>
+          <input type="number" id="item-price" placeholder="Price per unit" min="1" style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem;">
+        </div>
+        
+        <!-- Notes -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Notes (Optional)</label>
+          <textarea id="item-notes" placeholder="Add any notes about this listing..." style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; min-height:100px; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem; resize:vertical;"></textarea>
+        </div>
+        
+        <!-- Error Message -->
+        <div id="item-form-error" style="color:#8b3a3a; background:rgba(255,240,230,0.6); border:1px solid #8b5a2b; border-radius:2px; padding:0.75rem; display:none; font-family:'Crimson Text', Georgia, serif; font-size:0.9rem;"></div>
+        
+        <!-- Buttons -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin-top:1rem;">
+          <button class="action-btn" id="item-submit-btn" onclick="window.saveItemListing()" disabled style="opacity:0.5; cursor:not-allowed; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(139,90,43,0.3); color:#2a2118; font-family:'Cinzel', serif; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Create Listing</button>
+          <button class="action-btn ghost" style="padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:transparent; color:#6b5a47; font-family:'Cinzel', serif; text-transform:uppercase; letter-spacing:0.1em; font-weight:700; cursor:pointer;" onclick="window.cancelItemListingForm()">Cancel</button>
         </div>
       </div>
     </div>
   `
 
+  const formHtml = createParchmentFormContainer(
+    'Fence an Item',
+    'List items you want to sell on the Black Wing Market.',
+    formContent
+  )
+  
   craftingArea.innerHTML = formHtml
+  
+  // Apply parchment effects to the form container
+  const formContainer = craftingArea.querySelector('div[style*="background-image"]')
+  if (formContainer) {
+    formContainer.style.clipPath = generateDenseClipPath()
+    formContainer.style.cssText += getCardDishevelStyle()
+    
+    const nailImg = formContainer.querySelector('img[alt="nail"]')
+    if (nailImg) {
+      nailImg.src = getRandomNail()
+    }
+    
+    // Apply jagged tear clip-path to nail tear effect
+    const tearEffect = formContainer.querySelector('.nail-tear-effect')
+    if (tearEffect) {
+      tearEffect.style.clipPath = generateNailTearClipPath()
+    }
+  }
   
   // Reset search initialization flag
   const searchInput = document.getElementById('item-search')
@@ -393,66 +441,85 @@ async function showFetcherListingForm() {
   const craftingArea = document.getElementById('crafting-area')
   if (!craftingArea) return
 
-  // Show the crafting area
   craftingArea.style.display = 'block'
 
-  const formHtml = `
-    <div style="margin-bottom:2rem; padding:1.5rem; background:#0a0a0a; border:1px solid #505050; border-radius:5px;">
-      <h3 style="margin-bottom:1.5rem; font-size:1.1rem;">Offer Your Services as a Fetcher</h3>
-      <p style="color:#a8a8a8; font-size:0.9rem; margin-bottom:1rem;">List your services if you can acquire rare and hard-to-find items.</p>
-      <div id="fetcher-form-container">
-        <div style="display:grid; gap:1rem;">
-          <!-- Character Name -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Character Name *</label>
-            <input type="text" id="fetcher-character-name" placeholder="Your character name" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
-          </div>
-          
-          <!-- Server -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Server *</label>
-            <select id="fetcher-server" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
-              <option value="">Select a server</option>
-              <option value="Arisetsu">Arisetsu</option>
-              <option value="Dreva">Dreva</option>
-              <option value="Laeth">Laeth</option>
-              <option value="Miraverre">Miraverre</option>
-              <option value="Strekios">Strekios</option>
-            </select>
-          </div>
-          
-          <!-- Availability -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Availability</label>
-            <input type="text" id="fetcher-pst" placeholder="e.g. 6 PM - 10 PM" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
-          </div>
-          
-          <!-- Commission Rate -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Commission Rate % *</label>
-            <input type="number" id="fetcher-commission" min="0" max="100" step="1" value="50" placeholder="50" style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8;">
-          </div>
-          
-          <!-- Description -->
-          <div>
-            <label style="display:block; font-size:0.75rem; color:#b0b0b0; text-transform:uppercase; margin-bottom:0.35rem;">Description</label>
-            <textarea id="fetcher-notes" placeholder="Tell potential clients what you specialize in or any terms..." style="width:100%; padding:0.75rem; border:1px solid #505050; border-radius:5px; background:#1a1a1a; color:#e8e8e8; min-height:80px; font-family:inherit; resize:vertical;"></textarea>
-          </div>
-          
-          <!-- Error Message -->
-          <div id="fetcher-form-error" style="color:#ff6b6b; background:#2a1a1a; border:1px solid #4a3030; border-radius:4px; padding:0.6rem; display:none;"></div>
-          
-          <!-- Buttons -->
-          <div style="display:flex; gap:1rem;">
-            <button class="action-btn" id="fetcher-submit-btn" onclick="window.saveFetcherListing()" disabled style="opacity:0.5; cursor:not-allowed;">Create Listing</button>
-            <button class="action-btn ghost" onclick="window.cancelFetcherListingForm()">Cancel</button>
-          </div>
+  const formContent = `
+    <div id="fetcher-form-container">
+      <div style="display:grid; gap:1.2rem;">
+        <!-- Character Name -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Character Name *</label>
+          <input type="text" id="fetcher-character-name" placeholder="Your character name" style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem;">
+        </div>
+        
+        <!-- Server -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Server *</label>
+          <select id="fetcher-server" style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem;">
+            <option value="">Select a server</option>
+            <option value="Arisetsu">Arisetsu</option>
+            <option value="Dreva">Dreva</option>
+            <option value="Laeth">Laeth</option>
+            <option value="Miraverre">Miraverre</option>
+            <option value="Strekios">Strekios</option>
+          </select>
+        </div>
+        
+        <!-- Availability -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Availability</label>
+          <input type="text" id="fetcher-pst" placeholder="e.g. 6 PM - 10 PM" style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem;">
+        </div>
+        
+        <!-- Commission Rate -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Commission Rate % *</label>
+          <input type="number" id="fetcher-commission" min="0" max="100" step="1" value="50" placeholder="50" style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem;">
+        </div>
+        
+        <!-- Description -->
+        <div>
+          <label style="display:block; font-size:0.7rem; color:#6b5a47; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; font-weight:700; font-family:'Cinzel', serif;">Description</label>
+          <textarea id="fetcher-notes" placeholder="Tell potential clients what you specialize in or any terms..." style="width:100%; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(255,250,240,0.8); color:#2a2118; min-height:100px; font-family:'Crimson Text', Georgia, serif; font-size:0.95rem; resize:vertical;"></textarea>
+        </div>
+        
+        <!-- Error Message -->
+        <div id="fetcher-form-error" style="color:#8b3a3a; background:rgba(255,240,230,0.6); border:1px solid #8b5a2b; border-radius:2px; padding:0.75rem; display:none; font-family:'Crimson Text', Georgia, serif; font-size:0.9rem;"></div>
+        
+        <!-- Buttons -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin-top:1rem;">
+          <button class="action-btn" id="fetcher-submit-btn" onclick="window.saveFetcherListing()" disabled style="opacity:0.5; cursor:not-allowed; padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:rgba(139,90,43,0.3); color:#2a2118; font-family:'Cinzel', serif; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Create Listing</button>
+          <button class="action-btn ghost" style="padding:0.75rem; border:1px solid #8b5a2b; border-radius:0; background:transparent; color:#6b5a47; font-family:'Cinzel', serif; text-transform:uppercase; letter-spacing:0.1em; font-weight:700; cursor:pointer;" onclick="window.cancelFetcherListingForm()">Cancel</button>
         </div>
       </div>
     </div>
   `
 
+  const formHtml = createParchmentFormContainer(
+    'Offer Your Services as a Fetcher',
+    'List your services if you can acquire rare and hard-to-find items.',
+    formContent
+  )
+  
   craftingArea.innerHTML = formHtml
+  
+  // Apply parchment effects to the form container
+  const formContainer = craftingArea.querySelector('div[style*="background-image"]')
+  if (formContainer) {
+    formContainer.style.clipPath = generateDenseClipPath()
+    formContainer.style.cssText += getCardDishevelStyle()
+    
+    const nailImg = formContainer.querySelector('img[alt="nail"]')
+    if (nailImg) {
+      nailImg.src = getRandomNail()
+    }
+    
+    // Apply jagged tear clip-path to nail tear effect
+    const tearEffect = formContainer.querySelector('.nail-tear-effect')
+    if (tearEffect) {
+      tearEffect.style.clipPath = generateNailTearClipPath()
+    }
+  }
   
   // Enable submit button
   const submitBtn = document.getElementById('fetcher-submit-btn')
@@ -1267,7 +1334,7 @@ export async function saveItemListing() {
     
     const listingData = {
       type: 'item',
-      characterName,
+      sellerName: characterName,
       server,
       pstAvailability: pstAvailability || null,
       itemId,

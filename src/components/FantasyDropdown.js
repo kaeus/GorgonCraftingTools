@@ -55,7 +55,8 @@ export class FantasyDropdown {
     // Options list
     const list = document.createElement('div');
     list.className = 'fantasy-dropdown-list';
-    list.style.display = this.isOpen ? 'block' : 'none';
+    // Use !important to override global CSS
+    list.style.setProperty('display', this.isOpen ? 'block' : 'none', 'important');
     list.setAttribute('role', 'listbox');
     this.options.forEach((opt, idx) => {
       const option = document.createElement('div');

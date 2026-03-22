@@ -4,10 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your Listings - CraftingCorner</title>
-  <style>
-    body { visibility: hidden; background-color: #000; }
-    #global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
-  </style>
+  <link rel="stylesheet" href="./css/yourlistings.css">
   <script type="module" src="./js/main.js"></script>
 </head>
 <body>
@@ -19,22 +16,24 @@
 <div class="topbar"></div>
 
 <div class="page">
-  <h1>Your Listings</h1>
-  <p class="subtitle">Create and manage your crafter listings</p>
-  <div id="divider-container"></div>
-  <div id="status" class="status-bar loading">Loading crafting interface…</div>
-  <div id="crafting-area" style="display:none;">
-    <!-- Crafting UI will be rendered here -->
-  </div>
-
-  <!-- Incoming Orders (orders placed with this crafter) -->
-  <div id="incoming-orders-section" class="section-hidden">
-    <div class="divider"></div>
-    <div class="section-header">
-      <h2>Incoming Orders</h2>
+  <div class="listings-parchment-wrapper">
+    <h1>Your Listings</h1>
+    <p class="subtitle">Create and manage your crafter listings</p>
+    <div id="divider-container"></div>
+    <div id="status" class="status-bar loading">Loading crafting interface…</div>
+    <div id="crafting-area" style="display:none;">
+      <!-- Crafting UI will be rendered here -->
     </div>
-    <div id="incoming-orders-container">
-      <div class="empty-state" style="padding:1.5rem 0;">Loading incoming orders…</div>
+
+    <!-- Incoming Orders (orders placed with this crafter) -->
+    <div id="incoming-orders-section" class="section-hidden">
+      <div class="divider"></div>
+      <div class="section-header">
+        <h2>Incoming Orders</h2>
+      </div>
+      <div id="incoming-orders-container">
+        <div class="empty-state" style="padding:1.5rem 0;">Loading incoming orders…</div>
+      </div>
     </div>
   </div>
 </div>
@@ -53,6 +52,10 @@
       <button class="action-btn" onclick="window.selectListingType('item')" style="text-align:left; padding:1rem;">
         <div style="font-weight:600;">Fence an Item</div>
         <div style="font-size:0.8rem; color:#a8a8a8; margin-top:0.25rem;">It's yours isn't it?</div>
+      </button>
+      <button class="action-btn" onclick="window.selectListingType('fetcher')" style="text-align:left; padding:1rem;">
+        <div style="font-weight:600;">Hire a Fetcher</div>
+        <div style="font-size:0.8rem; color:#a8a8a8; margin-top:0.25rem;">Get those hard-to-find items</div>
       </button>
       <button class="action-btn tbd" style="text-align:left; padding:1rem;">
         <div style="font-weight:600;">+ Sell a Service</div>
@@ -93,6 +96,27 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js"></script>
+
+<script type="module">
+  import { generateDenseClipPath } from './js/scroll-edge.js'
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const parchmentContainer = document.querySelector('.listings-parchment-wrapper')
+    
+    if (parchmentContainer) {
+      // Apply dense clip-path for torn edges
+      parchmentContainer.style.clipPath = generateDenseClipPath()
+      
+      // Apply random background position for dusty glass overlay and parchment
+      const randomX = Math.random() * 100
+      const randomY = Math.random() * 100
+      parchmentContainer.style.setProperty('--glass-pos-x', `${randomX}%`)
+      parchmentContainer.style.setProperty('--glass-pos-y', `${randomY}%`)
+      parchmentContainer.style.setProperty('--parchment-pos-x', `${Math.random() * 100}%`)
+      parchmentContainer.style.setProperty('--parchment-pos-y', `${Math.random() * 100}%`)
+    }
+  })
+</script>
 
 </body>
 </html>

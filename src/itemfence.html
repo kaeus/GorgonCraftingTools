@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fence an Item - CraftingCorner</title>
+  <link rel="stylesheet" href="./css/itemform.css">
+  <link rel="stylesheet" href="./css/fantasy-dropdown.css">
+  <style>
+    body { visibility: hidden; background-color: #000; }
+    #global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
+  </style>
+  <script type="module" src="./js/main.js"></script>
+</head>
+<body>
+
+<!-- ── Global Loading Overlay ── -->
+<div id="global-loading-overlay"></div>
+
+<div class="topbar"></div>
+
+<div class="form-page">
+  <h1 class="form-page-title">Fence an Item</h1>
+  <p class="form-page-subtitle">List items you want to sell on the Black Wing Market</p>
+
+  <div id="divider-container"></div>
+  <div id="status" class="status-bar loading">Loading…</div>
+
+  <div class="form-container" id="form-wrapper">
+    <img src="" alt="nail" class="form-nail" id="form-nail">
+    
+    <h3 class="form-title">Fence an Item</h3>
+    <p class="form-subtitle">List items you want to sell on the Black Wing Market.</p>
+
+    <form id="item-listing-form">
+      <div class="form-group">
+        <label for="item-character-name">Character Name *</label>
+        <input type="text" id="item-character-name" placeholder="Your character name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="item-server">Server *</label>
+        <select id="item-server" required>
+          <option value="">Select a server</option>
+          <option value="Arisetsu">Arisetsu</option>
+          <option value="Dreva">Dreva</option>
+          <option value="Laeth">Laeth</option>
+          <option value="Miraverre">Miraverre</option>
+          <option value="Strekios">Strekios</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="item-pst">Availability</label>
+        <input type="text" id="item-pst" placeholder="e.g. 6 PM - 10 PM">
+      </div>
+      
+      <div class="form-group">
+        <label for="item-search">Item *</label>
+        <div style="position: relative;">
+          <input type="text" id="item-search" placeholder="Search items..." autocomplete="off" required>
+          <div id="item-search-results"></div>
+        </div>
+        <input type="hidden" id="item-id">
+        <div class="form-status" id="item-selected"></div>
+        <div class="form-status" id="item-search-status"></div>
+      </div>
+      
+      <div class="form-group">
+        <label for="item-amount">Amount *</label>
+        <input type="number" id="item-amount" placeholder="Quantity available" min="1" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="item-price">Council per Unit *</label>
+        <input type="number" id="item-price" placeholder="Price per unit" min="1" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="item-notes">Notes (Optional)</label>
+        <textarea id="item-notes" placeholder="Add any notes about this listing..."></textarea>
+      </div>
+      
+      <div class="form-error" id="item-form-error"></div>
+      
+      <div class="form-buttons">
+        <button type="submit" id="item-submit-btn" disabled>Create Listing</button>
+        <button type="button" onclick="window.location.href='yourListings.html'">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js"></script>
+
+<script type="module">
+  import { generateDenseClipPath, getRandomNail, getNailPositionStyle, getCardDishevelStyle } from './js/scroll-edge.js'
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const formWrapper = document.getElementById('form-wrapper')
+    
+    if (formWrapper) {
+      formWrapper.style.clipPath = generateDenseClipPath()
+      formWrapper.style.cssText += getCardDishevelStyle()
+      
+      const randomX = Math.random() * 100
+      const randomY = Math.random() * 100
+      formWrapper.style.setProperty('--glass-pos-x', `${randomX}%`)
+      formWrapper.style.setProperty('--glass-pos-y', `${randomY}%`)
+      formWrapper.style.setProperty('--parchment-pos-x', `${Math.random() * 100}%`)
+      formWrapper.style.setProperty('--parchment-pos-y', `${Math.random() * 100}%`)
+      
+      const nailImg = document.getElementById('form-nail')
+      if (nailImg) {
+        nailImg.src = getRandomNail()
+        nailImg.style.cssText = getNailPositionStyle()
+      }
+    }
+  })
+</script>
+
+<script type="module" src="./js/page-item-fence.js"></script>
+
+</body>
+</html>

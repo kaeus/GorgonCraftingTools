@@ -1,0 +1,220 @@
+/* ═══════════════════════════════════════════════════════════
+   YOUR LISTINGS PAGE STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+/* Import global styles first */
+@import url('./global.css');
+@import url('./parchment-theme.css');
+@import url('./fantasy-dropdown.css');
+
+body { visibility: hidden; background-color: #000; }
+#global-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; }
+
+/* Parchment Container */
+.listings-parchment-wrapper {
+  position: relative;
+  margin: 2% 5%;
+  padding: 6% 3.2% 2.8%;
+  background-color: #e8dcc8;
+  background-image: url(../assets/textures/seemless%20parchment.png);
+  background-size: cover;
+  background-position: var(--parchment-pos-x, 0%) var(--parchment-pos-y, 0%);
+  color: #2a2118;
+  border-radius: 2px;
+  overflow: visible;
+}
+
+.listings-parchment-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url(../assets/textures/dusty_glass_brown.png);
+  background-size: 400%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+}
+
+.listings-parchment-wrapper > * {
+  position: relative;
+  z-index: 3;
+}
+
+/* Typography */
+.listings-parchment-wrapper h1 {
+  color: #3a2817;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.listings-parchment-wrapper .subtitle {
+  color: #6b5a47;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.listings-parchment-wrapper h2 {
+  color: #3a2817;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.3);
+  border-bottom: 2px solid #8b5a2b;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Table and List Styling */
+.listings-parchment-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #3a2817;
+}
+
+.listings-parchment-wrapper tbody tr {
+  border-bottom: 1px solid rgba(201, 184, 160, 0.25);
+  transition: background-color var(--transition-normal);
+}
+
+.listings-parchment-wrapper tbody tr:hover {
+  background-color: rgba(139, 90, 43, 0.08);
+}
+
+.listings-parchment-wrapper th,
+.listings-parchment-wrapper td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  color: #3a2817;
+}
+
+.listings-parchment-wrapper table th {
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #3a2817;
+  border-bottom: 2px solid #8b5a2b;
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Action Buttons */
+.listings-parchment-wrapper .action-btn,
+.listings-parchment-wrapper button:not(#create-listing-btn) {
+  background-color: #8b6b5a;
+  color: #f5f1e8;
+  border: 1px solid #6b5a4a;
+  padding: 0.5rem 1rem;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all var(--transition-normal);
+}
+
+.listings-parchment-wrapper .action-btn:hover,
+.listings-parchment-wrapper button:not(#create-listing-btn):hover {
+  background-color: #8b7a6b;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.listings-parchment-wrapper .delete-btn {
+  background-color: #8b6a6a;
+  color: #f5e6e0;
+  border-color: #7b5a5a;
+}
+
+.listings-parchment-wrapper .delete-btn:hover {
+  background-color: #7b5a5a;
+  color: #fff;
+}
+
+.listings-parchment-wrapper .edit-btn {
+  background-color: #6b8b6b;
+  color: #e0f0e0;
+  border-color: #5a7a5a;
+}
+
+.listings-parchment-wrapper .edit-btn:hover {
+  background-color: #5a7a5a;
+  color: #fff;
+}
+
+/* Status Badges */
+.listings-parchment-wrapper .status-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.listings-parchment-wrapper .status-active {
+  background-color: #6b8b6b;
+  color: #fff;
+  border: 1px solid #5a7a5a;
+}
+
+.listings-parchment-wrapper .status-inactive {
+  background-color: #b8a080;
+  color: #fff;
+  border: 1px solid #a08060;
+}
+
+/* Override global badge styles for this page */
+.listings-parchment-wrapper table .badge.active {
+  background-color: #6b8b6b;
+  color: #fff;
+  border-color: #5a7a5a;
+}
+
+.listings-parchment-wrapper table .badge.inactive {
+  background-color: #b8a080;
+  color: #fff;
+  border-color: #a08060;
+}
+
+.listings-parchment-wrapper table .badge.pending {
+  background-color: #b8a080;
+  color: #fff;
+  border-color: #a08060;
+}
+
+/* Primary Action Button */
+#create-listing-btn {
+  background-color: #8b6a6a;
+  color: #fff;
+  border: 1px solid #7b5a5a;
+  padding: 0.5rem 1.25rem;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all var(--transition-normal);
+}
+
+#create-listing-btn:hover {
+  background-color: #7b5a5a;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Ensure h2 colors in listings parchment override global styles */
+.listings-parchment-wrapper > #incoming-orders-section h2 {
+  color: #3a2817;
+}

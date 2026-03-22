@@ -25,8 +25,8 @@
 }
 /* Match dropdown to .market-input styling for metacategory filter */
 #fantasy-metacategory-dropdown .fantasy-dropdown-selected {
-  background: rgba(15, 12, 8, 0.8);
-  border: 1px solid var(--color-parchment-border);
+  background: #1e1a17;
+  border: 1px solid #6b5a45;
   color: var(--color-text-primary);
   font-family: 'Crimson Pro', 'Cormorant', Georgia, serif;
   font-size: 0.95rem;
@@ -89,17 +89,17 @@
   border-radius: var(--radius-md);
   height: 48px;
   box-sizing: border-box;
-  background: rgba(15, 12, 8, 0.8);
-  background: rgba(15, 12, 8, 0.8);
-  border: 1px solid var(--color-parchment-border);
+  background: #1e1a17;
+  border: 1px solid #6b5a45;
   color: var(--color-text-primary);
   font-family: 'Crimson Pro', 'Cormorant', Georgia, serif;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(100, 80, 50, 0.05);
   transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
 }
+
 .market-dropdown-instance .fantasy-dropdown-list {
   background: rgba(15, 12, 8, 0.98);
-  border: 1px solid var(--color-parchment-border);
+  border: 1px solid #6b5a45;
   border-radius: 0 0 var(--radius-md) var(--radius-md);
 }
 /* --- CONTEXT-SPECIFIC DROPDOWN SIZING --- */
@@ -153,7 +153,6 @@
   pointer-events: none;
 }
 
-/* FantasyDropdown component styles */
 .fantasy-dropdown {
   position: relative;
 }
@@ -197,30 +196,52 @@
   left: 0;
   right: 0;
   background: rgba(15, 12, 8, 0.98);
-  border: 1px solid #6b5a3a;
+  border: 1px solid #6b5a45;
   border-radius: 0 0 6px 6px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.5);
   z-index: 1000;
   max-height: 320px;
   overflow-y: auto;
   margin-top: 2px;
+  display: none !important;
 }
 .fantasy-dropdown-option {
   padding: 0.65rem 1rem;
   font-size: 0.95rem;
   color: #e8e8e8;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  border-bottom: 1px solid rgba(90,74,58,0.08);
+  transition: background var(--transition-normal), color var(--transition-normal);
+  border-bottom: 1px solid rgba(90,74,58,0.06);
   font-family: 'Crimson Pro', 'Cormorant', Georgia, serif;
   font-weight: 400;
   letter-spacing: 0.01em;
 }
+
 .fantasy-dropdown-option:last-child {
   border-bottom: none;
 }
+
 .fantasy-dropdown-option.selected,
 .fantasy-dropdown-option:hover {
   background: linear-gradient(90deg, #3a2c1a 0%, #6b5a3a 100%);
   color: #d6c3a3;
+}
+
+/* ═════════════════════════════════════════════════════════
+   CRITICAL: Ensure dropdown lists are hidden/shown based on state
+   Uses aria-expanded attribute for reliable visibility control
+   ═════════════════════════════════════════════════════════ */
+
+/* Default: hide all dropdown lists */
+.fantasy-dropdown .fantasy-dropdown-list {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* When aria-expanded="true" on parent, show the list */
+.fantasy-dropdown[aria-expanded="true"] .fantasy-dropdown-list {
+  display: block !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
