@@ -19,7 +19,8 @@ export default defineConfig({
         'order-view': path.resolve(__dirname, 'src/order-view.html'),
         'yourListings': path.resolve(__dirname, 'src/yourListings.html'),
         admin: path.resolve(__dirname, 'src/admin.html'),
-        crookedColiseum: path.resolve(__dirname, 'src/crookedColiseum.html')
+        crookedColiseum: path.resolve(__dirname, 'src/crookedColiseum.html'),
+        'account-settings': path.resolve(__dirname, 'src/account-settings.html')
       },
       output: {
         entryFileNames: 'js/[name].js',
