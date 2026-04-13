@@ -31,17 +31,17 @@ export function renderSidebar() {
   const sidebarHTML = `
     <img class="sidebar-banner-cap sidebar-banner-cap--top" src="./images/ui/sidebar/banner_top.png" alt="">
     <div class="sidebar-content">
-      <div class="topbar-title">
-        <a href="yourListings.html" class="topbar-image-link" id="post-listing-btn">
+      <div class="topbar-title tbd">
+        <a href="yourListings.html tbd" class="topbar-image-link" id="post-listing-btn">
           <img src="${getButtonImageSrc('yourListings.html')}" alt="Manage Your Listings">
         </a>
       </div>
-      <div class="topbar-title">
+      <div class="topbar-title tbd">
         <a href="market.html" class="topbar-image-link">
           <img src="${getButtonImageSrc('market.html')}" alt="Black Wing Market">
         </a>
       </div>
-      <div class="topbar-title">
+      <div class="topbar-title tbd">
         <a href="artisan_alley.html" class="topbar-image-link">
           <img src="${getButtonImageSrc('artisan_alley.html')}" alt="Artisan Alley">
         </a>
@@ -120,7 +120,7 @@ export function renderAdminSidebar() {
     <img class="sidebar-banner-cap sidebar-banner-cap--top" src="./images/ui/sidebar/banner_top.png" alt="">
     <div class="sidebar-content">
       <div class="topbar-title">Gorgon Crafting <span>Admin</span></div>
-      <div class="topbar-title">
+      <div class="topbar-title tbd">
         <a href="artisan_alley.html" class="topbar-image-link">
           <img src="${getButtonImageSrc('artisan_alley.html')}" alt="Artisan Alley">
         </a>
@@ -130,7 +130,7 @@ export function renderAdminSidebar() {
           <img src="${getButtonImageSrc('legs_list.html')}" alt="Legs List">
         </a>
       </div>
-      <div class="topbar-title">
+      <div class="topbar-title tbd">
         <a href="crookedColiseum.html" class="topbar-image-link">
           <img src="${getButtonImageSrc('crookedColiseum.html')}" alt="Crooked Coliseum">
         </a>
@@ -198,17 +198,17 @@ export function renderOrderSidebar() {
   const sidebarHTML = `
     <img class="sidebar-banner-cap sidebar-banner-cap--top" src="./images/ui/sidebar/banner_top.png" alt="">
     <div class="sidebar-content">
-      <div class="topbar-title">
+      <div class="topbar-title tbd">
         <a href="yourListings.html" class="topbar-image-link">
           <img src="${getButtonImageSrc('yourListings.html')}" alt="Manage Your Listings">
         </a>
       </div>
-      <div class="topbar-title">
+      <div class="topbar-title tbd">
         <a href="market.html" class="topbar-image-link">
           <img src="${getButtonImageSrc('market.html')}" alt="Black Wing Market">
         </a>
       </div>
-      <div class="topbar-title">
+      <div class="topbar-title tbd">
         <a href="artisan_alley.html" class="topbar-image-link">
           <img src="${getButtonImageSrc('artisan_alley.html')}" alt="Artisan Alley">
         </a>
