@@ -26,9 +26,18 @@
 
   <!-- Server + Configure Tips -->
   <div class="coliseum-controls">
-    <button class="action-btn" id="configure-tips-btn" disabled title="Sign in to configure tips">
+    <button class="action-btn" id="configure-tips-btn" disabled title="You must be logged in to configure tips">
       Configure Tips
     </button>
+    <div class="view-tips-wrapper" id="view-tips-wrapper">
+      <button class="action-btn ghost" id="view-tips-btn" aria-haspopup="true" aria-expanded="false">
+        View Tips
+      </button>
+      <div class="view-tips-popover" id="view-tips-popover" role="tooltip">
+        <div class="view-tips-popover-title">Active Tips</div>
+        <div id="active-tips-summary"></div>
+      </div>
+    </div>
     <span class="tips-count-badge" id="tips-count-badge" style="display:none;"></span>
   </div>
 
@@ -51,6 +60,15 @@
       </div>
       <p class="coliseum-hint">Click two fighters to compare their odds head-to-head.</p>
       <div id="fighter-selector"></div>
+
+      <a class="bet-tracker-promo" href="https://github.com/kaeus/GorgonBetTracker" target="_blank" rel="noopener noreferrer">
+        <div class="bet-tracker-promo-title">Track Your Bets In-Game</div>
+        <p class="bet-tracker-promo-body">
+          Looking to track your betting gains/losses? Want an easier way in-game to view the betting odds for the active fight?
+          Head on over and download the <strong>GorgonBetTracker</strong>!
+        </p>
+        <span class="bet-tracker-promo-cta">Open on GitHub →</span>
+      </a>
 
     </div>
 

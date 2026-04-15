@@ -235,6 +235,68 @@ function updateFightResult(selected) {
   `
 }
 
+function renderActiveTips() {
+  const container = document.getElementById('active-tips-summary')
+  if (!container) return
+
+  const advantages = FIGHTERS.filter(f => tips.globalAdvantages[f])
+  const disadvantages = FIGHTERS.filter(f => tips.globalDisadvantages[f])
+  const fightAdvByWinner = {}
+  for (const key of Object.keys(tips.fightAdvantages)) {
+    if (!tips.fightAdvantages[key]) continue
+    const [fighter, opponent] = key.split(':')
+    if (!fightAdvByWinner[fighter]) fightAdvByWinner[fighter] = []
+    fightAdvByWinner[fighter].push(opponent)
+  }
+  const fightAdvWinners = FIGHTERS.filter(f => fightAdvByWinner[f])
+  const fightAdvCount = fightAdvWinners.reduce((n, f) => n + fightAdvByWinner[f].length, 0)
+
+  const total = advantages.length + disadvantages.length + fightAdvCount
+  if (total === 0) {
+    container.innerHTML = '<p class="empty-state-small">No tips shared yet for today.</p>'
+    return
+  }
+
+  const section = (title, badgeClass, badgeText, count, body) => {
+    if (count === 0) return ''
+    return `
+      <div class="active-tips-section">
+        <h4 class="tips-section-title">
+          ${title}
+          <span class="tips-section-badge ${badgeClass}">${badgeText}</span>
+          <span class="active-tips-count">${count}</span>
+        </h4>
+        ${body}
+      </div>
+    `
+  }
+
+  const chipList = (chips) => `<div class="active-tips-chips">${chips.join('')}</div>`
+
+  const advChips = advantages.map(f => `<span class="active-tip-chip bonus">${f}</span>`)
+  const disChips = disadvantages.map(f => `<span class="active-tip-chip penalty">${f}</span>`)
+
+  const fightGroups = fightAdvWinners.map(winner => {
+    const opponents = fightAdvByWinner[winner]
+      .slice()
+      .sort((a, b) => FIGHTERS.indexOf(a) - FIGHTERS.indexOf(b))
+      .map(opp => `<span class="active-tip-chip bonus">${opp}</span>`)
+      .join('')
+    return `
+      <div class="active-tips-winner-group">
+        <div class="active-tips-winner-label">${winner} beats</div>
+        <div class="active-tips-chips">${opponents}</div>
+      </div>
+    `
+  }).join('')
+
+  container.innerHTML = `
+    ${section('Advantages', 'bonus', '+5%', advantages.length, chipList(advChips))}
+    ${section('Disadvantages', 'penalty', '−5%', disadvantages.length, chipList(disChips))}
+    ${section('Fight Advantages', 'bonus', '+10%', fightAdvCount, fightGroups)}
+  `
+}
+
 function updateTipsBadge() {
   const badge = document.getElementById('tips-count-badge')
   if (!badge) return
@@ -253,6 +315,7 @@ function updateTipsBadge() {
 function renderAll() {
   renderOddsGrid()
   renderFeaturedFights()
+  renderActiveTips()
   updateTipsBadge()
   // Re-render selector so chips reset to deselected state on data updates
   renderFighterSelector()
@@ -352,6 +415,7 @@ function handleTipsCheckboxChange(e) {
   saveTips()
   renderOddsGrid()
   renderFeaturedFights()
+  renderActiveTips()
   updateTipsBadge()
 }
 
@@ -462,7 +526,7 @@ export function setCurrentUser(user) {
     btn.title = 'Configure betting tips'
   } else {
     btn.setAttribute('disabled', 'true')
-    btn.title = 'Sign in to configure tips'
+    btn.title = 'You must be logged in to configure tips'
   }
 }
 
@@ -486,6 +550,32 @@ export function initColiseum() {
 
   // Configure Tips button
   document.getElementById('configure-tips-btn')?.addEventListener('click', openTipsModal)
+
+  // View Tips popover (hover + click to toggle)
+  const viewWrap = document.getElementById('view-tips-wrapper')
+  const viewBtn = document.getElementById('view-tips-btn')
+  const viewPop = document.getElementById('view-tips-popover')
+  if (viewWrap && viewBtn && viewPop) {
+    const open = () => {
+      viewPop.classList.add('open')
+      viewBtn.setAttribute('aria-expanded', 'true')
+    }
+    const close = () => {
+      viewPop.classList.remove('open')
+      viewBtn.setAttribute('aria-expanded', 'false')
+    }
+    viewWrap.addEventListener('mouseenter', open)
+    viewWrap.addEventListener('mouseleave', close)
+    viewBtn.addEventListener('focus', open)
+    viewBtn.addEventListener('blur', close)
+    viewBtn.addEventListener('click', e => {
+      e.stopPropagation()
+      viewPop.classList.contains('open') ? close() : open()
+    })
+    document.addEventListener('click', e => {
+      if (!viewWrap.contains(e.target)) close()
+    })
+  }
 
   // Modal close button
   document.getElementById('tips-modal-close')?.addEventListener('click', closeTipsModal)
