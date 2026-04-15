@@ -175,7 +175,7 @@ h1, h2, h3, h4, h5, h6 {
   bottom: calc(220px * 100 / 336);
   left: 0;
   right: 0;
-  background: url('images/ui/sidebar/banner_middle.png') top center / 100% auto repeat-y;
+  background: url('/images/ui/sidebar/banner_middle.png') top center / 100% auto repeat-y;
   filter: brightness(0.7) sepia(0.3);
   z-index: 0;
 }

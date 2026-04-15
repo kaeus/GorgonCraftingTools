@@ -32,7 +32,7 @@ export function renderSidebar() {
     <img class="sidebar-banner-cap sidebar-banner-cap--top" src="./images/ui/sidebar/banner_top.png" alt="">
     <div class="sidebar-content">
       <div class="topbar-title tbd">
-        <a href="yourListings.html tbd" class="topbar-image-link" id="post-listing-btn">
+        <a href="yourListings.html" class="topbar-image-link" id="post-listing-btn">
           <img src="${getButtonImageSrc('yourListings.html')}" alt="Manage Your Listings">
         </a>
       </div>
